@@ -1,0 +1,10 @@
+{
+	"websiteIsBroken": {
+		"temporaryUnawaible": false,
+		"inEarlyDevelopment": true
+	},
+	"api": {
+		"description": "information about an API",
+		"url": "https:// :("
+	}
+}

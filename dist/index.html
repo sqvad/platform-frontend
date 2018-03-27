@@ -1,0 +1,58 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>INS Ecosystem</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="./bootstrap.min.css" />
+		<script src="./polyfill.js?version=20170724"></script>
+		<script src="./web3.min.js"></script>
+		<!--
+			<link rel="shortcut icon" type="image/png" href="./favicon.png" />
+			<link rel="apple-touch-icon-precomposed" sizes="57x57" href="./favicon-57x57.png" />
+			<link rel="apple-touch-icon-precomposed" sizes="72x72" href="./favicon-72x72.png" />
+			<link rel="apple-touch-icon-precomposed" sizes="114x114" href="./favicon-114x114.png" />
+			<link rel="apple-touch-icon-precomposed" sizes="120x120" href="./favicon-120x120.png" />
+			<link rel="apple-touch-icon-precomposed" sizes="144x144" href="./favicon-144x144.png" />
+			<link rel="apple-touch-icon-precomposed" sizes="152x152" href="./favicon-152x152.png" />
+			<link rel="icon" type="image/png" href="./favicon-48x48.png" sizes="48x48" />
+			<link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32" />
+			<link rel="icon" type="image/png" href="./favicon.png" sizes="16x16" />
+		-->
+	</head>
+	<body>
+		<div id="root">loading...</div>
+		<script>
+			function onBundleLoad() {
+				fetch(
+					"./settings.json?rnd="+Math.random(),
+					{
+							method: 'GET',
+							headers: {
+								"Content-Type": "application/json"
+							},
+							// headers: {
+							// 	"Access-Control-Allow-Credentials": true,
+							// 	"Access-Control-Request-Headers": "Cookie",
+							// },
+							// mode: 'cors',
+							// cache: 'default' ,
+							// credentials: 'include',
+					}
+				)
+				.then(x=>{ return x.json(); })
+				.then(x=>{
+					var msg = "";
+					if (x.websiteIsBroken.inEarlyDevelopment) {
+						msg = "Sorry, service in early development."
+					}
+					var root = document.getElementById("root");
+					root.innerHTML = msg;
+				});
+			}
+			function onBundleError() {
+				onBundleLoad();
+			}
+		</script>
+		<script src="./bundle.js?version=20171123" onload="onBundleLoad()" onerror="onBundleError()"></script>
+	</body>
+</html>
