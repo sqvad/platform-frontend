@@ -1,7 +1,7 @@
-For install:
+For run:
 npm install
 webpack-dev-server --open --host=localhost --port=8092
 
-For run:
+For deploy:
 npm install
 webpack -d

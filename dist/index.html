@@ -22,37 +22,49 @@
 	<body>
 		<div id="root">loading...</div>
 		<script>
-			function onBundleLoad() {
-				fetch(
-					"./settings.json?rnd="+Math.random(),
-					{
+			var _onBundleLoad;
+			(function() {
+				var settingsLoaded = false;
+				var bundleLoaded = false;
+				_onBundleLoad = onBundleLoad;
+				loadSettings();
+
+				function loadSettings() {
+					fetch(
+						"./settings.json?rnd="+Math.random(),
+						{
 							method: 'GET',
 							headers: {
 								"Content-Type": "application/json"
-							},
-							// headers: {
-							// 	"Access-Control-Allow-Credentials": true,
-							// 	"Access-Control-Request-Headers": "Cookie",
-							// },
-							// mode: 'cors',
-							// cache: 'default' ,
-							// credentials: 'include',
-					}
-				)
-				.then(x=>{ return x.json(); })
-				.then(x=>{
-					var msg = "";
-					if (x.websiteIsBroken.inEarlyDevelopment) {
-						msg = "Sorry, service in early development."
-					}
-					var root = document.getElementById("root");
-					root.innerHTML = msg;
-				});
-			}
-			function onBundleError() {
-				onBundleLoad();
-			}
+							}
+						}
+					)
+					.then(x=>{ return x.json(); })
+					.then(x=>{
+						var msg = "";
+						if (x.websiteIsBroken.inEarlyDevelopment) {
+							msg = "Sorry, service in early development."
+						}
+						var root = document.getElementById("root");
+						root.innerHTML = msg;
+						root.setAttribute("data-settings", JSON.stringify(x));
+						// root.setAttribute("data-cant-run", "true");
+						return x;
+					})
+					.then(x=>{
+						settingsLoaded = true;
+						checkBoth();
+					});
+				}
+				function onBundleLoad() {
+					bundleLoaded = true;
+					checkBoth();
+				}
+				function checkBoth() {
+
+				}
+			})();
 		</script>
-		<script src="./bundle.js?version=20171123" onload="onBundleLoad()" onerror="onBundleError()"></script>
+		<script src="./bundle.js?version=20180328" onload="_onBundleLoad()"></script>
 	</body>
 </html>

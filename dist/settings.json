@@ -6,5 +6,8 @@
 	"api": {
 		"description": "information about an API",
 		"url": "https:// :("
+	},
+	"misc": {
+		"pathViaHash": true
 	}
 }
