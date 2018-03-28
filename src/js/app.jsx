@@ -1,10 +1,26 @@
 import React from 'react';
+import Api from './api.js';
+import PageEmpty from './pages/page-empty.jsx';
 
 class App extends React.Component {
 	componentWillMount() {
-		this.props.m.on('change', ()=>{
+		var model = this.props.m;
+		this.api = new Api(model);
+		model.on('change', ()=>{
 			this.needChange = true;
 		});
+		this.api.pushState = (href,e) => {
+			var target = e && e.touches && e.touches[0] && e.touches[0].target || e.target || {};
+			if (target && target.getAttribute("data-external-link")) {
+				return;
+			}
+			this.needChange = true;
+			window.history.pushState({x:Date.now()}, null, href);
+			if (e && e.preventDefault) {
+				e.preventDefault();
+			}
+		};
+		this.onRAF();
 	}
 	componentWillUnmount() {
 		this.deprecated = true;
@@ -13,6 +29,7 @@ class App extends React.Component {
 		if (this.deprecated) return;
 		if (this.href!=window.location.href) {
 			this.href = window.location.href;
+			this.props.m.path = this.parsePath();
 			this.needChange = true;
 		}
 		var width = window.innerWidth || document.body.clientWidth;
@@ -46,9 +63,14 @@ class App extends React.Component {
 		requestAnimationFrame(()=>this.onRAF());
 	}
 	render() {
-		var m = this.props.m;
-		var path = this.parsePath();
-		return <div>jsx</div>;
+		// if (!this.props.m.path) this.onRAF();
+		var m = Object.assign({}, this.props.m);
+		m.api = this.api;
+		var spread = {m};
+		var Page;
+		// @todo dispatch
+		if (!Page) Page = PageEmpty;
+		return <Page {...spread}>jsx</Page>;
 	}
 	parsePath(pathname, search) {
 		var path;
