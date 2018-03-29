@@ -1,0 +1,7 @@
+
+.bg-violet {
+	background: #38334b;
+}
+.bg-violet, .bg-violet a {
+	color: #ffffff;
+}

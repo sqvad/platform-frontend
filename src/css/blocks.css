@@ -1,0 +1,17 @@
+.header-short {
+	padding: 15px;
+	font-size: 14px;
+}
+.header-short a.for-logo {
+	position: relative;
+	display: block;
+	height: 43px;
+}
+.header-short a.for-logo .logo {
+	position: absolute;
+}
+.logo-nopad-131x43 {
+	width: 131px;
+	height: 43px;
+	background: transparent url(../img/logo/131x43.png) left top no-repeat;
+}
