@@ -1,5 +1,6 @@
 import React from 'react';
 import Any from '../any.jsx';
+import Headers from './headers.jsx';
 
 class Page extends Any {
 	componentWillMount() {
@@ -8,23 +9,29 @@ class Page extends Any {
 	}
 	render(p,s,c,m) {
 		var pagePostfix = this.pagePostfix || p.pagePostfix || s.pagePostfix;
-		var cls = [
-			"width page",
+		var device = [
 			(pagePostfix ? "page-"+pagePostfix : ""),
 			(m.device.isMobile ? "" : "no-") + "mobile",
 			(m.device.isTablet ? "" : "no-") + "tablet",
 			(m.device.isHandlehand ? "" : "no-") + "handlehand",
 			(m.device.isDesktop ? "" : "no-") + "desktop",
 		].join(" ").replace(/\s+/g, " ");
-		return <div className="container"><div
-				className={cls}
-				onClick={this.onAnyClick}
-			>{c}</div></div>;
+		var header = null;
+		if (p.header=="short") {
+			header = <Headers.Short m={m} />;
+		}
+		return <div className={device}>{header}<div className="container">
+			<div className="width page" onClick={this.onAnyClick}>{c}</div>
+		</div></div>;
 	}
 };
 
 Page.propTypes = {
-	pagePostfix: Any.PropTypes.string
+	pagePostfix: Any.PropTypes.string,
+	header: Any.PropTypes.oneOf([
+		"none",
+		"short",
+	])
 };
 
 export default Page;
