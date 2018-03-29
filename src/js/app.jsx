@@ -55,6 +55,8 @@ class App extends React.Component {
 				this.props.m.device.isHandlehand = false;
 				this.props.m.device.isDesktop = true;
 			}
+			this.props.m.device.retina = Math.round(typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1);
+			if (this.props.m.device.retina>3) this.props.m.device.retina = 3;
 		}
 		if (this.needChange) {
 			this.needChange = false;

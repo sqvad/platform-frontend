@@ -11,7 +11,7 @@ class A extends Any {
 				href = "#" + href;
 			}
 		}
-		return <a href={href} className={p.className}>{c}</a>;
+		return <a href={href} className={p.className} style={p.style}>{c}</a>;
 	}
 }
 

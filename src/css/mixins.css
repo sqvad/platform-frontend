@@ -5,3 +5,15 @@
 .bg-violet, .bg-violet a {
 	color: #ffffff;
 }
+
+.bg-violet .btn-outline-secondary,
+.bg-violet .btn-outline-secondary:hover, .bg-violet .btn-outline-secondary.hover,
+.bg-violet .btn-outline-secondary:active, .bg-violet .btn-outline-secondary.active
+{
+	color: #ffffff;
+}
+.bg-violet .btn-outline-secondary:hover, .bg-violet .btn-outline-secondary.hover,
+.bg-violet .btn-outline-secondary:active, .bg-violet .btn-outline-secondary.active
+{
+	background-color: #423c5a;
+}

@@ -14,8 +14,11 @@ class HeaderShort extends Any {
 							</A>
 						</div>
 						<div className="col-6 d-flex align-items-center justify-content-end">
-							<A m={m} href="/profile">ALEXANDER DOBRIKOV</A>
-							<button type="button" className="btn btn-primary">Primary</button>
+							<A m={m} href="/profile" className="d-block mr-3 pt-2 pb-2">ALEXANDER DOBRIKOV</A>
+							<button type="button" className="btn btn-sm btn-outline-secondary">
+								Log Out
+								<span className="icon icon-24 icon-logout" />
+							</button>
 						</div>
 					</div>
 				</div>

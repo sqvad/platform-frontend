@@ -8,7 +8,8 @@
 }
 .btn-sm {
 	font-size: 14px;
-	padding: 10px 16px 11px 16px;
+	line-height: 24px;
+	padding: 7px 16px;
 }
 .btn-lg {
 	font-size: 18px;

@@ -5,13 +5,31 @@
 .header-short a.for-logo {
 	position: relative;
 	display: block;
-	height: 43px;
+	height: 40px;
 }
 .header-short a.for-logo .logo {
 	position: absolute;
+	top: -1px;
 }
 .logo-nopad-131x43 {
 	width: 131px;
 	height: 43px;
 	background: transparent url(../img/logo/131x43.png) left top no-repeat;
+}
+
+.icon {
+	display: inline-block;
+	vertical-align: middle;
+	background: transparent url(../img/sprite-1x.png) left top no-repeat;
+}
+.icon-24 {
+	height: 24px;
+	width: 24px;
+}
+.btn-sm .icon-24 {
+	margin-bottom: -3px;
+	position: relative;
+	top: -1px;
+	margin-left: 10px;
+	margin-right: -7px;
 }

@@ -15,6 +15,7 @@ class Page extends Any {
 			(m.device.isTablet ? "" : "no-") + "tablet",
 			(m.device.isHandlehand ? "" : "no-") + "handlehand",
 			(m.device.isDesktop ? "" : "no-") + "desktop",
+			"retina-" + m.device.retina,
 		].join(" ").replace(/\s+/g, " ");
 		var header = null;
 		if (p.header=="short") {
