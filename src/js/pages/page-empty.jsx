@@ -9,71 +9,56 @@ class PageEmpty extends T.Page {
 		return <T.Page m={m} pagePostfix="empty" header="short">
 			<div>
 				@todo src/js/pages/page-empty.jsx
-				<div className="mt-3">
+				<p className="mt-4">Default state:</p>
+				<div>
 					<button type="button" className="btn btn-primary">Primary</button>
 					<button type="button" className="btn btn-secondary">Secondary</button>
-					<button type="button" className="btn btn-success">Success</button>
-					<button type="button" className="btn btn-danger">Danger</button>
-					<button type="button" className="btn btn-warning">Warning</button>
-					<button type="button" className="btn btn-info">Info</button>
-					<button type="button" className="btn btn-light">Light</button>
-					<button type="button" className="btn btn-dark">Dark</button>
-					<button type="button" className="btn btn-link">Link</button>
+					<button type="button" className="btn btn-sm btn-primary">Primary</button>
+					<button type="button" className="btn btn-sm btn-secondary">Secondary</button>
+					<button type="button" className="btn btn-lg btn-primary">Primary</button>
+					<button type="button" className="btn btn-lg btn-secondary">Secondary</button>
 				</div>
-				<div className="mt-3">
+				<div className="mt-3 mb-4">
 					<button type="button" className="btn btn-outline-primary">Primary</button>
 					<button type="button" className="btn btn-outline-secondary">Secondary</button>
-					<button type="button" className="btn btn-outline-success">Success</button>
-					<button type="button" className="btn btn-outline-danger">Danger</button>
-					<button type="button" className="btn btn-outline-warning">Warning</button>
-					<button type="button" className="btn btn-outline-info">Info</button>
-					<button type="button" className="btn btn-outline-light">Light</button>
-					<button type="button" className="btn btn-outline-dark">Dark</button>
-					<button type="button" className="btn btn-outline-link">Link</button>
+					<button type="button" className="btn btn-sm btn-outline-primary">Primary</button>
+					<button type="button" className="btn btn-sm btn-outline-secondary">Secondary</button>
+					<button type="button" className="btn btn-lg btn-outline-primary">Primary</button>
+					<button type="button" className="btn btn-lg btn-outline-secondary">Secondary</button>
 				</div>
-				<div className="mt-3">
+				<p>Active+hover state:</p>
+				<div>
 					<button type="button" className="btn active btn-primary">Primary</button>
 					<button type="button" className="btn active btn-secondary">Secondary</button>
-					<button type="button" className="btn active btn-success">Success</button>
-					<button type="button" className="btn active btn-danger">Danger</button>
-					<button type="button" className="btn active btn-warning">Warning</button>
-					<button type="button" className="btn active btn-info">Info</button>
-					<button type="button" className="btn active btn-light">Light</button>
-					<button type="button" className="btn active btn-dark">Dark</button>
-					<button type="button" className="btn active btn-link">Link</button>
+					<button type="button" className="btn btn-sm active btn-primary">Primary</button>
+					<button type="button" className="btn btn-sm active btn-secondary">Secondary</button>
+					<button type="button" className="btn btn-lg active btn-primary">Primary</button>
+					<button type="button" className="btn btn-lg active btn-secondary">Secondary</button>
 				</div>
-				<div className="mt-3">
+				<div className="mt-3 mb-4">
 					<button type="button" className="btn active btn-outline-primary">Primary</button>
 					<button type="button" className="btn active btn-outline-secondary">Secondary</button>
-					<button type="button" className="btn active btn-outline-success">Success</button>
-					<button type="button" className="btn active btn-outline-danger">Danger</button>
-					<button type="button" className="btn active btn-outline-warning">Warning</button>
-					<button type="button" className="btn active btn-outline-info">Info</button>
-					<button type="button" className="btn active btn-outline-light">Light</button>
-					<button type="button" className="btn active btn-outline-dark">Dark</button>
-					<button type="button" className="btn active btn-outline-link">Link</button>
+					<button type="button" className="btn btn-sm active btn-outline-primary">Primary</button>
+					<button type="button" className="btn btn-sm active btn-outline-secondary">Secondary</button>
+					<button type="button" className="btn btn-lg active btn-outline-primary">Primary</button>
+					<button type="button" className="btn btn-lg active btn-outline-secondary">Secondary</button>
 				</div>
-				<div className="mt-3">
+				<p>Disabled state:</p>
+				<div>
 					<button type="button" className="btn disabled btn-primary">Primary</button>
 					<button type="button" className="btn disabled btn-secondary">Secondary</button>
-					<button type="button" className="btn disabled btn-success">Success</button>
-					<button type="button" className="btn disabled btn-danger">Danger</button>
-					<button type="button" className="btn disabled btn-warning">Warning</button>
-					<button type="button" className="btn disabled btn-info">Info</button>
-					<button type="button" className="btn disabled btn-light">Light</button>
-					<button type="button" className="btn disabled btn-dark">Dark</button>
-					<button type="button" className="btn disabled btn-link">Link</button>
+					<button type="button" className="btn btn-sm disabled btn-primary">Primary</button>
+					<button type="button" className="btn btn-sm disabled btn-secondary">Secondary</button>
+					<button type="button" className="btn btn-lg disabled btn-primary">Primary</button>
+					<button type="button" className="btn btn-lg disabled btn-secondary">Secondary</button>
 				</div>
 				<div className="mt-3">
 					<button type="button" className="btn disabled btn-outline-primary">Primary</button>
 					<button type="button" className="btn disabled btn-outline-secondary">Secondary</button>
-					<button type="button" className="btn disabled btn-outline-success">Success</button>
-					<button type="button" className="btn disabled btn-outline-danger">Danger</button>
-					<button type="button" className="btn disabled btn-outline-warning">Warning</button>
-					<button type="button" className="btn disabled btn-outline-info">Info</button>
-					<button type="button" className="btn disabled btn-outline-light">Light</button>
-					<button type="button" className="btn disabled btn-outline-dark">Dark</button>
-					<button type="button" className="btn disabled btn-outline-link">Link</button>
+					<button type="button" className="btn btn-sm disabled btn-outline-primary">Primary</button>
+					<button type="button" className="btn btn-sm disabled btn-outline-secondary">Secondary</button>
+					<button type="button" className="btn btn-lg disabled btn-outline-primary">Primary</button>
+					<button type="button" className="btn btn-lg disabled btn-outline-secondary">Secondary</button>
 				</div>
 			</div>
 		</T.Page>;

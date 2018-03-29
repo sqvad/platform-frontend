@@ -1,28 +1,11 @@
 html, body {
-	font: normal 16px/1.2 'Roboto', -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+	font: normal 16px/1.2 serif;
 	color: #000000;
 }
-.header-short {
-	padding: 15px;
-	font-size: 14px;
-}
-.header-short a.for-logo {
-	position: relative;
-	display: block;
-	height: 43px;
-}
-.header-short a.for-logo .logo {
-	position: absolute;
-}
-.bg-violet {
-	background: #38334b;
-}
-.bg-violet, .bg-violet a {
-	color: #ffffff;
+html, body, button, input, select {
+	font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;
 }
 
-.logo-nopad-131x43 {
-	width: 131px;
-	height: 43px;
-	background: transparent url(../img/logo/131x43.png) left top no-repeat;
-}
+@import "./mixins.css";
+@import "./blocks.css";
+@import "./form.css";
