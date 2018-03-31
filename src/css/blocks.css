@@ -42,9 +42,21 @@
 	vertical-align: middle;
 	background: transparent url(../img/sprite-1x.png) left top no-repeat;
 }
+.icon-white {
+	background-position-x: -33px;
+}
+.icon-gray, .icon-disabled {
+	background-position-x: -67px;
+}
+.icon-violet {
+	background-position-x: -99px;
+}
 .icon-24 {
 	height: 24px;
 	width: 24px;
+}
+.icon-next {
+	background-position-y: -33px;
 }
 .btn-sm .icon-24 {
 	margin-bottom: -3px;
@@ -52,4 +64,31 @@
 	top: -1px;
 	margin-left: 10px;
 	margin-right: -7px;
+}
+.btn-lg .icon-24 {
+	margin-bottom: -3px;
+	position: relative;
+	top: -1px;
+	margin-left: 10px;
+	margin-right: -7px;
+}
+.btn-lg.btn-with-icon-at-right-side {
+	position: relative;
+	padding-left: 75px;
+	padding-right: 75px;
+}
+.btn-with-icon-at-right-side .icon-24 {
+	position: absolute;
+	top: 50%; margin-top: -11px;
+	right: 15px;
+}
+
+.register-as {
+	margin-top: 57px;
+	margin-bottom: 16px;
+}
+.register-as .btn {
+	padding-top: 14px;
+	padding-bottom: 13px;
+	font-weight: 600;
 }

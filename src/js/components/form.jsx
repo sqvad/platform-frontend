@@ -2,14 +2,15 @@ import React from 'react';
 import Any from '../any.jsx';
 
 class Form extends Any {
-	componentWillMount() {
-		super.componentWillMount();
-	}
 	componentDidMount() {
-		this.onSubmit = this.props.onSubmit.bind(this);
+		this.onSubmit = this.onSubmit.bind(this);
 	}
 	render(p,s,c,m) {
 		return <form onSubmit={this.onSubmit}><div>{c}</div></form>
+	}
+	onSubmit(e) {
+		if (e && e.preventDefault) e.preventDefault();
+		this.props.onSubmit();
 	}
 }
 

@@ -78,3 +78,8 @@ label.input-group {
 .input-group label {
 	display: block;
 }
+
+select.btn::after {
+	display: block;
+	content: "!"
+}
