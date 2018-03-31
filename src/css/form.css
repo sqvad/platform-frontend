@@ -16,10 +16,65 @@ form {
 }
 
 input.form-control {
-	font-size: 14px;
-	padding-bottom: 6px;
+	font-size: 16px;
+	padding-bottom: 4px;
 	padding-left: 0;
+	color: black;
 	border-color: #bec5d1;
 	border-width: 0 0 2px 0;
 	border-radius: 0;
+}
+
+.with-placeholder {
+	position: relative;
+}
+.with-placeholder input, .with-placeholder input:focus, .with-placeholder input:active {
+	background: transparent;
+}
+label.input-group {
+	padding-top: 20px;
+	padding-bottom: 20px;
+	margin-bottom: 10px;
+}
+.placeholder {
+	z-index: -1;
+	position: absolute;
+	pointer-events: none;
+	left: 0px;
+	top: 30px;
+	font-size: 14px;
+	text-transform: capitalize;
+	color: #7e8593;
+	transition: color 0.1s linear, font-size 0.1s linear, left 0.1s linear, top 0.1s linear;
+}
+.input-group.placeholder-to-up .placeholder {
+	font-size: 12px;
+	color: #353535;
+	top: 12px;
+	font-weight: bold;
+}
+.input-group.focused .placeholder {
+	color: #fc4c04;
+}
+.input-group:hover input, .input-group.has-danger:hover input {
+	border-color: #ffbda2;
+}
+.input-group.has-danger input {
+	border-color: #bec5d1;
+}
+.input-group.focused input, .input-group.focused:hover input {
+	border-color: #fc4c04;
+	outline: none;
+}
+.input-group .input-hint {
+	position: absolute;
+	top: 58px;
+	font-size: 12px;
+	color: #7e8593;
+}
+.input-group.has-danger .input-hint {
+	color: #ff0000;
+}
+.input-group label {
+	display: block;
 }

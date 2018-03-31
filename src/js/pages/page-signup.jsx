@@ -76,6 +76,11 @@ class ChooseRole extends T.Any {
 class PageSignUp extends T.Page {
 	componentWillMount() {
 		super.componentWillMount();
+		this.setState({
+			email:"",
+			password:"",
+			passwordConfirm:"",
+		});
 	}
 	render(p,s,c,m) {
 		return <T.Page.PageWrapDevice m={m} pagePostfix="signup">
@@ -90,9 +95,19 @@ class PageSignUp extends T.Page {
 					<ChooseRole onChoose={this.onRole.bind(this)} m={m} {...s} />
 					<div className="row d-flex justify-content-center">
 						<div className="col-6">
-							<T.Input.Email />
-							<T.Input.Password />
-							<T.Input.Email />
+							<T.Input.Email
+								onChange={this.onEmail.bind(this)}
+								value={s.email} required
+							/>
+							<T.Input.Password
+								onChange={this.onPassword.bind(this)}
+								value={s.password} required
+							/>
+							<T.Input.PasswordConfirm
+								onChange={this.onPasswordConfirm.bind(this)}
+								value={s.passwordConfirm} required
+								password={s.password}
+							/>
 						</div>
 					</div>
 				</T.Form>
@@ -101,6 +116,15 @@ class PageSignUp extends T.Page {
 	}
 	onRole(roleId) {
 		this.setState({role:roleId});
+	}
+	onEmail(v, valid) {
+		this.setState({email:v});
+	}
+	onPassword(v, valid) {
+		this.setState({password:v});
+	}
+	onPasswordConfirm(v, valid) {
+		this.setState({passwordConfirm:v});
 	}
 };
 

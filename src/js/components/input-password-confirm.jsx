@@ -1,10 +1,10 @@
 import React from 'react';
 import Input from './input-base.jsx';
 
-class InputPassword extends Input {
+class InputPasswordConfirm extends Input {
 	constructor(props) {
 		super(props);
-		this.defaultHint = "Minimum 8 characters";
+		this.defaultHint = "As previous field";
 		this.setState({
 			onValid: this.onValid.bind(this),
 			onInvalid: this.onInvalid.bind(this),
@@ -20,17 +20,17 @@ class InputPassword extends Input {
 		input._onValid.call(this, valid, validOld, input);
 	}
 	onInvalid(valid, validOld, input) {
-		input._onInvalid.call(this, valid, validOld, input, this.defaultHint, this.defaultHint);
+		input._onInvalid.call(this, valid, validOld, input, "Not match", this.defaultHint);
 	}
 	checkValid(str) {
-		return str.length>7;
+		return str==this.props.password;
 	}
 }
 
-InputPassword.defaultProps = {
-	name: "password",
+InputPasswordConfirm.defaultProps = {
+	name: "password-confirm",
 	type: "password",
-	placeholder: "PASSWORD",
+	placeholder: "CONFIRM PASSWORD",
 };
 
-export default InputPassword;
+export default InputPasswordConfirm;
