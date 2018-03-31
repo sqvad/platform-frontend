@@ -1,6 +1,7 @@
 import React from 'react';
 import Api from './api.js';
 import PageEmpty from './pages/page-empty.jsx';
+import PageSignUp from './pages/page-signup.jsx';
 
 class App extends React.Component {
 	componentWillMount() {
@@ -65,14 +66,14 @@ class App extends React.Component {
 		requestAnimationFrame(()=>this.onRAF());
 	}
 	render() {
-		// if (!this.props.m.path) this.onRAF();
 		var m = Object.assign({}, this.props.m);
 		m.api = this.api;
 		var spread = {m};
 		var Page;
 		// @todo dispatch
-		if (!Page) Page = PageEmpty;
-		return <Page {...spread}>jsx</Page>;
+		// if (!Page) Page = PageEmpty;
+		if (!Page) Page = PageSignUp;
+		return <Page {...spread}></Page>;
 	}
 	parsePath(pathname, search) {
 		var path;

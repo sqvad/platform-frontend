@@ -11,6 +11,26 @@
 	position: absolute;
 	top: -1px;
 }
+.header-medium {
+	padding: 15px;
+	min-height: 210px;
+	background: #38334b url(../img/header-1.png) center top no-repeat;
+}
+.header-medium h1, .header-medium h2 {
+	margin: 0;
+	text-align: center;
+}
+.header-medium h1 {
+	margin-top: 23px;
+	font-size: 34px;
+	font-weight: 600;
+}
+.header-medium h2 {
+	margin-top: 7px;
+	font-size: 16px;
+	font-weight: normal;
+}
+
 .logo-nopad-131x43 {
 	width: 131px;
 	height: 43px;

@@ -2,6 +2,9 @@ import React from 'react';
 import Any from '../any.jsx';
 
 class A extends Any {
+	componentWillMount() {
+		super.componentWillMount();
+	}
 	render(p,s,c,m) {
 		var href = p.href;
 		if (m.settings.misc.pathViaHash) {

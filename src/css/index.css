@@ -3,7 +3,7 @@ html, body {
 	color: #000000;
 }
 html, body, button, input, select {
-	font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+	font-family: Roboto,-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;
 }
 
 @import "./mixins.css";

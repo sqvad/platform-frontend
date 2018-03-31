@@ -1,1 +1,25 @@
 @import "./form-btn.css";
+
+form {
+	display: block;
+}
+.form-header {
+	font-size: 16px;
+	text-transform: uppercase;
+	font-weight: normal;
+	text-align: center;
+	margin: 10px 0;
+}
+.desktop option {
+	background: #ffffff;
+	color: #000000;
+}
+
+input.form-control {
+	font-size: 14px;
+	padding-bottom: 6px;
+	padding-left: 0;
+	border-color: #bec5d1;
+	border-width: 0 0 2px 0;
+	border-radius: 0;
+}
