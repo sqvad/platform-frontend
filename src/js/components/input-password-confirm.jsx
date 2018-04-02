@@ -14,7 +14,15 @@ class InputPasswordConfirm extends Input {
 	}
 	render(p,s,c,m) {
 		var type = "password";
-		return <Input {...p} {...p} {...s} m={m} type={type} />;
+		return <Input {...p} {...p} {...s} m={m} type={type} ref={((v)=>{this.input=v;})} />;
+	}
+	shouldComponentUpdate(nextProps, nextState) {
+		return true;
+	}
+	componentDidUpdate(prevProps, prevState) {
+		if (this.props.password!=prevProps.password) {
+			this.input.onChange();
+		}
 	}
 	onValid(valid, validOld, input) {
 		input._onValid.call(this, valid, validOld, input);

@@ -15,8 +15,9 @@ form {
 	color: #000000;
 }
 
-input.form-control {
+input.form-control, select.form-control {
 	font-size: 16px;
+	line-height: 20px;
 	padding-bottom: 4px;
 	padding-left: 0;
 	color: black;
@@ -28,8 +29,13 @@ input.form-control {
 .with-placeholder {
 	position: relative;
 }
-.with-placeholder input, .with-placeholder input:focus, .with-placeholder input:active {
+.with-placeholder input, .with-placeholder input:focus, .with-placeholder input:active,
+.with-placeholder select, .with-placeholder select:focus, .with-placeholder select:active
+{
 	background: transparent;
+}
+.with-placeholder select.form-control, .with-placeholder select.form-control:not([size]):not([multiple]) {
+	height: 34px;
 }
 label.input-group {
 	padding-top: 20px;
@@ -56,13 +62,15 @@ label.input-group {
 .input-group.focused .placeholder {
 	color: #fc4c04;
 }
-.input-group:hover input, .input-group.has-danger:hover input {
+.input-group:hover input, .input-group.has-danger:hover input,
+.input-group:hover select, .input-group.has-danger:hover select {
 	border-color: #ffbda2;
 }
 .input-group.has-danger input {
 	border-color: #bec5d1;
 }
-.input-group.focused input, .input-group.focused:hover input {
+.input-group.focused input, .input-group.focused:hover input,
+.input-group.focused select, .input-group.focused:hover select {
 	border-color: #fc4c04;
 	outline: none;
 }
