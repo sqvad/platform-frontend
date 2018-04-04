@@ -43,6 +43,8 @@ class Select extends Any {
 			options.unshift({value:"#placeholder#",text:p.placeholder});
 		} else if (p.useFormControl) {
 			options.unshift({value:"#placeholder#",text:""});
+		} else if (p.placeholderOnFocus && s.focused) {
+			options.unshift({value:"#placeholder#",text:p.placeholderOnFocus});
 		}
 		return <select className={cls} value={p.value} onChange={this.onChangeViaSelect} onFocus={this.onFocus} onBlur={this.onBlur}>
 			{options.map((v,i)=>{
@@ -64,7 +66,15 @@ class Select extends Any {
 	onBlur() {
 		var errorViaRequied = this.props.required && (this.props.value||"")=="";
 		this.setState({focused:false,wasBlurred:true,errorViaRequied}, ()=>{
-			if (this.props.onBlur) this.props.onBlur(this.node.value||'', this.valid, this);
+			if (this.props.onBlur) {
+				var v;
+				if (this.node) {
+					v = this.node.value||'';
+				} else {
+					v = this.props.value||'';
+				}
+				this.props.onBlur(v, this.valid, this);
+			}
 			this.forceUpdate();
 		});
 	}
