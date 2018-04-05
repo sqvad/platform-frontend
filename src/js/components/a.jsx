@@ -2,19 +2,22 @@ import React from 'react';
 import Any from '../any.jsx';
 
 class A extends Any {
-	componentWillMount() {
-		super.componentWillMount();
-	}
 	render(p,s,c,m) {
 		var href = p.href;
-		if (m.settings.misc.pathViaHash) {
+		if (!p.external && m.settings.misc.pathViaHash) {
 			if (href=="/") {
 				href = "#"
 			} else {
 				href = "#" + href;
 			}
 		}
-		return <a href={href} className={p.className} style={p.style}>{c}</a>;
+		var also = {};
+		var cls = p.className || "";
+		if (p.external) {
+			also.target = "_blank";
+			cls += " external";
+		}
+		return <a href={href} className={cls} style={p.style} {...also}>{c}</a>;
 	}
 }
 

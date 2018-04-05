@@ -2,10 +2,12 @@ html, body {
 	font: normal 16px/1.2 serif;
 	color: #000000;
 }
-html, body, button, input, select {
+html, body, button, input, select, h1 {
 	font-family: Roboto,-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;
 }
 
+@import "./tags.css";
 @import "./mixins.css";
 @import "./blocks.css";
 @import "./form.css";
+@import "./pages.css";
