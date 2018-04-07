@@ -55,8 +55,8 @@
 	color: #ffffff;
 }
 .btn-secondary:hover, .btn-secondary.hover, .btn-secondary:active, .btn-secondary.active {
-	background-color: #fe7b45;
-	border-color: #fe7b45;
+	background-color: #fc4c04;
+	border-color: #fc4c04;
 	color: #ffffff;
 }
 .btn-secondary.disabled {

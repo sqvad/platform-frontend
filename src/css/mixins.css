@@ -21,3 +21,6 @@
 .text-muted, a.text-muted, .text-muted a {
 	color: #9c9c9c !important;
 }
+
+.red { color: #bc1010; }
+.green { color: #63aa17; }

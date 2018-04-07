@@ -48,35 +48,35 @@ class HeaderMedium extends Any {
 					{c}
 			</div>
 		</div>;
-		/*
-		return <div className="header-medium bg-violet d-flex" key="header">
-			<div className="container d-flex">
-				<div className="row d-flex align-items-center justify-content-between" style={{width:"100%"}}>
-					<div className="col-2 pl-0 align-self-start">
-						<A m={m} href="/" className="for-logo">
-							<div className="logo logo-nopad-131x43" />
-						</A>
-					</div>
-					<div className="col-8">
-						{c}
-					</div>
-					<div className="col-2 pr-0 align-self-start d-flex align-items-center justify-content-end">
-						<A m={m} href="/profile" className="d-block mr-3 pt-2 pb-2">ALEXANDER DOBRIKOV</A>
-						<button type="button" className="btn btn-sm btn-outline-secondary">
-							Log Out
-							<span className="icon icon-24 icon-logout" />
-						</button>
-					</div>
-				</div>
-			</div>
+	}
+}
+
+class HeaderLeft extends Any {
+	render(p,s,c,m) {
+		return <div className="bg-violet w-100">
+			<A className="left-menu-logo" m={m}>
+				<span className="left-menu-logo-img"></span>
+			</A>
+			<A className="left-menu-item active" m={m}>
+				<span className="icon icon-30 icon-wallet"></span>
+				<span className="left-menu-item-label">wallets</span>
+			</A>
+			<A className="left-menu-item" m={m}>
+				<span className="icon icon-30 icon-settings icon-white"></span>
+				<span className="left-menu-item-label">settings</span>
+			</A>
+			<A className="left-menu-item hover" m={m}>
+				<span className="icon icon-30 icon-logout icon-white"></span>
+				<span className="left-menu-item-label">log out</span>
+			</A>
 		</div>;
-		*/
 	}
 }
 
 var Headers = {
 	Short: HeaderShort,
 	Medium: HeaderMedium,
+	Left: HeaderLeft,
 };
 
 export default Headers;

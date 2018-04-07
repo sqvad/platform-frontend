@@ -45,10 +45,37 @@ class PageWrapDevice extends Any {
 		return <div className={device} onClick={this.onAnyClick}>{c}</div>;
 	}
 }
+class PageWrapProfile extends Any {
+	render(p,s,c,m) {
+		return <div className="d-flex" style={{minHeight:"100%"}}>
+			{c}
+		</div>;
+	}
+}
+class PageWrapProfileLeft extends Any {
+	render(p,s,c,m) {
+		return <div className="d-flex profile-left-menu bg-violet">
+			{c}
+		</div>;
+	}
+}
+class PageWrapProfileWidth extends Any {
+	render(p,s,c,m) {
+		return <div className="w-100">
+			<div className="profile-logo"></div>
+			<div className="profile-center">
+				{c}
+			</div>
+		</div>;
+	}
+}
 
 Page.PageWrapWidth = PageWrapWidth;
 Page.PageWrapHeader = PageWrapHeader;
 Page.PageWrapDevice = PageWrapDevice;
+Page.PageWrapProfile = PageWrapProfile;
+Page.PageWrapProfileLeft = PageWrapProfileLeft;
+Page.PageWrapProfileWidth = PageWrapProfileWidth;
 
 Page.propTypes = {
 	pagePostfix: Any.PropTypes.string,

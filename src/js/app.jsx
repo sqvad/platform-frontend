@@ -4,6 +4,7 @@ import PageEmpty from './pages/page-empty.jsx';
 import PageSignUp from './pages/page-signup.jsx';
 import PageSet2FA from './pages/page-set2fa.jsx';
 import PageSignIn from './pages/page-signin.jsx';
+import PageWallets from './pages/page-wallets.jsx';
 
 class App extends React.Component {
 	componentWillMount() {
@@ -76,7 +77,8 @@ class App extends React.Component {
 		// if (!Page) Page = PageEmpty;
 		// if (!Page) Page = PageSignUp;
 		// if (!Page) Page = PageSet2FA;
-		if (!Page) Page = PageSignIn;
+		// if (!Page) Page = PageSignIn;
+		if (!Page) Page = PageWallets;
 		return <Page {...spread}></Page>;
 	}
 	parsePath(pathname, search) {

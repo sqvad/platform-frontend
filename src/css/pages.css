@@ -18,3 +18,23 @@
 .page-set2fa .btn-outline-primary {
     background: white;
 }
+
+.table-transactions-tokens {
+    font-size: 16px;
+}
+.table-transactions-tokens tr {
+    border: 1px solid #e5e6e7;
+}
+.table-transactions-tokens td, .table-transactions-tokens th {
+    padding: 19px 13px 14px 0;
+}
+.table-transactions-tokens td:first-child, .table-transactions-tokens th:first-child {
+    padding-left: 14px;
+    padding-right: 51px;
+    white-space: nowrap;
+}
+.transactions-tokens h2 {
+    margin-top: 3px;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+}
