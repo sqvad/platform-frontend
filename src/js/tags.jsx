@@ -8,6 +8,7 @@ import A from './components/a.jsx';
 import Form from './components/form.jsx';
 import Select from './components/select.jsx';
 import Input from './components/input.jsx';
+import Checkbox from './components/checkbox.jsx';
 
 export default {
 	Any,
@@ -18,4 +19,5 @@ export default {
 	Form,
 	Select,
 	Input,
+	Checkbox,
 };

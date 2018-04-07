@@ -17,3 +17,7 @@
 {
 	background-color: #423c5a;
 }
+
+.text-muted, a.text-muted, .text-muted a {
+	color: #9c9c9c !important;
+}

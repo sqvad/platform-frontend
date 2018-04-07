@@ -5,7 +5,7 @@
 	},
 	"api": {
 		"description": "information about an API",
-		"url": "https:// :("
+		"url": "http://ins-wallet-api-test.us-east-2.elasticbeanstalk.com"
 	},
 	"misc": {
 		"pathViaHash": true

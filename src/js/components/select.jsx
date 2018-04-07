@@ -39,12 +39,12 @@ class Select extends Any {
 			cls = "";
 		}
 		var options = p.options.slice(0);
-		if (p.placeholder && !p.useFormControl) {
+		if (p.placeholderOnFocus && s.focused) {
+			options.unshift({value:"#placeholder#",text:p.placeholderOnFocus});
+		} else if (p.placeholder && !p.useFormControl) {
 			options.unshift({value:"#placeholder#",text:p.placeholder});
 		} else if (p.useFormControl) {
 			options.unshift({value:"#placeholder#",text:""});
-		} else if (p.placeholderOnFocus && s.focused) {
-			options.unshift({value:"#placeholder#",text:p.placeholderOnFocus});
 		}
 		return <select className={cls} value={p.value} onChange={this.onChangeViaSelect} onFocus={this.onFocus} onBlur={this.onBlur}>
 			{options.map((v,i)=>{

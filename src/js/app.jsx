@@ -3,6 +3,7 @@ import Api from './api.js';
 import PageEmpty from './pages/page-empty.jsx';
 import PageSignUp from './pages/page-signup.jsx';
 import PageSet2FA from './pages/page-set2fa.jsx';
+import PageSignIn from './pages/page-signin.jsx';
 
 class App extends React.Component {
 	componentWillMount() {
@@ -74,7 +75,8 @@ class App extends React.Component {
 		// @todo dispatch
 		// if (!Page) Page = PageEmpty;
 		// if (!Page) Page = PageSignUp;
-		if (!Page) Page = PageSet2FA;
+		// if (!Page) Page = PageSet2FA;
+		if (!Page) Page = PageSignIn;
 		return <Page {...spread}></Page>;
 	}
 	parsePath(pathname, search) {

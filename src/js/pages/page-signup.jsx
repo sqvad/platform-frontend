@@ -6,21 +6,8 @@ class ChooseRole extends T.Any {
 		this.toggle = this.toggle.bind(this);
 	}
 	render(p,s,c,m) {
-		var tree = [
-			{id:"consumer",title:"Consumer"},
-			{id:"supplier",title:"Supplier"},
-			{id:"warehouseProvider",title:"Warehouse Provider"},
-			{id:"warehouseServices",title:"Warehouse Services", children: [
-				{id: "wp#0", title: "Warehouse Services"},
-				{id: "wp#1", title: "Independent worker"},
-				{id: "wp#2", title: "Staffing agency"},
-			]},
-			{id:"logisticServices",title:"Logistic Services", children: [
-				{id: "ls#0", title: "Logistic Services"},
-				{id: "ls#1", title: "Independent courier"},
-				{id: "ls#2", title: "Logistics company"},
-			]},
-		];
+		if (!m.userTypes) return null;
+		var tree = JSON.parse(JSON.stringify(m.userTypes));
 		return <div className="register-as">
 			<h2 className="form-header">Register as</h2>
 			<div className="btn-group btn-group-toggle d-flex justify-content-center flex-wrap">
@@ -36,6 +23,7 @@ class ChooseRole extends T.Any {
 								key={"role"+i} value={p.role} onChange={this.onChooseViaSelect.bind(this)}
 								className={"btn "+(isActive? "btn-secondary active":"btn-outline-secondary")}
 								options={v.children.map(v=>{return {value:v.id,text:v.title}})}
+								placeholder={v.title}
 								placeholderOnFocus="Please choose..."
 								onBlur={this.onChooseViaSelect.bind(this)}
 							></T.Select>;
@@ -80,6 +68,9 @@ class PageSignUp extends T.Page {
 			firstName:"",
 			lastName:"",
 			country:"",
+		});
+		props.m.api.fetchUserTypes().then(userTypes=>{
+			this.setState({userTypes:userTypes});
 		});
 	}
 	render(p,s,c,m) {
@@ -322,6 +313,12 @@ class PageSignUp_page2 extends T.Page {
 		</div>;
 	}
 	useEntendedFields(s) {
+		var id = s && s.role || this.props.role;
+		var types = this.props.userTypes;
+		var type = (types||[]).filter(v=>v.id==id)[0];
+		if (type) {
+			return type.userDataType==2;
+		}
 		return true;
 	}
 	checkValid() {
