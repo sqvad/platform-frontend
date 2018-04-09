@@ -8,9 +8,15 @@ class PageWallets extends T.Page {
 		var _p = JSON.parse(JSON.stringify(p));
 		_p.walletId = "ETH";
 		var _s = JSON.parse(JSON.stringify(s));
-		_s.tab = "transactions";
-		_s.tab = "tokens";
-		_s.openedTransactions = {"1":true};
+		if (!_s.tab) {
+			_s.tab = "transactions";
+			_s.tab = "tokens";
+			_s.tab = "send";
+			_s.tab = "receive";
+		}
+		if (!_s.openedTransactions) {
+			_s.openedTransactions = {"1":true};
+		}
 		return this._render(_p,_s,c,_m);
 	}
 	_render(p,s,c,m) {
@@ -33,6 +39,8 @@ class PageWallets extends T.Page {
 						{c}
 						{s.tab=="transactions"?this.renderWallet_transactions(p,s,c,m):null}
 						{s.tab=="tokens"?this.renderWallet_tokens(p,s,c,m):null}
+						{s.tab=="send"?this.render_send(p,s,c,m):null}
+						{s.tab=="receive"?this.render_receive(p,s,c,m):null}
 					</div>
 				</div>
 			</T.Page.PageWrapProfile>
@@ -49,17 +57,24 @@ class PageWallets extends T.Page {
 					<span className="in-usd">{wallet.usd} USD</span>
 				</div>
 				<div className="btn-group btn-group-toggle d-flex justify-content-start flex-wrap">
-					<div className={"btn "+ ((p.tab||s.tab)=="transactions"?" btn-secondary active":" btn-outline-secondary")}>
+					<div className={"btn "+ ((p.tab||s.tab)=="transactions"?" btn-secondary active":" btn-outline-secondary")}
+						onClick={()=>this.setState({tab:"transactions"})}
+					>
 						TRANSACTIONS
 					</div>
 					<div className={"btn "+ ((p.tab||s.tab)=="tokens"?" btn-secondary active":" btn-outline-secondary")}
+						onClick={()=>this.setState({tab:"tokens"})}
 					>
 						TOKENS
 					</div>
-					<div className={"btn "+ ((p.tab||s.tab)=="send"?" btn-secondary active":" btn-outline-secondary")}>
+					<div className={"btn "+ ((p.tab||s.tab)=="send"?" btn-secondary active":" btn-outline-secondary")}
+						onClick={()=>this.setState({tab:"send"})}
+					>
 						SEND
 					</div>
-					<div className={"btn "+ ((p.tab||s.tab)=="receive"?" btn-secondary active":" btn-outline-secondary")}>
+					<div className={"btn "+ ((p.tab||s.tab)=="receive"?" btn-secondary active":" btn-outline-secondary")}
+						onClick={()=>this.setState({tab:"receive"})}
+					>
 						RECEIVE
 					</div>
 					<div className={"btn "+ ((p.tab||s.tab)=="settings"?" btn-secondary active":" btn-outline-secondary")}>
@@ -113,7 +128,13 @@ class PageWallets extends T.Page {
 					{transactions.map((v,i)=>{
 						var opened = s.openedTransactions[""+v.id];
 						var descIsSmall = (v.desc || "").length < 100;
-						return <div key={"-"+i} className={"transaction-container" + (opened?" opened":" closed")}>
+						return <div key={"-"+i} className={"transaction-container" + (opened?" opened":" closed")}
+							onClick={()=>{
+								var t = JSON.parse(JSON.stringify(s.openedTransactions));
+								t[v.id] = !t[v.id];
+								this.setState({openedTransactions:t});
+							}}
+						>
 							<div className="transaction-header d-flex">
 								<div className="transaction-toggler">
 									{opened?"–":"+"}
@@ -191,6 +212,189 @@ class PageWallets extends T.Page {
 				</T.Page.PageWrapProfileWidth>
 			</T.Page.PageWrapProfile>
 		</T.Page.PageWrapDevice>;
+	}
+	render_send(p,s,c,m) {
+		return <SendTokens {...p} {...s} m={m} />;
+	}
+	render_receive(p,s,c,m) {
+		return <div>
+			<h2>RECEIVE</h2>
+			<h3>RECEIVING ADDRESS</h3>
+			<div
+				style={{border:"1px solid #e5e6e7",padding:"15px"}}
+				className="d-flex align-items-center"
+			>
+				<img src="/img/qr-test.png" width="145" height="145" />
+				<span>
+					0x298DB031c12294c7235D00ef6380a4B53c9619a3
+					<br />
+					Receiver
+				</span>
+			</div>
+			<h3>OTHER ADDRESSES</h3>
+			<div
+				style={{border:"1px solid #e5e6e7",padding:"15px"}}
+				className="d-flex align-items-center"
+			>
+				<div
+					style={{marginRight:"15px",paddingRight:"15px",borderRight:"1px solid #e5e6e7"}}
+					className="align-self-stretch"
+				>
+					<b>Receiver</b>
+					<br />
+					0x298DB031c12294c7235D00ef6380a4B53c9619a3
+				</div>
+				<div
+					className="d-flex justify-content-between w-100"
+				>
+					<div>
+						<span className="mr-3">
+							<span className="icon icon-24 icon-copy"></span>
+							Copy
+						</span>
+						<span>
+							<span className="icon icon-24 icon-qr"></span>
+							QR-code
+						</span>
+					</div>
+					<div>
+						0.1234ETH
+					</div>
+				</div>
+			</div>
+		</div>;
+	}
+}
+class SendTokens extends T.Any {
+	constructor(props) {
+		super(props);
+		this.setState({
+			currency: props.currency || "ETH",
+			priority: props.priority || "medium",
+			specifyCustomGasLimit: true,
+		})
+	}
+	render(p,s,c,m) {
+		return <div>
+			<h2>SEND</h2>
+			<p>This form allows you to spend funds from your wallet. Always double check your destination address!</p>
+
+				<T.If v={1}><div style={{maxWidth:"482px"}}><T.Form>
+					<T.Input.TxAdr
+						name="to" placeholder="Send to"
+						onChange={this.onTo.bind(this)} value={s.to} required
+					/>
+					<div className="d-flex">
+						<T.Select
+							useFormControl className="form-control mr-3" placeholder="Currency"
+							required onChange={this.onCurrency.bind(this)} value={s.currency}
+							options={
+								m.user.wallets.map(v=>{
+									return {value:v.id,title:v.id};
+								})
+							}
+						/>
+						<T.Input.Float
+							name="amount" placeholder="Amount" min={0} aboveMin={true} max={5} belowMax={false}
+							onChange={this.onAmount.bind(this)} value={s.amount} required
+						/>
+					</div>
+					<T.Select
+						useFormControl className="form-control" placeholder="Priority"
+						required onChange={this.onPriority.bind(this)} value={s.specifyCustomGasLimit ? "custom" : s.priority}
+						options={[
+							{value:"low",title:"Low"},
+							{value:"medium",title:"Medium"},
+							{value:"high",title:"High"},
+							s.specifyCustomGasLimit ? {value:"custom",title:"Custom"} : null,
+						].filter(v=>!!v)}
+						disabled={s.specifyCustomGasLimit}
+					/>
+					<T.Checkbox checked={s.specifyCustomGasLimit} onChange={this.onSpecifyCustomGasLimit.bind(this)}>
+						Specify custom gas limit (advanced users)
+					</T.Checkbox>
+					<T.If v={s.specifyCustomGasLimit}><div>
+						<T.Input.Float
+							name="customFee" placeholder="Custom fee" min={0} aboveMin={true} exampleNum={0.01}
+							onChange={this.onCustomFee.bind(this)} value={s.customFee} required
+						/>
+						<T.Input.Float
+							name="gasLimit" placeholder="Gas limit" min={0} aboveMin={true} exampleNum={0.01}
+							onChange={this.onAmount.bind(this)} value={s.amount} required
+						/>
+					</div></T.If>
+					<T.Textarea v={s.note||""} onChange={this.onNote.bind(this)} />
+					<div className="mt-4">
+						<button type="submit"
+							className={[
+								"btn btn-lg btn-primary",
+								false ? "" : " disabled",
+							].join(" ")}
+						>
+							Sign Up
+						</button>
+					</div>
+				</T.Form></div></T.If>
+
+				<div style={{maxWidth:"548px"}}>
+					<h2>REVIEW YOUR TRANSACTION</h2>
+					<div style={{border: "1px solid #e5e6e7", padding:"15px"}}>
+						<div style={{}}>
+							You are about to send the following transaction:
+							<br />
+							<b>{s.amount} {s.currency}</b> to <b>{s.to}</b>
+							<br />
+							<b>{s.customFee} {s.currency}</b> as a transaction fee to miners.
+						</div>
+						<div style={{borderTop: "1px solid #e5e6e7", paddingTop:"15px", marginTop:"15px"}}>
+							<b>{s.amount + s.customFee} {s.currency}</b> ETH in total.
+							<div className="mt-4">
+								<button type="submit"
+									className={[
+										"btn btn-lg btn-outline-primary",
+										"mr-2"
+									].join(" ")}
+									style={{fontWeight:600}}
+								>
+									Cancel
+								</button>
+								<button type="submit"
+									className={[
+										"btn btn-lg btn-primary",
+									].join(" ")}
+								>
+									Sign transaction
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+		</div>;
+	}
+	onTo(to,toValid) {
+		this.setState({to:to.trim(),toValid});
+	}
+	onCurrency(currency,currencyValid) {
+		this.setState({currency,currencyValid});
+	}
+	onAmount(amount,amountValid) {
+		this.setState({amount,amountValid});
+	}
+	onCustomGasLimit(customGasLimit,customGasLimitValid) {
+		this.setState({customGasLimit,customGasLimitValid});
+	}
+	onPriority(priority,priorityValid) {
+		this.setState({priority,priorityValid});
+	}
+	onSpecifyCustomGasLimit(on) {
+		this.setState({specifyCustomGasLimit:on});
+	}
+	onCustomFee(customFee,customFeeValid) {
+		this.setState({customFee,customFeeValid});
+	}
+	onNote(note) {
+		this.setState({note})
 	}
 }
 

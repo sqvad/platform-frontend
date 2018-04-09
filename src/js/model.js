@@ -1,6 +1,6 @@
 import CONSTS from './consts.js';
 
-const model = {
+var model = {
 	listeners: {
 		'change': [],
 	},
@@ -10,6 +10,7 @@ const model = {
 	emit: function(type) {
 		this.listeners[type].forEach(clb=>clb());
 	},
+	Web3: Web3,
 };
 
 export default model;

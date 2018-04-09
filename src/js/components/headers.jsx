@@ -58,15 +58,15 @@ class HeaderLeft extends Any {
 				<span className="left-menu-logo-img"></span>
 			</A>
 			<A className="left-menu-item active" m={m}>
-				<span className="icon icon-30 icon-wallet"></span>
+				<span className="icon icon-30 icon-lg icon-wallet"></span>
 				<span className="left-menu-item-label">wallets</span>
 			</A>
 			<A className="left-menu-item" m={m}>
-				<span className="icon icon-30 icon-settings icon-white"></span>
+				<span className="icon icon-30 icon-lg icon-settings icon-white"></span>
 				<span className="left-menu-item-label">settings</span>
 			</A>
 			<A className="left-menu-item hover" m={m}>
-				<span className="icon icon-30 icon-logout icon-white"></span>
+				<span className="icon icon-30 icon-lg icon-logout icon-white"></span>
 				<span className="left-menu-item-label">log out</span>
 			</A>
 		</div>;

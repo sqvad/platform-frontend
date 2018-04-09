@@ -46,7 +46,11 @@ class Select extends Any {
 		} else if (p.useFormControl) {
 			options.unshift({value:"#placeholder#",text:""});
 		}
-		return <select className={cls} value={p.value} onChange={this.onChangeViaSelect} onFocus={this.onFocus} onBlur={this.onBlur}>
+		return <select
+			{...p}
+			className={cls}
+			value={p.value} onChange={this.onChangeViaSelect} onFocus={this.onFocus} onBlur={this.onBlur}
+		>
 			{options.map((v,i)=>{
 				return <option key={"option"+i} value={v.value||v.id}>{v.text||v.title}</option>
 			})}

@@ -54,7 +54,7 @@ class PageWrapProfile extends Any {
 }
 class PageWrapProfileLeft extends Any {
 	render(p,s,c,m) {
-		return <div className="d-flex profile-left-menu bg-violet">
+		return <div className="d-flex profile-left-menu bg-violet" style={{boxShadow:"0 0 20px rgba(0, 0, 0, 0.23)", zIndex:1}}>
 			{c}
 		</div>;
 	}

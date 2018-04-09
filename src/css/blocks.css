@@ -36,47 +36,70 @@
 	height: 43px;
 	background: transparent url(../img/logo/131x43.png) left top no-repeat;
 }
-
+/*
 .icon {
 	display: inline-block;
 	vertical-align: middle;
-	background: transparent url(../img/sprite-1x.png) left top no-repeat;
-	background-size: 600px 600px;
+	background: transparent url(../img/sprite-3x.png) left top no-repeat;
 }
-.icon-white {
-	background-position-x: -100px;
-}
-.icon-gray, .icon-disabled {
-	background-position-x: -200px;
-}
-.icon-violet {
-	background-position-x: -300px;
-}
+*/
 .icon-24 {
+	display: inline-block;
+	vertical-align: middle;
 	height: 24px;
 	width: 24px;
+	background: transparent url(../img/sprite-1x.png) left top no-repeat;
 }
 .icon-30 {
-	height: 60px;
-	width: 60px;
-	background-image: url(../img/sprite-2x.png);
-	transform: scale(0.5,0.5);
-	margin: -15px;
+	display: inline-block;
+	vertical-align: middle;
+	height: 30px;
+	width: 30px;
+	background: transparent url(../img/sprite-1x.png) left top no-repeat;
+}
+.icon-white {
+	background-position-x: -33px;
+}
+.icon-gray, .icon-disabled {
+	background-position-x: -67px;
+}
+.icon-violet {
+	background-position-x: -100px;
+}
+.icon-lg {
+	background-position-x: -167px;
+}
+.icon-lg.icon-white {
+	background-position-x: -200px;
 }
 .icon-next {
-	background-position-y: -100px;
+	background-position-y: -50px;
 }
 .icon-prev {
-	background-position-y: -200px;
+	background-position-y: -100px;
 }
 .icon-wallet {
-	background-position-y: -300px;
+	background-position-y: -150px;
 }
 .icon-settings {
-	background-position-y: -400px;
+	background-position-y: -200px;
 }
 .icon-logout {
-	background-position-y: -500px;
+	background-position-y: -250px;
+}
+.icon-copy {
+	background-position-y: -300px;
+}
+.icon-qr {
+	background-position-y: -350px;
+}
+.retina-2 .icon-24 {
+	background-image: url(../img/sprite-2x.png);
+	background-size: 300px 400px;
+}
+.retina-3 .icon-24 {
+	background-image: url(../img/sprite-3x.png);
+	background-size: 300px 400px;
 }
 .icon-currency-horizontal {
 	display: inline-block;
@@ -243,6 +266,11 @@
 	font-size: 22px;
 	font-weight: 800;
 	margin-top: 27px;
+}
+.page-wallet h3 {
+	font-size: 16px;
+	font-weight: 800;
+	margin-top: 17px;
 }
 
 .transactions-list h2 {

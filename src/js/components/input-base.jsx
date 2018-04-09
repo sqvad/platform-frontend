@@ -59,7 +59,7 @@ class Input extends Any {
 			if (this.valid) {
 				if (p.onValid) p.onValid(this.valid, this.valid, this);
 			} else {
-				if (p.onInvalid) p.onInvalid(this.valid, this.valid, this);
+				if (p.onInvalid) p.onInvalid(this.valid, this.valid, this, p.value);
 			}
 			this.forceUpdate();
 		});
@@ -68,17 +68,30 @@ class Input extends Any {
 		var errorViaRequied = this.props.required && (this.props.value||"")=="";
 		this.setState({focused:false,wasBlurred:true,errorViaRequied}, ()=>{
 			if (this.props.value!="" && this.state.wasChanged && !this.valid) {
-				if (this.props.onInvalid) this.props.onInvalid(this.valid, this.valid, this);
+				if (this.props.onInvalid) this.props.onInvalid(this.valid, this.valid, this, this.props.value);
 			} else if (this.props.value=="" && !errorViaRequied) {
 				if (this.props.onValid) this.props.onValid(this.valid, this.valid, this);
 			}
-			if (this.props.onBlur) this.props.onBlur(this.node.value||'', this.valid, this);
+			if (this.props.onBlur) this.props.onBlur(this.node.value||'', this.valid, this, this, this.props.value);
 			this.forceUpdate();
 		});
 	}
 	onChange() {
 		var p = this.props;
 		var v = this.node.value||'';
+		if (p.regexpRemove) {
+			var regexpRemove;
+			if (Array.isArray(p.regexpRemove)) {
+				regexpRemove = p.regexpRemove;
+			} else {
+				regexpRemove = [p.regexpRemove];
+			}
+			v = regexpRemove.reduce((s,v)=>{
+				var reg = v.r || v;
+				var to = ('v' in v) ? v.v : '';
+				return s.replace(reg, to);
+			},v);
+		}
 		var valid;
 		var validOld = this.valid;
 		if (p.checkValid) {
@@ -88,7 +101,7 @@ class Input extends Any {
 		if (valid) {
 			if (p.onValid) p.onValid(valid, validOld, this);
 		} else {
-			if (p.onInvalid) p.onInvalid(valid, validOld, this);
+			if (p.onInvalid) p.onInvalid(valid, validOld, this, v);
 		}
 		if (p.onChange) {
 			p.onChange(v, valid, validOld, this);
@@ -102,7 +115,7 @@ class Input extends Any {
 		},()=>{this.forceUpdate()});
 		if (this.props.onValid) this.props.onValid(valid, validOld, input);
 	}
-	_onInvalid(valid, validOld, input, errorHint, defaultHint) {
+	_onInvalid(valid, validOld, input, errorHint, defaultHint, value) {
 		if (input.state.wasBlurred) {
 			if (input.state.focused && (input.props.value||"")=="") {
 				this.setState({hint:defaultHint,hasError:false},()=>{this.forceUpdate()});
@@ -110,7 +123,7 @@ class Input extends Any {
 				this.setState({hint:errorHint,hasError:true},()=>{this.forceUpdate()});
 			}
 		}
-		if (this.props.onInvalid) this.props.onInvalid(valid, validOld, input);
+		if (this.props.onInvalid) this.props.onInvalid(valid, validOld, input, value);
 	}
 }
 Input.propTypes = {
@@ -134,6 +147,25 @@ Input.propTypes = {
 	onChange: Any.PropTypes.func,
 	onFocus: Any.PropTypes.func,
 	onBlur: Any.PropTypes.func,
+	regexp: Any.PropTypes.instanceOf(RegExp),
+	regexpRemove: Any.PropTypes.oneOfType([
+	Any.PropTypes.oneOfType([
+		Any.PropTypes.instanceOf(RegExp),
+		Any.PropTypes.shape({
+			r: Any.PropTypes.instanceOf(RegExp),
+			v: Any.PropTypes.string,
+		})
+	]),
+	Any.PropTypes.arrayOf(
+		Any.PropTypes.oneOfType([
+			Any.PropTypes.instanceOf(RegExp),
+			Any.PropTypes.shape({
+				r: Any.PropTypes.instanceOf(RegExp),
+				v: Any.PropTypes.string,
+			})
+		])
+	),
+]),
 };
 
 export default Input;
