@@ -62,8 +62,8 @@ class PageWrapProfileLeft extends Any {
 class PageWrapProfileWidth extends Any {
 	render(p,s,c,m) {
 		return <div className="w-100">
-			<div className="profile-logo"></div>
-			<div className="profile-center">
+			{!p.skipLogo?<div className="profile-logo"></div>:null}
+			<div className="profile-center" key="profile-center">
 				{c}
 			</div>
 		</div>;

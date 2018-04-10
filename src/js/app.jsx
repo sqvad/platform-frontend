@@ -5,6 +5,8 @@ import PageSignUp from './pages/page-signup.jsx';
 import PageSet2FA from './pages/page-set2fa.jsx';
 import PageSignIn from './pages/page-signin.jsx';
 import PageWallets from './pages/page-wallets.jsx';
+import PageSettings from './pages/page-settings.jsx';
+import PageEA from './pages/page-early-access.jsx';
 
 class App extends React.Component {
 	componentWillMount() {
@@ -78,7 +80,13 @@ class App extends React.Component {
 		// if (!Page) Page = PageSignUp;
 		// if (!Page) Page = PageSet2FA;
 		// if (!Page) Page = PageSignIn;
-		if (!Page) Page = PageWallets;
+		// if (!Page) Page = PageWallets;
+		if (m.path.contains["signup"]) Page = PageSignUp;
+		if (m.path.contains["set2fa"]) Page = PageSet2FA;
+		if (m.path.contains["signin"]) Page = PageSignIn;
+		if (m.path.contains["wallets"]) Page = PageWallets;
+		if (m.path.contains["settings"]) Page = PageSettings;
+		if (!Page) Page = PageEA;
 		return <Page {...spread}></Page>;
 	}
 	parsePath(pathname, search) {
