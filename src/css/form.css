@@ -44,7 +44,7 @@ label.input-group {
 	margin-bottom: 10px;
 }
 .placeholder {
-	z-index: -1;
+	/*z-index: -1;*/
 	position: absolute;
 	pointer-events: none;
 	left: 0px;

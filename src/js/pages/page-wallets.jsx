@@ -6,13 +6,14 @@ class PageWallets extends T.Page {
 		var _m = JSON.parse(JSON.stringify(PageWallets.mockupModel));
 		_m = Object.assign(_m, m);
 		var _p = JSON.parse(JSON.stringify(p));
-		_p.walletId = "ETH";
+		// _p.walletId = "ETH";
 		var _s = JSON.parse(JSON.stringify(s));
 		if (!_s.tab) {
 			_s.tab = "transactions";
 			_s.tab = "tokens";
 			_s.tab = "send";
 			_s.tab = "receive";
+			_s.tab = "settings";
 		}
 		if (!_s.openedTransactions) {
 			_s.openedTransactions = {"1":true};
@@ -20,7 +21,7 @@ class PageWallets extends T.Page {
 		return this._render(_p,_s,c,_m);
 	}
 	_render(p,s,c,m) {
-		if (p.walletId) {
+		if (p.walletId || s.walletId) {
 			return this.renderWallet(p,s,c,m);
 		} else {
 			return this.render_walletsList(p,s,c,m);
@@ -41,14 +42,19 @@ class PageWallets extends T.Page {
 						{s.tab=="tokens"?this.renderWallet_tokens(p,s,c,m):null}
 						{s.tab=="send"?this.render_send(p,s,c,m):null}
 						{s.tab=="receive"?this.render_receive(p,s,c,m):null}
+						{s.tab=="settings"?this.render_settings(p,s,c,m):null}
 					</div>
 				</div>
 			</T.Page.PageWrapProfile>
 		</T.Page.PageWrapDevice>;
 	}
 	renderWallet_header(p,s,c,m) {
-		var wallet = m.user.wallets.filter(v=>v.id==p.walletId)[0];
-		return <div className="bg-violet">
+		var wallet = m.user.wallets.filter(v=>v.id==(p.walletId||s.walletId))[0];
+		return <div
+			className="bg-violet" style={{
+				background:"#312c42 url(./img/wallet-header-"+(wallet.id.toLowerCase())+".png) right top no-repeat"
+			}}
+		>
 			<div className="profile-center wallet-page-header">
 				<h1>My {wallet.id} wallet</h1>
 				<div className="wallet-page-stat">
@@ -77,7 +83,9 @@ class PageWallets extends T.Page {
 					>
 						RECEIVE
 					</div>
-					<div className={"btn "+ ((p.tab||s.tab)=="settings"?" btn-secondary active":" btn-outline-secondary")}>
+					<div className={"btn "+ ((p.tab||s.tab)=="settings"?" btn-secondary active":" btn-outline-secondary")}
+						onClick={()=>this.setState({tab:"settings"})}
+					>
 						SETTINGS
 					</div>
 				</div>
@@ -195,7 +203,10 @@ class PageWallets extends T.Page {
 					<h1>Wallets</h1>
 					<div className="wallets-list">
 						{m.user.wallets.map((v,i)=>{
-							return <div key={"wallet"+i} className={"wallet wallet-"+v.id}>
+							return <div
+									key={"wallet"+i} className={"wallet wallet-"+v.id}
+									onClick={()=>{this.setState({walletId:v.id})}}
+								>
 								<div className={"icon-currency-horizontal icon-currency-"+v.id}></div>
 								<div className="d-flex flex-row justify-content-between">
 									My {v.id} Wallet
@@ -264,6 +275,28 @@ class PageWallets extends T.Page {
 			</div>
 		</div>;
 	}
+	render_settings(p,s,c,m) {
+		var wallet = m.user.wallets.filter(v=>v.id==p.walletId)[0];
+		return <div>
+			<h2>SETTINGS</h2>
+			<h3>CHANGE WALLET NAME</h3>
+			<T.Form onSubmit={()=>{}}>
+				<T.Input
+					placeholder="Wallet name"
+				/>
+				<div className="mt-4">
+					<button type="submit"
+						className={[
+							"btn btn-lg btn-primary",
+							false ? "" : " disabled",
+						].join(" ")}
+					>
+						Save changes
+					</button>
+				</div>
+			</T.Form>
+		</div>;
+	}
 }
 class SendTokens extends T.Any {
 	constructor(props) {
@@ -278,7 +311,6 @@ class SendTokens extends T.Any {
 		return <div>
 			<h2>SEND</h2>
 			<p>This form allows you to spend funds from your wallet. Always double check your destination address!</p>
-
 				<T.If v={1}><div style={{maxWidth:"482px"}}><T.Form>
 					<T.Input.TxAdr
 						name="to" placeholder="Send to"

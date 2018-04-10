@@ -4,7 +4,7 @@ import Input from './input-base.jsx';
 class InputPassword extends Input {
 	constructor(props) {
 		super(props);
-		this.defaultHint = "Minimum 8 characters";
+		this.defaultHint = "Password of at least 10 characters";
 		this.setState({
 			onValid: this.onValid.bind(this),
 			onInvalid: this.onInvalid.bind(this),
@@ -23,7 +23,7 @@ class InputPassword extends Input {
 		input._onInvalid.call(this, valid, validOld, input, this.defaultHint, this.defaultHint);
 	}
 	checkValid(str) {
-		return str.length>7;
+		return str.length>=10;
 	}
 }
 
