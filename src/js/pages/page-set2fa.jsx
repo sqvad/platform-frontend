@@ -4,10 +4,17 @@ import T from '../tags.jsx';
 class PageSet2FA extends T.Page {
 	constructor(props) {
 		super(props);
-		this.setState({});
+		props.m.api.loadLib_qrcode()
+		.then(()=>{
+			return new Promise(resolve=>{
+				this.setState({qrLibLoaded:true}, resolve);
+			});
+		});
+		props.m.api.getUserData();
+		// this.showPopup_finish2fa();
 	}
 	render(p,s,c,m) {
-		return <T.Page.PageWrapDevice m={m} pagePostfix="set2fa">
+		return <T.Page.PageWrapDevice m={m} pagePostfix="set2fa" popup={s.popup}>
 			<T.Page.PageWrapHeader key="header" m={m} header="short" {...s}></T.Page.PageWrapHeader>
 			<T.Page.PageWrapWidth key="width" m={m} {...p}>
 				<h1 className="h1-center d-flex flex-column align-items-center">
@@ -23,7 +30,7 @@ class PageSet2FA extends T.Page {
 				<div className="d-flex flex-column align-items-center">
 					{s.helpOpened ? this.render_helpOpened(p,s,c,m) : this.render_helpClosed(p,s,c,m)}
 					{s.generateOpened ? this.render_generateOpened(p,s,c,m) : null}
-					{this.render_generateClosed(p,s,c,m)}
+					{!s.generateOpened ? this.render_generateClosed(p,s,c,m) : this.render_check2fa(p,s,c,m)}
 				</div>
 				<p className="p-muted" style={{"textAlign":"center"}}>
 					Had problems with setup? Please check our tutorials:
@@ -48,7 +55,7 @@ class PageSet2FA extends T.Page {
 						</button>
 					</div>
 					<div className="row d-flex justify-content-center">
-						<div className="mb-2 col-9">
+						<div className="mb-2 col-10">
 							<p style={{"textAlign":"center"}}>You must have an authentication app installed on your phone or tablet. This app generates access codes for your Populous account. We will ask you to enter these codes to confirm some important actions for your account, like login or changing account settings.</p>
 							<p style={{"textAlign":"center"}}>If you lost your authentication app or device, you can reset 2FA via email, like your password.</p>
 							<p style={{"textAlign":"center"}}>Authentication apps we can recommend are:</p>
@@ -109,12 +116,14 @@ class PageSet2FA extends T.Page {
 							<p style={{"textAlign":"center"}}>
 								Enter this key:
 								<br />
-								<b>NZZUI4ZIPI5SS2CAERWVESRDOVQXK32U</b>
+								<b><T.A m={m} href={s.gaLink} external>{s.totpSecretKey}</T.A></b>
 							</p>
 							<p style={{"textAlign":"center"}}>
 								QR-code:
 								<br />
-								<img src="/img/qr-test.png" width="164" height="164" alt="QR code image" />
+								<T.A m={m} href={s.gaLink} external>
+									<img src={s.qrDataUrl} width="228" height="228" alt={s.qrDataUrl?"QR code is loading...":"QR code for "+ s.gaLink} />
+								</T.A>
 							</p>
 						</div>
 					</div>
@@ -124,10 +133,54 @@ class PageSet2FA extends T.Page {
 	}
 	render_generateClosed(p,s,c,m) {
 		return <div className="mb-4" style={{minWidth:"200px"}}>
-			<button className="btn btn-lg btn-primary w-100" onClick={()=>this.setState({generateOpened:!s.generateOpened})}>
+			<button className="btn btn-lg btn-primary w-100" onClick={()=>this.generateKey()}>
 				Generate key
 			</button>
 		</div>;
+	}
+	generateKey() {
+		var p = this.props;
+		Promise.all([
+			p.m.api.loadLib_qrcode()
+			.then(()=>{
+				return new Promise(resolve=>{
+					this.setState({qrLibLoaded:true}, resolve);
+				});
+			}),
+			p.m.api.getUserData()
+			.then(()=>{
+				return p.m.api.generateTotpSecretKey()
+				.then(x=>{
+					return new Promise(resolve=>{
+						var host = p.m.settings.api.totpDomain;
+						if (host=='window.location.hostname') {
+							host = window.location.hostname;
+						}
+						var gaLink = 'otpauth://totp/'+host+':'+p.m.auth.email+'?secret='+x+'&issuer='+host+'&algorithm=SHA1&digits=6&period=30';
+						this.setState({totpSecretKey:x,gaLink}, resolve);
+					});
+				})
+			})
+		])
+		.then(()=>{
+			qrcodelib.toDataURL(this.state.gaLink, (err, url)=>{
+				this.setState({qrDataUrl:url});
+			});
+		});
+		this.setState({generateOpened:true});
+	}
+	render_check2fa(p,s,c,m) {
+		return <div className="mb-4" style={{minWidth:"200px"}}>
+			<button className="btn btn-lg btn-primary w-100" onClick={()=>{
+				this.showPopup_finish2fa();
+			}}>
+				Finish
+			</button>
+		</div>;
+	}
+	showPopup_finish2fa() {
+		var popup = <T.Popup.Finish2fa {...this.props} onClose={()=>this.setState({popup:null})} />;
+		this.setState({popup});
 	}
 }
 

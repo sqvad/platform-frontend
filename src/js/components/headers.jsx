@@ -2,8 +2,26 @@ import React from 'react';
 import Any from '../any.jsx';
 import A from './a.jsx';
 
+class Name extends Any {
+	render(p,s,c,m) {
+		if (!p.user) return null;
+		return <A m={m} href="/profile" className="d-block mr-3 pt-2 pb-2">{userData.firstName} {userData.lastName}</A>;
+	}
+}
+class Logout extends Any {
+	render(p,s,c,m) {
+		if (!p.user) return null;
+		return <button type="button" className="btn btn-sm btn-outline-secondary">
+			Log Out
+			<span className="icon icon-24 icon-logout" />
+		</button>;
+	}
+}
+
 class HeaderShort extends Any {
 	render(p,s,c,m) {
+		var authData = m.auth || {};
+		var userData = m.user;
 		return <div className="header-short bg-violet">
 			<div className="container">
 				<div className="width page">
@@ -14,11 +32,8 @@ class HeaderShort extends Any {
 							</A>
 						</div>
 						<div className="col-6 pr-0 d-flex align-items-center justify-content-end">
-							<A m={m} href="/profile" className="d-block mr-3 pt-2 pb-2">ALEXANDER DOBRIKOV</A>
-							<button type="button" className="btn btn-sm btn-outline-secondary">
-								Log Out
-								<span className="icon icon-24 icon-logout" />
-							</button>
+							<Name />
+							<Logout />
 						</div>
 					</div>
 				</div>
@@ -38,14 +53,11 @@ class HeaderMedium extends Any {
 						</A>
 					</div>
 					<div className="col-6 pr-0 d-flex align-items-center justify-content-end">
-						<A m={m} href="/profile" className="d-block mr-3 pt-2 pb-2">ALEXANDER DOBRIKOV</A>
-						<button type="button" className="btn btn-sm btn-outline-secondary">
-							Log Out
-							<span className="icon icon-24 icon-logout" />
-						</button>
+						<Name />
+						<Logout />
 					</div>
 				</div>
-					{c}
+				{c}
 			</div>
 		</div>;
 	}

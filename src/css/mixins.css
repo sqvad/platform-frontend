@@ -24,3 +24,18 @@
 
 .red { color: #bc1010; }
 .green { color: #63aa17; }
+
+.blink-3 {
+	animation-duration: 3s;
+	animation-name: blink-3;
+}
+
+@keyframes blink-3 {
+	from { opacity: 1; }
+	16% { opacity: 0; }
+	33% { opacity: 1; }
+	50% { opacity: 0; }
+	66% { opacity: 1; }
+	82% { opacity: 0; }
+	to { opacity: 1; }
+}

@@ -2,11 +2,6 @@ import React from 'react';
 import Any from '../any.jsx';
 
 class Select extends Any {
-	componentDidMount() {
-		this.onChangeViaSelect = this.onChangeViaSelect.bind(this);
-		this.onFocus = this.onFocus.bind(this);
-		this.onBlur = this.onBlur.bind(this);
-	}
 	render(p,s,c,m) {
 		var select = this.renderViaSelect(p,s,c,m);
 		if (p.useFormControl) {
@@ -36,7 +31,7 @@ class Select extends Any {
 		if (p.className) {
 			cls = p.className;
 		} else {
-			cls = "";
+			cls = ""; 
 		}
 		var options = p.options.slice(0);
 		if (p.placeholderOnFocus && s.focused) {
@@ -46,10 +41,14 @@ class Select extends Any {
 		} else if (p.useFormControl) {
 			options.unshift({value:"#placeholder#",text:""});
 		}
+		var _p = JSON.parse(JSON.stringify(p));
+		delete _p.useFormControl;
+		delete _p.options;
+		delete _p.placeholderOnFocus;
 		return <select
-			{...p}
+			{..._p}
 			className={cls}
-			value={p.value} onChange={this.onChangeViaSelect} onFocus={this.onFocus} onBlur={this.onBlur}
+			value={p.value} onChange={this.onChangeViaSelect.bind(this)} onFocus={this.onFocus.bind(this)} onBlur={this.onBlur.bind(this)}
 		>
 			{options.map((v,i)=>{
 				return <option key={"option"+i} value={v.value||v.id}>{v.text||v.title}</option>

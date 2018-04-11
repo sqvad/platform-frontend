@@ -7,8 +7,9 @@ class PageEmpty extends T.Page {
 	}
 	render(p,s,c,m) {
 		return <div style={{padding:"30px"}}>
-			Pages:
+			Pages: 
 			<ul>
+				<li><T.A href="/start" m={m}>[start]</T.A></li>
 				<li><T.A href="/signup" m={m}>Sign Up</T.A></li>
 				<li><T.A href="/set2fa" m={m}>PageSet2FA</T.A></li>
 				<li><T.A href="/signin" m={m}>PageSignIn</T.A></li>
