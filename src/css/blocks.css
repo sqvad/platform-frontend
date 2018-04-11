@@ -343,3 +343,77 @@
 .transaction-details-field i {
 	font-style: normal;
 }
+
+.popup-container {
+	position: fixed;
+	z-index: 9001;
+	left: 0; right: 0; width: 100%;
+	top: 0; bottom: 0; height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: rgba(0, 0, 0, .5);
+}
+.popup {
+	position: relative;
+	width: 540px;
+	max-width: 96%;
+	min-height: 428px;
+	padding: 50px 70px;
+	background: white;
+	max-height: 96%;
+	overflow-y: auto;
+	box-shadow: 0px 0px 32px 0px rgba(0,0,0,0.3);
+}
+.popup {
+	transition: .2s transform linear;
+}
+.popup-container {
+	transition: .2s opacity linear;
+}
+.popup-hidden .popup {
+	transform: translateY(-1234px);
+}
+.popup-hidden.popup-container {
+	opacity: 0;
+}
+.popup-close {
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 16px;
+	height: 16px;
+	border: 0px solid transparent;
+	border-width: 19px 20px 10px 10px;
+	box-sizing: content-box;
+}
+.popup-close:after, .popup-close:before {
+	content: " ";
+	display: block;
+	width: 3px;
+	height: 130%;
+	position: absolute;
+	background: #cccccc;
+	transition: background-color 0.1s linear;
+}
+.popup-close:hover:after, .popup-close:hover:before {
+	background: #868686;
+}
+.popup-close:after {
+	left: 0%; bottom: 0%;
+	transform: translate(-0.5px,-1px) rotate(45deg);
+	transform-origin: left bottom;
+}
+.popup-close:before {
+	right: 0%; bottom: 0%;
+	transform: translate(0.5px,-1px) rotate(-45deg);
+	transform-origin: right bottom;
+}
+.popup h1 {
+	margin: 0 0 22px 0;
+	color: #fc4c04;
+	text-align: center;
+	font-size: 34px;
+	line-height: 1.1;
+	font-weight: 800;
+}

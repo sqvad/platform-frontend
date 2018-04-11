@@ -9,8 +9,15 @@ class ChooseRole extends T.Any {
 		if (!m.userTypes) return null;
 		var tree = JSON.parse(JSON.stringify(m.userTypes));
 		return <div className="register-as">
-			<h2 className="form-header">Register as</h2>
-			<div className="btn-group btn-group-toggle d-flex justify-content-center flex-wrap">
+			<h2 className="form-header">
+				<span style={{
+					color: p.forgotAboutRole ? "red" : "inherit",
+					transition: "color 0.5s linear, font-size 0.5s linear"
+				}}>
+					Register as
+				</span>
+			</h2>
+			<div className={"btn-group btn-group-toggle d-flex justify-content-center flex-wrap" + (p.forgotAboutRole?" blink-3":"")}>
 				{(
 					tree.map((v,i)=>{
 						var button = null;
@@ -59,23 +66,34 @@ class ChooseRole extends T.Any {
 class PageSignUp extends T.Page {
 	constructor(props) {
 		super(props);
-		this.setState({
-			page: 1,
-			email:"",
-			password:"",
-			passwordConfirm:"",
-			role:"",
-			firstName:"",
-			lastName:"",
-			country:"",
-		});
-		props.m.api.fetchUserTypes().then(userTypes=>{
+		this.setState({page: 1});
+		// this.setState({
+		// 	page: 2,
+		// 	email:"some.box@gmail.com",
+		// 	password:"some.box..,,",
+		// 	passwordConfirm:"some.box..,,",
+		// 	role:"WAREHOUSE_PROVIDER",
+		// 	firstName:"walter",
+		// 	lastName:"skiner",
+		// 	country:"us",
+		// 	occupation: "11",
+		// 	companyName: "11",
+		// 	companyNumber: "11",
+		// 	companyDescription: "11",
+		// 	addressLine1: "11",
+		// 	addressLine2: "11",
+		// 	city: "11",
+		// 	postcode: "11",
+		// 	phoneAreaCode: "11",
+		// 	phoneNumberCode: "11",
+		// });
+		props.m.api.getUserTypes().then(userTypes=>{
 			this.setState({userTypes:userTypes});
 		});
 	}
 	render(p,s,c,m) {
 		var page1 = <PageSignUp_page1 {...p} {...s} m={m} onSubmit={this.goto2ndPage.bind(this)} />;
-		var page2 = <PageSignUp_page2 {...p} {...s} m={m} onPrev={this.goto1stPage.bind(this)} />;
+		var page2 = <PageSignUp_page2 {...p} {...s} m={m} onPrev={this.goto1stPage.bind(this)} onSubmit={this.register.bind(this)} />;
 		if (s.page==1) {
 			return <div>
 				<div key="page1">{page1}</div>
@@ -88,42 +106,49 @@ class PageSignUp extends T.Page {
 			</div>;
 		}
 	}
-	goto1stPage(result) {
-		this.setState({
-			role: result.role || this.state.role || this.props.role,
-			firstName: result.firstName || this.state.firstName || this.props.firstName,
-			lastName: result.lastName || this.state.lastName || this.props.lastName,
-			country: result.country || this.state.country || this.props.country,
-			occupation: result.occupation || this.state.occupation || this.props.occupation,
-			companyName: result.companyName || this.state.companyName || this.props.companyName,
-			companyNumber: result.companyNumber || this.state.companyNumber || this.props.companyNumber,
-			companyDescription: result.companyDescription || this.state.companyDescription || this.props.companyDescription,
-			addressLine1: result.addressLine1 || this.state.addressLine1 || this.props.addressLine1,
-			addressLine2: result.addressLine2 || this.state.addressLine2 || this.props.addressLine2,
-			city: result.city || this.state.city || this.props.city,
-			postcode: result.postcode || this.state.postcode || this.props.postcode,
-			phoneAreaCode: result.phoneAreaCode || this.state.phoneAreaCode || this.props.phoneAreaCode,
-			phoneNumberCode: result.phoneNumberCode || this.state.phoneNumberCode || this.props.phoneNumberCode,
-			page: 1
-		});
+	goto1stPage(result, skipPage, clb) {
+		var changes = {
+			role: ('role' in result) ? result.role : this.state.role || this.props.role,
+			firstName: ('firstName' in result) ? result.firstName : this.state.firstName || this.props.firstName,
+			lastName: ('lastName' in result) ? result.lastName : this.state.lastName || this.props.lastName,
+			country: ('country' in result) ? result.country : this.state.country || this.props.country,
+			occupation: ('occupation' in result) ? result.occupation : this.state.occupation || this.props.occupation,
+			companyName: ('companyName' in result) ? result.companyName : this.state.companyName || this.props.companyName,
+			companyNumber: ('companyNumber' in result) ? result.companyNumber : this.state.companyNumber || this.props.companyNumber,
+			companyDescription: ('companyDescription' in result) ? result.companyDescription : this.state.companyDescription || this.props.companyDescription,
+			addressLine1: ('addressLine1' in result) ? result.addressLine1 : this.state.addressLine1 || this.props.addressLine1,
+			addressLine2: ('addressLine2' in result) ? result.addressLine2 : this.state.addressLine2 || this.props.addressLine2,
+			city: ('city' in result) ? result.city : this.state.city || this.props.city,
+			postcode: ('postcode' in result) ? result.postcode : this.state.postcode || this.props.postcode,
+			phoneAreaCode: ('phoneAreaCode' in result) ? result.phoneAreaCode : this.state.phoneAreaCode || this.props.phoneAreaCode,
+			phoneNumberCode: ('phoneNumberCode' in result) ? result.phoneNumberCode : this.state.phoneNumberCode || this.props.phoneNumberCode,
+		};
+		if (skipPage!==true) changes.page = 1;
+		this.setState(changes, clb);
 	}
 	goto2ndPage(result) {
 		this.setState({
-			role: result.role || this.state.role || this.props.role,
-			email: result.email || this.state.email || this.props.email,
-			password: result.password || this.state.password || this.props.password,
-			passwordConfirm: result.passwordConfirm || this.state.passwordConfirm || this.props.passwordConfirm,
+			role: ('role' in result) ? result.role : this.state.role || this.props.role,
+			email: ('email' in result) ? result.email : this.state.email || this.props.email,
+			password: ('password' in result) ? result.password : this.state.password || this.props.password,
+			passwordConfirm: ('passwordConfirm' in result) ? result.passwordConfirm : this.state.passwordConfirm || this.props.passwordConfirm,
 			page: 2
+		});
+	}
+	register(result) {
+		this.goto1stPage(result, true, ()=>{
+			this.props.m.api.register(this.state);
 		});
 	}
 }
 class PageSignUp_page1 extends T.Page {
 	constructor(props) {
 		super(props);
-		this.checkValid();
 	}
 	render(p,s,c,m) {
 		var canSubmit = s.canSubmit;
+		var emailUnavaible = s.emailAvaible===false;
+		var emailFetching = s.emailAvaible===null;
 		return <T.Page.PageWrapDevice m={m} pagePostfix="signup">
 			<T.Page.PageWrapHeader key="header" m={m} header="medium" {...s}>
 				<hgroup>
@@ -139,6 +164,8 @@ class PageSignUp_page1 extends T.Page {
 							<T.Input.Email
 								name="email" onChange={this.onEmail.bind(this)}
 								value={s.email} required
+								unavaibleForRegistration={emailUnavaible}
+								emailFetching={emailFetching}
 							/>
 							<T.Input.Password
 								name="password" onChange={this.onPassword.bind(this)}
@@ -172,15 +199,25 @@ class PageSignUp_page1 extends T.Page {
 	}
 	checkValid() {
 		var s = this.state || {};
-		this.setState({
-			canSubmit: s.role && s.emailValid && s.passwordValid && s.passwordConfirmValid
-		});
+		var canSubmit_noRole = s.emailValid && s.passwordValid && s.passwordConfirmValid && s.emailAvaible;
+		var canSubmit = s.role && canSubmit_noRole;
+		this.setState({canSubmit, forgotAboutRole:canSubmit_noRole&&!canSubmit});
+		return canSubmit;
 	}
 	onRole(roleId) {
 		this.setState({role:roleId}, ()=>{this.checkValid()});
 	}
 	onEmail(v, valid) {
-		this.setState({email:v,emailValid:valid}, ()=>{this.checkValid()});
+		this.setState({email:v,emailValid:valid,emailAvaible:valid?null:true}, ()=>{
+			this.checkValid();
+			if (valid) {
+				this.props.m.api.isEmailAvailable(v)
+				.then(v=>{
+					// this.setState({emailAvaible:false}, ()=>{this.checkValid()});
+					this.setState({emailAvaible:v}, ()=>{this.checkValid()});
+				});
+			}
+		});
 	}
 	onPassword(v, valid) {
 		this.setState({
@@ -198,6 +235,21 @@ class PageSignUp_page1 extends T.Page {
 class PageSignUp_page2 extends T.Page {
 	constructor(props) {
 		super(props);
+		this.setState({
+			firstName: props.firstName,
+			lastName: props.lastName,
+			country: props.country,
+			occupation: props.occupation,
+			companyName: props.companyName,
+			companyNumber: props.companyNumber,
+			companyDescription: props.companyDescription,
+			addressLine1: props.addressLine1,
+			addressLine2: props.addressLine2,
+			city: props.city,
+			postcode: props.postcode,
+			phoneAreaCode: props.phoneAreaCode,
+			phoneNumberCode: props.phoneNumberCode,
+		});
 		this.checkValid();
 	}
 	render(p,s,c,m) {
@@ -306,9 +358,9 @@ class PageSignUp_page2 extends T.Page {
 				onChange={this.onPhoneAreaCode.bind(this)} checkValid={v=>v.length}
 				type="text" name="phone-area-code" placeholder="Phone area code" hint={s.phoneAreaCode?"":"If exists. With no country code. For \"+358 9-123...\" is 9."}
 			/>
-			<T.Input value={s.phoneNumber} required
+			<T.Input value={s.phoneNumberCode} required
 				onChange={this.onPhoneNumber.bind(this)} checkValid={v=>v.length}
-				type="text" name="phone" placeholder="Phone number" hint={s.phoneNumber?"":"With no phone area code"}
+				type="text" name="phone" placeholder="Phone number" hint={s.phoneNumberCode?"":"With no phone area code"}
 			/>
 		</div>;
 	}
@@ -380,8 +432,8 @@ class PageSignUp_page2 extends T.Page {
 	onPhoneAreaCode(phoneAreaCode,phoneAreaCodeValid) {
 		this.setState({phoneAreaCode,phoneAreaCodeValid}, ()=>{this.checkValid()});
 	}
-	onPhoneNumber(phoneNumber,phoneNumberValid) {
-		this.setState({phoneNumber,phoneNumberValid}, ()=>{this.checkValid()});
+	onPhoneNumber(phoneNumberCode,phoneNumberCodeValid) {
+		this.setState({phoneNumberCode,phoneNumberCodeValid}, ()=>{this.checkValid()});
 	}
 };
 

@@ -42,7 +42,7 @@ class PageWrapDevice extends Any {
 			(m.device.isDesktop ? "" : "no-") + "desktop",
 			"retina-" + m.device.retina,
 		].join(" ").replace(/\s+/g, " ");
-		return <div className={device} onClick={this.onAnyClick}>{c}</div>;
+		return <div className={device} onClick={this.onAnyClick}>{c}{p.popup}</div>;
 	}
 }
 class PageWrapProfile extends Any {

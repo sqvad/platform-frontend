@@ -6,6 +6,7 @@ import If from './components/if.jsx';
 import Page from './components/page.jsx';
 import Headers from './components/headers.jsx';
 import A from './components/a.jsx';
+import Popup from './components/popup.jsx';
 import _Date from './components/date.jsx';
 import Form from './components/form.jsx';
 import Select from './components/select.jsx';
@@ -21,6 +22,7 @@ export default {
 	Page,
 	Headers,
 	A,
+	Popup,
 	Date:_Date,
 	Form,
 	Select,

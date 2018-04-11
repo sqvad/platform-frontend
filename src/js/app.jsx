@@ -6,6 +6,7 @@ import PageSet2FA from './pages/page-set2fa.jsx';
 import PageSignIn from './pages/page-signin.jsx';
 import PageWallets from './pages/page-wallets.jsx';
 import PageSettings from './pages/page-settings.jsx';
+import PageStart from './pages/page-start.jsx';
 import PageEA from './pages/page-early-access.jsx';
 
 class App extends React.Component {
@@ -86,6 +87,7 @@ class App extends React.Component {
 		if (m.path.contains["signin"]) Page = PageSignIn;
 		if (m.path.contains["wallets"]) Page = PageWallets;
 		if (m.path.contains["settings"]) Page = PageSettings;
+		if (m.path.contains["start"] || m.path.contains["verify-email"]) Page = PageStart;
 		if (!Page) Page = PageEA;
 		return <Page {...spread}></Page>;
 	}
