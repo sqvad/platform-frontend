@@ -14,6 +14,7 @@ import Input from './components/input.jsx';
 import Checkbox from './components/checkbox.jsx';
 import Textarea from './components/textarea.jsx';
 import TX from './components/tx.jsx';
+import Currency from './components/currency.jsx';
 
 export default {
 	Any,
@@ -30,4 +31,5 @@ export default {
 	Checkbox,
 	Textarea,
 	TX,
+	Currency,
 };

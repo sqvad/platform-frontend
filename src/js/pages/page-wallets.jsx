@@ -13,7 +13,7 @@ class PageWallets extends T.Page {
 			_s.tab = "tokens";
 			_s.tab = "send";
 			_s.tab = "receive";
-			_s.tab = "settings";
+			// _s.tab = "settings";
 		}
 		if (!_s.openedTransactions) {
 			_s.openedTransactions = {"1":true};
@@ -39,7 +39,7 @@ class PageWallets extends T.Page {
 					<div className="profile-center">
 						{c}
 						{s.tab=="transactions"?this.renderWallet_transactions(p,s,c,m):null}
-						{s.tab=="tokens"?this.renderWallet_tokens(p,s,c,m):null}
+						{0 && s.tab=="tokens"?this.renderWallet_tokens(p,s,c,m):null}
 						{s.tab=="send"?this.render_send(p,s,c,m):null}
 						{s.tab=="receive"?this.render_receive(p,s,c,m):null}
 						{s.tab=="settings"?this.render_settings(p,s,c,m):null}
@@ -211,11 +211,11 @@ class PageWallets extends T.Page {
 								<div className="d-flex flex-row justify-content-between">
 									My {v.id} Wallet
 									<span>
-										{v.value} {v.id}
+										<T.Currency m={m} {...v} id={v.id} />
 									</span>
 								</div>
 								<div className="in-usd">
-									{v.usd} USD
+									<T.Currency m={m} {...v} usd />
 								</div>
 							</div>;
 						})}
@@ -242,10 +242,10 @@ class PageWallets extends T.Page {
 					Receiver
 				</span>
 			</div>
-			<h3>OTHER ADDRESSES</h3>
+			<h3 style={{display:"none"}}>OTHER ADDRESSES</h3>
 			<div
-				style={{border:"1px solid #e5e6e7",padding:"15px"}}
-				className="d-flex align-items-center"
+				style={{border:"1px solid #e5e6e7",padding:"15px",display:"none"}}
+				className="align-items-center"
 			>
 				<div
 					style={{marginRight:"15px",paddingRight:"15px",borderRight:"1px solid #e5e6e7"}}
@@ -304,10 +304,21 @@ class SendTokens extends T.Any {
 		this.setState({
 			currency: props.currency || "ETH",
 			priority: props.priority || "medium",
-			specifyCustomGasLimit: true,
-		})
+			specifyCustomGasLimit: false,
+			isReview: false,
+			isReport: false
+		});
 	}
 	render(p,s,c,m) {
+		if (!s.isReview && !s.isReport) {
+			return this.render_form(p,s,c,m);
+		} else if (s.isReview) {
+			return this.render_review(p,s,c,m);
+		} else {
+			return this.render_report(p,s,c,m);
+		}
+	}
+	render_form(p,s,c,m) {
 		return <div>
 			<h2>SEND</h2>
 			<p>This form allows you to spend funds from your wallet. Always double check your destination address!</p>
@@ -331,30 +342,32 @@ class SendTokens extends T.Any {
 							onChange={this.onAmount.bind(this)} value={s.amount} required
 						/>
 					</div>
-					<T.Select
-						useFormControl className="form-control" placeholder="Priority"
-						required onChange={this.onPriority.bind(this)} value={s.specifyCustomGasLimit ? "custom" : s.priority}
-						options={[
-							{value:"low",title:"Low"},
-							{value:"medium",title:"Medium"},
-							{value:"high",title:"High"},
-							s.specifyCustomGasLimit ? {value:"custom",title:"Custom"} : null,
-						].filter(v=>!!v)}
-						disabled={s.specifyCustomGasLimit}
-					/>
-					<T.Checkbox checked={s.specifyCustomGasLimit} onChange={this.onSpecifyCustomGasLimit.bind(this)}>
-						Specify custom gas limit (advanced users)
-					</T.Checkbox>
-					<T.If v={s.specifyCustomGasLimit}><div>
-						<T.Input.Float
-							name="customFee" placeholder="Custom fee" min={0} aboveMin={true} exampleNum={0.01}
-							onChange={this.onCustomFee.bind(this)} value={s.customFee} required
+					<div style={{display:"none"}}>
+						<T.Select
+							useFormControl className="form-control" placeholder="Priority"
+							required onChange={this.onPriority.bind(this)} value={s.specifyCustomGasLimit ? "custom" : s.priority}
+							options={[
+								{value:"low",title:"Low"},
+								{value:"medium",title:"Medium"},
+								{value:"high",title:"High"},
+								s.specifyCustomGasLimit ? {value:"custom",title:"Custom"} : null,
+							].filter(v=>!!v)}
+							disabled={s.specifyCustomGasLimit}
 						/>
-						<T.Input.Float
-							name="gasLimit" placeholder="Gas limit" min={0} aboveMin={true} exampleNum={0.01}
-							onChange={this.onAmount.bind(this)} value={s.amount} required
-						/>
-					</div></T.If>
+						<T.Checkbox checked={s.specifyCustomGasLimit} onChange={this.onSpecifyCustomGasLimit.bind(this)}>
+							Specify custom gas limit (advanced users)
+						</T.Checkbox>
+						<T.If v={s.specifyCustomGasLimit}><div>
+							<T.Input.Float
+								name="customFee" placeholder="Custom fee" min={0} aboveMin={true} exampleNum={0.01}
+								onChange={this.onCustomFee.bind(this)} value={s.customFee} required
+							/>
+							<T.Input.Float
+								name="gasLimit" placeholder="Gas limit" min={0} aboveMin={true} exampleNum={0.01}
+								onChange={this.onAmount.bind(this)} value={s.amount} required
+							/>
+						</div></T.If>
+					</div>
 					<T.Textarea v={s.note||""} onChange={this.onNote.bind(this)} />
 					<div className="mt-4">
 						<button type="submit"
@@ -367,41 +380,6 @@ class SendTokens extends T.Any {
 						</button>
 					</div>
 				</T.Form></div></T.If>
-
-				<div style={{maxWidth:"548px"}}>
-					<h2>REVIEW YOUR TRANSACTION</h2>
-					<div style={{border: "1px solid #e5e6e7", padding:"15px"}}>
-						<div style={{}}>
-							You are about to send the following transaction:
-							<br />
-							<b>{s.amount} {s.currency}</b> to <b>{s.to}</b>
-							<br />
-							<b>{s.customFee} {s.currency}</b> as a transaction fee to miners.
-						</div>
-						<div style={{borderTop: "1px solid #e5e6e7", paddingTop:"15px", marginTop:"15px"}}>
-							<b>{s.amount + s.customFee} {s.currency}</b> ETH in total.
-							<div className="mt-4">
-								<button type="submit"
-									className={[
-										"btn btn-lg btn-outline-primary",
-										"mr-2"
-									].join(" ")}
-									style={{fontWeight:600}}
-								>
-									Cancel
-								</button>
-								<button type="submit"
-									className={[
-										"btn btn-lg btn-primary",
-									].join(" ")}
-								>
-									Sign transaction
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
-
 		</div>;
 	}
 	onTo(to,toValid) {
@@ -428,26 +406,82 @@ class SendTokens extends T.Any {
 	onNote(note) {
 		this.setState({note})
 	}
+	render_review(p,s,c,m) {
+		return <div>
+			<div style={{maxWidth:"548px"}}>
+				<h2>REVIEW YOUR TRANSACTION</h2>
+				<div style={{border: "1px solid #e5e6e7", padding:"15px"}}>
+					<div style={{}}>
+						You are about to send the following transaction:
+						<br />
+						<b>{s.amount} {s.currency}</b> to <b>{s.to}</b>
+						<br />
+						<b>{s.customFee} {s.currency}</b> as a transaction fee to miners.
+					</div>
+					<div style={{borderTop: "1px solid #e5e6e7", paddingTop:"15px", marginTop:"15px"}}>
+						<b>{s.amount + s.customFee} {s.currency}</b> ETH in total.
+						<div className="mt-4">
+							<button type="submit"
+								className={[
+									"btn btn-lg btn-outline-primary",
+									"mr-2"
+								].join(" ")}
+								style={{fontWeight:600}}
+							>
+								Cancel
+							</button>
+							<button type="submit"
+								className={[
+									"btn btn-lg btn-primary",
+								].join(" ")}
+							>
+								Sign transaction
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>;
+	}
+	render_report(p,s,c,m) {
+		return <div>
+			{this.render_review(p,s,c,m)}
+			<T.Popup.Put2fa onClose={()=>{this.on2faOk()}} {...p} />
+		</div>;
+	}
+	on2faOk() {
+		debugger;
+		this;
+	}
 }
 
 PageWallets.mockupModel = {
+	currency: [
+		{
+			id:"ETH",
+			format: 18
+		}
+	],
 	user: {
 		userType: "...",
 		wallets: [
 			{
 				id: "ETH",
 				value: "0.1234",
-				usd: 1012105.00
+				format: 18,
+				name: "My ETH wallet"
 			},
 			{
 				id: "BTC",
-				value: "0.0001",
-				usd: 1.04
+				value: "10000000.0040",
+				format: 18,
+				name: "My BTC wallet"
 			},
 			{
 				id: "INS",
 				value: "0",
-				usd: 0
+				format: 0,
+				name: "My INS wallet"
 			},
 		]
 	}

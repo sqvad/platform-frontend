@@ -10,6 +10,7 @@ var model = {
 	emit: function(type) {
 		this.listeners[type].forEach(clb=>clb());
 	},
+	CONSTS: CONSTS,
 	Web3: Web3,
 };
 

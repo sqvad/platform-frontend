@@ -1,7 +1,7 @@
 
 var authdataMockup = {
   "canSignIn": false,
-  "email": "some.box@gmail.com",
+  "email": "zitrix.box+t91@gmail.com",
   "emailVerified": false,
   "fullVerified": false,
   "totpSecretKeyConfirmed": false,
@@ -283,6 +283,45 @@ class Api {
 		// https://www.npmjs.com/package/qrcode
 		return this._loadLib(['./qrcode.min.js']);
 	}
+    getCurrenciesRate() {
+        if (this.m.currenciesRate) return Promise.resolve(this.m.currenciesRate);
+        if (this.currenciesRatePromise) return this.currenciesRatePromise;
+        var keys = this.m.CONSTS.CLASSIC_CURRENIES_KEYS.join(",");
+        var rate = {};
+        this.currenciesRatePromise = Promise.all(
+            ['ETH','BTC','INS'].map(id=>{
+                return fetch(
+                    `https://min-api.cryptocompare.com/data/price?fsym=${id}&tsyms=${keys}`,
+                    {
+            			method: 'GET',
+            			mode: 'nocors',
+            			cache: 'default' ,
+                    }
+                ).then(x=>x.json())
+                .then(x=>{
+                    rate[id] = x;
+                });
+            })
+        )
+        .then(()=>{
+            this.m.currenciesRate = rate;
+            this.m.emit('change');
+            return this.m.currenciesRate;
+        })
+        ;
+        return this.currenciesRatePromise;
+    }
+    getDefaultClassicCurrency() {
+        var viaLocalStorage = localStorage.getItem(this.m.settings.misc.localStorage_prefix+ "INS_defaultClassicCurrency");
+        var viaSettings = this.m.settings.misc.defaultClassicCurrency;
+        var viaHardcode = "USD";
+        var ret = viaLocalStorage || viaSettings || viaHardcode;
+        if (this.m.defaultClassicCurrency!=ret) {
+            this.m.defaultClassicCurrency = ret;
+            this.m.emit('change');
+        }
+        return Promise.resolve(ret);
+    }
 }
 
 export default Api;
