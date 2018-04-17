@@ -47,7 +47,11 @@ class PageWrapDevice extends Any {
 }
 class PageWrapProfile extends Any {
 	render(p,s,c,m) {
-		return <div className="d-flex" style={{minHeight:"100%"}}>
+		var cls = "d-flex";
+		if (m.device.isMobile) {
+			cls = "d-flex flex-column";
+		}
+		return <div className={cls} style={{minHeight:"100%"}}>
 			{c}
 		</div>;
 	}

@@ -86,7 +86,12 @@ class App extends React.Component {
 		if (m.path.contains["signup"]) Page = PageSignUp;
 		if (m.path.contains["set2fa"]) Page = PageSet2FA;
 		if (m.path.contains["signin"]) Page = PageSignIn;
-		if (m.path.contains["wallets"]) Page = PageWallets;
+		if (m.path.contains["wallets"]) {
+			Page = PageWallets;
+			if (m.path.order.length>2) {
+				spread.walletId = m.path.order[2];
+			}
+		}
 		if (m.path.contains["settings"]) Page = PageSettings;
 		if (m.path.contains["start"] || m.path.contains["verify-email"]) Page = PageStart;
 		if (!Page) Page = PageEA;
