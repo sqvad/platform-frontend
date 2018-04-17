@@ -9,11 +9,11 @@ class PageWallets extends T.Page {
 		// _p.walletId = "ETH";
 		var _s = JSON.parse(JSON.stringify(s));
 		if (!_s.tab) {
-			_s.tab = "transactions";
-			_s.tab = "tokens";
-			_s.tab = "send";
+			// _s.tab = "transactions";
+			// _s.tab = "tokens";
+			// _s.tab = "send";
 			_s.tab = "receive";
-			_s.tab = "settings";
+			// _s.tab = "settings";
 		}
 		if (!_s.openedTransactions) {
 			_s.openedTransactions = {"1":true};
@@ -39,7 +39,7 @@ class PageWallets extends T.Page {
 					<div className="profile-center">
 						{c}
 						{s.tab=="transactions"?this.renderWallet_transactions(p,s,c,m):null}
-						{s.tab=="tokens"?this.renderWallet_tokens(p,s,c,m):null}
+						{0 && s.tab=="tokens"?this.renderWallet_tokens(p,s,c,m):null}
 						{s.tab=="send"?this.render_send(p,s,c,m):null}
 						{s.tab=="receive"?this.render_receive(p,s,c,m):null}
 						{s.tab=="settings"?this.render_settings(p,s,c,m):null}
@@ -50,41 +50,58 @@ class PageWallets extends T.Page {
 	}
 	renderWallet_header(p,s,c,m) {
 		var wallet = m.user.wallets.filter(v=>v.id==(p.walletId||s.walletId))[0];
+		var style = {};
+		var img = wallet.id.toLowerCase();
+		if (m.device.isMobile) {
+			img += "-mobile-"+ m.device.retina +"x.jpg";
+			style.background = "#302840 url(./img/wallet-header-"+img+") center top no-repeat";
+			style.backgroundSize = "200px 434px";
+			style.paddingBottom = "37px";
+		} else {
+			img += ".png";
+			style.background =  "#312c42 url(./img/wallet-header-"+img+") right top no-repeat";
+		}
 		return <div
-			className="bg-violet" style={{
-				background:"#312c42 url(./img/wallet-header-"+(wallet.id.toLowerCase())+".png) right top no-repeat"
-			}}
+			className="bg-violet" style={style}
 		>
 			<div className="profile-center wallet-page-header">
-				<h1>My {wallet.id} wallet</h1>
+				<h1 style={{
+					marginTop:m.device.isMobile?"-21px":"",
+					marginBottom:m.device.isMobile?"3px":""
+				}}>My {wallet.id} wallet</h1>
 				<div className="wallet-page-stat">
-					{wallet.value} {wallet.id}
+					<T.Currency m={m} {...wallet} />
 					<br />
-					<span className="in-usd">{wallet.usd} USD</span>
+					<span className="in-usd">
+						<T.Currency m={m} {...wallet} usd />
+					</span>
 				</div>
-				<div className="btn-group btn-group-toggle d-flex justify-content-start flex-wrap">
+				<div className={
+					"btn-group btn-group-toggle d-flex justify-content-start flex-wrap" + (m.device.isMobile?" flex-column":"")
+				}>
 					<div className={"btn "+ ((p.tab||s.tab)=="transactions"?" btn-secondary active":" btn-outline-secondary")}
-						onClick={()=>this.setState({tab:"transactions"})}
+						onClick={()=>this.setState({tab:"transactions"})} style={{marginLeft:m.device.isMobile?"-1px":""}}
 					>
 						TRANSACTIONS
 					</div>
 					<div className={"btn "+ ((p.tab||s.tab)=="tokens"?" btn-secondary active":" btn-outline-secondary")}
 						onClick={()=>this.setState({tab:"tokens"})}
+						style={{display:"none"}}
 					>
 						TOKENS
 					</div>
 					<div className={"btn "+ ((p.tab||s.tab)=="send"?" btn-secondary active":" btn-outline-secondary")}
-						onClick={()=>this.setState({tab:"send"})}
+						onClick={()=>this.setState({tab:"send"})} style={{marginTop:m.device.isMobile?"-1px":""}}
 					>
 						SEND
 					</div>
 					<div className={"btn "+ ((p.tab||s.tab)=="receive"?" btn-secondary active":" btn-outline-secondary")}
-						onClick={()=>this.setState({tab:"receive"})}
+						onClick={()=>this.setState({tab:"receive"})} style={{marginTop:m.device.isMobile?"-1px":""}}
 					>
 						RECEIVE
 					</div>
 					<div className={"btn "+ ((p.tab||s.tab)=="settings"?" btn-secondary active":" btn-outline-secondary")}
-						onClick={()=>this.setState({tab:"settings"})}
+						onClick={()=>this.setState({tab:"settings"})} style={{marginTop:m.device.isMobile?"-1px":""}}
 					>
 						SETTINGS
 					</div>
@@ -143,28 +160,37 @@ class PageWallets extends T.Page {
 								this.setState({openedTransactions:t});
 							}}
 						>
-							<div className="transaction-header d-flex">
+							<div className={"transaction-header d-flex"+(m.device.isMobile?" justify-content-between":"")}>
 								<div className="transaction-toggler">
 									{opened?"–":"+"}
 								</div>
 								<div className="transaction-value">
 									<span className={v.type=="received" ? "green" : v.type=="sent" ? "red" : ""}>
-										{v.value} {v.currency}
+										<T.Currency m={m} {...v} id={p.walletId} />
 									</span>
 								</div>
 								<div className="transaction-type">
 									{v.type}
 								</div>
-								<div className="transaction-time">
-									<T.Date onlyTime v={new Date(v.date)} />
-								</div>
+								<T.If v={!m.device.isMobile}>
+									<div className="transaction-time">
+										<T.Date onlyTime v={new Date(v.date)} />
+									</div>
+								</T.If>
 							</div>
 							{opened?
-								<div className="transaction-details d-flex">
+								<div className={"transaction-details d-flex"+(m.device.isMobile?" flex-column":"")}>
+									<T.If v={m.device.isMobile}>
+										<div className="transaction-details-field">
+											<i><T.Date onlyTime v={new Date(v.date)} /></i>
+										</div>
+									</T.If>
 									<div className="transaction-details-field">
 										<i>Transaction ID</i>
 										<br />
-										<T.TX tx={v.tx} fullAdrOnDesktop={descIsSmall} {...p} />
+										<div className="text-truncate">
+											<T.TX tx={v.tx} fullAdrOnDesktop={descIsSmall} fullAdr={m.device.isMobile} {...p} />
+										</div>
 										{
 											descIsSmall?null:
 											<span>
@@ -199,25 +225,25 @@ class PageWallets extends T.Page {
 				<T.Page.PageWrapProfileLeft>
 					<T.Headers.Left m={m} {...p} />
 				</T.Page.PageWrapProfileLeft>
-				<T.Page.PageWrapProfileWidth>
+				<T.Page.PageWrapProfileWidth skipLogo={m.device.isMobile}>
 					<h1>Wallets</h1>
 					<div className="wallets-list">
 						{m.user.wallets.map((v,i)=>{
-							return <div
+							return <T.A m={m}
 									key={"wallet"+i} className={"wallet wallet-"+v.id}
-									onClick={()=>{this.setState({walletId:v.id})}}
+									href={"/wallets/"+v.id}
 								>
 								<div className={"icon-currency-horizontal icon-currency-"+v.id}></div>
 								<div className="d-flex flex-row justify-content-between">
 									My {v.id} Wallet
 									<span>
-										{v.value} {v.id}
+										<T.Currency m={m} {...v} id={v.id} />
 									</span>
 								</div>
 								<div className="in-usd">
-									{v.usd} USD
+									<T.Currency m={m} {...v} usd />
 								</div>
-							</div>;
+							</T.A>;
 						})}
 					</div>
 				</T.Page.PageWrapProfileWidth>
@@ -232,20 +258,30 @@ class PageWallets extends T.Page {
 			<h2>RECEIVE</h2>
 			<h3>RECEIVING ADDRESS</h3>
 			<div
-				style={{border:"1px solid #e5e6e7",padding:"15px"}}
-				className="d-flex align-items-center"
+				style={{
+					border:"1px solid #e5e6e7",padding:"15px",
+					marginBottom:m.device.isMobile?"15px":""
+				}}
+				className={"d-flex align-items-center"+(m.device.isMobile?" flex-column":"")}
 			>
 				<img src="/img/qr-test.png" width="145" height="145" />
-				<span>
-					0x298DB031c12294c7235D00ef6380a4B53c9619a3
-					<br />
+				<span style={{
+					display:m.device.isMobile?"block":"",
+					wordBreak:m.device.isMobile?"break-all":"",
+					textAlign:m.device.isMobile?"center":"",
+				}}>
+					<div style={{
+						margin:m.device.isMobile?"2px 0 8px 0":"",
+					}}>
+						0x298DB031c12294c7235D00ef6380a4B53c9619a3
+					</div>
 					Receiver
 				</span>
 			</div>
-			<h3>OTHER ADDRESSES</h3>
+			<h3 style={{display:"none"}}>OTHER ADDRESSES</h3>
 			<div
-				style={{border:"1px solid #e5e6e7",padding:"15px"}}
-				className="d-flex align-items-center"
+				style={{border:"1px solid #e5e6e7",padding:"15px",display:"none"}}
+				className="align-items-center"
 			>
 				<div
 					style={{marginRight:"15px",paddingRight:"15px",borderRight:"1px solid #e5e6e7"}}
@@ -282,7 +318,7 @@ class PageWallets extends T.Page {
 			<h3>CHANGE WALLET NAME</h3>
 			<T.Form onSubmit={()=>{}}>
 				<T.Input
-					placeholder="Wallet name"
+					placeholder="Wallet name" inputGroupCls="border4sides"
 				/>
 				<div className="mt-4">
 					<button type="submit"
@@ -304,21 +340,33 @@ class SendTokens extends T.Any {
 		this.setState({
 			currency: props.currency || "ETH",
 			priority: props.priority || "medium",
-			specifyCustomGasLimit: true,
-		})
+			specifyCustomGasLimit: false,
+			isReview: false,
+			isReport: false
+		});
 	}
 	render(p,s,c,m) {
+		if (!s.isReview && !s.isReport) {
+			return this.render_form(p,s,c,m);
+		} else if (s.isReview) {
+			return this.render_review(p,s,c,m);
+		} else {
+			return this.render_report(p,s,c,m);
+		}
+	}
+	render_form(p,s,c,m) {
 		return <div>
 			<h2>SEND</h2>
 			<p>This form allows you to spend funds from your wallet. Always double check your destination address!</p>
 				<T.If v={1}><div style={{maxWidth:"482px"}}><T.Form>
 					<T.Input.TxAdr
-						name="to" placeholder="Send to"
+						name="to" placeholder="Send to" inputGroupCls="border4sides"
 						onChange={this.onTo.bind(this)} value={s.to} required
 					/>
 					<div className="d-flex">
 						<T.Select
-							useFormControl className="form-control mr-3" placeholder="Currency"
+							useFormControl className="form-control mr-3" inputGroupCls="border4sides"
+							placeholder="Currency"
 							required onChange={this.onCurrency.bind(this)} value={s.currency}
 							options={
 								m.user.wallets.map(v=>{
@@ -329,32 +377,35 @@ class SendTokens extends T.Any {
 						<T.Input.Float
 							name="amount" placeholder="Amount" min={0} aboveMin={true} max={5} belowMax={false}
 							onChange={this.onAmount.bind(this)} value={s.amount} required
+							inputGroupCls="border4sides"
 						/>
 					</div>
-					<T.Select
-						useFormControl className="form-control" placeholder="Priority"
-						required onChange={this.onPriority.bind(this)} value={s.specifyCustomGasLimit ? "custom" : s.priority}
-						options={[
-							{value:"low",title:"Low"},
-							{value:"medium",title:"Medium"},
-							{value:"high",title:"High"},
-							s.specifyCustomGasLimit ? {value:"custom",title:"Custom"} : null,
-						].filter(v=>!!v)}
-						disabled={s.specifyCustomGasLimit}
-					/>
-					<T.Checkbox checked={s.specifyCustomGasLimit} onChange={this.onSpecifyCustomGasLimit.bind(this)}>
-						Specify custom gas limit (advanced users)
-					</T.Checkbox>
-					<T.If v={s.specifyCustomGasLimit}><div>
-						<T.Input.Float
-							name="customFee" placeholder="Custom fee" min={0} aboveMin={true} exampleNum={0.01}
-							onChange={this.onCustomFee.bind(this)} value={s.customFee} required
+					<div style={{display:"none"}}>
+						<T.Select
+							useFormControl className="form-control" placeholder="Priority"
+							required onChange={this.onPriority.bind(this)} value={s.specifyCustomGasLimit ? "custom" : s.priority}
+							options={[
+								{value:"low",title:"Low"},
+								{value:"medium",title:"Medium"},
+								{value:"high",title:"High"},
+								s.specifyCustomGasLimit ? {value:"custom",title:"Custom"} : null,
+							].filter(v=>!!v)}
+							disabled={s.specifyCustomGasLimit}
 						/>
-						<T.Input.Float
-							name="gasLimit" placeholder="Gas limit" min={0} aboveMin={true} exampleNum={0.01}
-							onChange={this.onAmount.bind(this)} value={s.amount} required
-						/>
-					</div></T.If>
+						<T.Checkbox checked={s.specifyCustomGasLimit} onChange={this.onSpecifyCustomGasLimit.bind(this)}>
+							Specify custom gas limit (advanced users)
+						</T.Checkbox>
+						<T.If v={s.specifyCustomGasLimit}><div>
+							<T.Input.Float
+								name="customFee" placeholder="Custom fee" min={0} aboveMin={true} exampleNum={0.01}
+								onChange={this.onCustomFee.bind(this)} value={s.customFee} required
+							/>
+							<T.Input.Float
+								name="gasLimit" placeholder="Gas limit" min={0} aboveMin={true} exampleNum={0.01}
+								onChange={this.onAmount.bind(this)} value={s.amount} required
+							/>
+						</div></T.If>
+					</div>
 					<T.Textarea v={s.note||""} onChange={this.onNote.bind(this)} />
 					<div className="mt-4">
 						<button type="submit"
@@ -367,41 +418,6 @@ class SendTokens extends T.Any {
 						</button>
 					</div>
 				</T.Form></div></T.If>
-
-				<div style={{maxWidth:"548px"}}>
-					<h2>REVIEW YOUR TRANSACTION</h2>
-					<div style={{border: "1px solid #e5e6e7", padding:"15px"}}>
-						<div style={{}}>
-							You are about to send the following transaction:
-							<br />
-							<b>{s.amount} {s.currency}</b> to <b>{s.to}</b>
-							<br />
-							<b>{s.customFee} {s.currency}</b> as a transaction fee to miners.
-						</div>
-						<div style={{borderTop: "1px solid #e5e6e7", paddingTop:"15px", marginTop:"15px"}}>
-							<b>{s.amount + s.customFee} {s.currency}</b> ETH in total.
-							<div className="mt-4">
-								<button type="submit"
-									className={[
-										"btn btn-lg btn-outline-primary",
-										"mr-2"
-									].join(" ")}
-									style={{fontWeight:600}}
-								>
-									Cancel
-								</button>
-								<button type="submit"
-									className={[
-										"btn btn-lg btn-primary",
-									].join(" ")}
-								>
-									Sign transaction
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
-
 		</div>;
 	}
 	onTo(to,toValid) {
@@ -428,26 +444,82 @@ class SendTokens extends T.Any {
 	onNote(note) {
 		this.setState({note})
 	}
+	render_review(p,s,c,m) {
+		return <div>
+			<div style={{maxWidth:"548px"}}>
+				<h2>REVIEW YOUR TRANSACTION</h2>
+				<div style={{border: "1px solid #e5e6e7", padding:"15px"}}>
+					<div style={{}}>
+						You are about to send the following transaction:
+						<br />
+						<b>{s.amount} {s.currency}</b> to <b>{s.to}</b>
+						<br />
+						<b>{s.customFee} {s.currency}</b> as a transaction fee to miners.
+					</div>
+					<div style={{borderTop: "1px solid #e5e6e7", paddingTop:"15px", marginTop:"15px"}}>
+						<b>{s.amount + s.customFee} {s.currency}</b> ETH in total.
+						<div className="mt-4">
+							<button type="submit"
+								className={[
+									"btn btn-lg btn-outline-primary",
+									"mr-2"
+								].join(" ")}
+								style={{fontWeight:600}}
+							>
+								Cancel
+							</button>
+							<button type="submit"
+								className={[
+									"btn btn-lg btn-primary",
+								].join(" ")}
+							>
+								Sign transaction
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>;
+	}
+	render_report(p,s,c,m) {
+		return <div>
+			{this.render_review(p,s,c,m)}
+			<T.Popup.Put2fa onClose={()=>{this.on2faOk()}} {...p} />
+		</div>;
+	}
+	on2faOk() {
+		debugger;
+		this;
+	}
 }
 
 PageWallets.mockupModel = {
+	currency: [
+		{
+			id:"ETH",
+			format: 18
+		}
+	],
 	user: {
 		userType: "...",
 		wallets: [
 			{
 				id: "ETH",
 				value: "0.1234",
-				usd: 1012105.00
+				format: 18,
+				name: "My ETH wallet"
 			},
 			{
 				id: "BTC",
-				value: "0.0001",
-				usd: 1.04
+				value: "10000000.0040",
+				format: 18,
+				name: "My BTC wallet"
 			},
 			{
 				id: "INS",
 				value: "0",
-				usd: 0
+				format: 0,
+				name: "My INS wallet"
 			},
 		]
 	}

@@ -6,7 +6,8 @@ class TX extends Any {
 	render(p,s,c,m) {
 		var tx = p.v || p.tx || p.txHash;
 		var txFormatted = tx;
-		if (p.fullAdrOnDesktop && p.m.device.isDesktop) {
+		if (p.fullAdr) {
+		} else if (p.fullAdrOnDesktop && p.m.device.isDesktop) {
 		} else {
 			txFormatted = this.format(tx);
 		}

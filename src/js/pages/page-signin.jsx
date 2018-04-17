@@ -20,7 +20,7 @@ class PageSignIn extends T.Page {
 			<T.Page.PageWrapWidth key="width" m={m} {...p}>
 				<T.Form onSubmit={()=>{s.canSubmit && p.onSubmit(s)}}>
 					<div className="row d-flex justify-content-center mt-4">
-						<div className="col-6">
+						<div className={m.device.isMobile?"":"col-6"} style={{width:m.device.isMobile?"90%":""}}>
 							<T.Input.Email
 								name="email" onChange={this.onEmail.bind(this)}
 								value={s.email} required
@@ -37,7 +37,11 @@ class PageSignIn extends T.Page {
 								</span>
 								<span>
 									<T.A href="" {...p} className="external text-muted" style={{fontSize:"0.8em",position:"relative",top:"0.2em"}}>
-										Forgot your password?
+										<span style={{
+											fontSize: m.device.isMobile ? "0.8em" : ""
+										}}>
+											Forgot your password?
+										</span>
 									</T.A>
 								</span>
 							</div>

@@ -16,6 +16,7 @@ class Select extends Any {
 		inputGroupCls += haveValue ? " filled placeholder-to-up" : " empty";
 		if (s.focused) inputGroupCls += " focused";
 		if (p.hasError || s.errorViaRequied) inputGroupCls += " has-danger";
+		if (p.inputGroupCls) inputGroupCls += " "+ p.inputGroupCls;
 		var hint = p.hint || null;
 		if (s.errorViaRequied) {
 			hint = "This field is required";
@@ -31,7 +32,7 @@ class Select extends Any {
 		if (p.className) {
 			cls = p.className;
 		} else {
-			cls = ""; 
+			cls = "";
 		}
 		var options = p.options.slice(0);
 		if (p.placeholderOnFocus && s.focused) {
@@ -45,6 +46,7 @@ class Select extends Any {
 		delete _p.useFormControl;
 		delete _p.options;
 		delete _p.placeholderOnFocus;
+		delete _p.inputGroupCls;
 		return <select
 			{..._p}
 			className={cls}

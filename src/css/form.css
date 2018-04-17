@@ -25,6 +25,20 @@ input.form-control, select.form-control {
 	border-width: 0 0 2px 0;
 	border-radius: 0;
 }
+.border4sides input.form-control, .border4sides.input-group.has-danger input,
+.border4sides select.form-control, .border4sides.input-group.has-danger select {
+	border-width: 1px;
+	border-color: #e5e6e7;
+	padding-left: 13px;
+	font-size: 14px;
+	padding-top: 10px;
+	padding-bottom: 8px;
+}
+.border4sides select.form-control, .border4sides.input-group.has-danger select,
+.border4sides.with-placeholder select.form-control:not([size]):not([multiple])
+{
+	height: 40px;
+}
 
 .with-placeholder {
 	position: relative;
@@ -54,11 +68,21 @@ label.input-group {
 	color: #7e8593;
 	transition: color 0.1s linear, font-size 0.1s linear, left 0.1s linear, top 0.1s linear;
 }
+.border4sides .placeholder {
+	left: 13px;
+	top: 33px;
+}
 .input-group.placeholder-to-up .placeholder {
 	font-size: 12px;
 	color: #353535;
 	top: 12px;
 	font-weight: bold;
+}
+.border4sides.input-group.placeholder-to-up  .placeholder {
+	top: 2px;
+	left: 0;
+	/* font-size: 14px; */
+	color: #000000;
 }
 .input-group.focused .placeholder {
 	color: #fc4c04;
@@ -80,6 +104,9 @@ label.input-group {
 	top: 58px;
 	font-size: 12px;
 	color: #7e8593;
+}
+.border4sides.input-group .input-hint {
+	top: 64px;
 }
 .input-group.has-danger .input-hint {
 	color: #ff0000;

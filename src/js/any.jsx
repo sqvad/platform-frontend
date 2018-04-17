@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { CSSTransitionGroup } from 'react-transition-group';
+import CONSTS from './consts.js';
 
 class Any extends React.Component {
 	constructor(props) {
@@ -79,6 +80,8 @@ class Any extends React.Component {
 
 Any.prototype.Anim = CSSTransitionGroup;
 
+Any.prototype.CONSTS = CONSTS;
+Any.CONSTS = CONSTS;
 Any.PropTypes = PropTypes;
 Any.createElement = React.createElement;
 export default Any;

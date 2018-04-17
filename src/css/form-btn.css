@@ -15,6 +15,10 @@
 	font-size: 18px;
 	padding: 13px 34px;
 }
+.mobile .btn-lg {
+	padding-left: 20px;
+	padding-right: 20px;
+}
 .btn-lg.btn-primary, .btn-lg.btn-secondary {
 	font-weight: 600;
 }

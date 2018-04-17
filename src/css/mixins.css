@@ -1,3 +1,6 @@
+.nobr-mobile {
+	white-space: nowrap;
+}
 
 .bg-violet {
 	background: #38334b;

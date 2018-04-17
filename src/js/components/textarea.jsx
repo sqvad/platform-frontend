@@ -4,7 +4,7 @@ import Any from '../any.jsx';
 class Textarea extends Any {
 	render(p,s,c,m) {
 		return <div className="input-group with-placeholder flex-column for-textarea">
-			<div class="placeholder">Note</div>
+			<div>Note</div>
 			<div>
 				<textarea
 					value={p.value} onChange={this.onChange.bind(this)}

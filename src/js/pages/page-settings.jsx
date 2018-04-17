@@ -72,7 +72,12 @@ class PageSettings extends T.Page {
 						value="USD" onChange={()=>{}}
 						useFormControl className="form-control" placeholder="Default currency"
 						options={[
-							{id:"USD", text:"USD"}
+							{id:"USD", text:"USD"},
+							{id:"EUR", text:"EUR"},
+							{id:"CNY", text:"CNY"},
+							{id:"JPY", text:"JPY"},
+							{id:"KOW", text:"KOW"},
+							{id:"AUD", text:"AUD"},
 						]}
 					/>
 				</div>

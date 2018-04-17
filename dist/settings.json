@@ -9,6 +9,9 @@
 		"totpDomain": "ins-consulting.waitdomain"
 	},
 	"misc": {
-		"pathViaHash": true
+		"pathViaHash": true,
+		"defaultClassicCurrency": "USD",
+		"localStorage_prefix": "INS_",
+		"serverSendWei": false
 	}
 }

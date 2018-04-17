@@ -8,6 +8,11 @@ class ChooseRole extends T.Any {
 	render(p,s,c,m) {
 		if (!m.userTypes) return null;
 		var tree = JSON.parse(JSON.stringify(m.userTypes));
+		var cls = [
+			"btn-group btn-group-toggle d-flex flex-wrap",
+			m.device.isMobile ? "flex-column align-items-stretch " : " justify-content-center",
+			p.forgotAboutRole ? "blink-3" : "",
+		].filter(v=>!!v).join(" ");
 		return <div className="register-as">
 			<h2 className="form-header">
 				<span style={{
@@ -17,7 +22,7 @@ class ChooseRole extends T.Any {
 					Register as
 				</span>
 			</h2>
-			<div className={"btn-group btn-group-toggle d-flex justify-content-center flex-wrap" + (p.forgotAboutRole?" blink-3":"")}>
+			<div className={cls}>
 				{(
 					tree.map((v,i)=>{
 						var button = null;
@@ -28,16 +33,27 @@ class ChooseRole extends T.Any {
 							var isActive = isActiveSelf || activeChild;
 							return <T.Select
 								key={"role"+i} value={p.role} onChange={this.onChooseViaSelect.bind(this)}
-								className={"btn "+(isActive? "btn-secondary active":"btn-outline-secondary")}
+								className={[
+									"btn ",
+									isActive? "btn-secondary active" : "btn-outline-secondary",
+								].join(" ")}
 								options={v.children.map(v=>{return {value:v.id,text:v.title}})}
 								placeholder={v.title}
 								placeholderOnFocus="Please choose..."
 								onBlur={this.onChooseViaSelect.bind(this)}
+								style={{
+									marginLeft: m.device.isMobile ? "-1px" : "",
+									marginTop: m.device.isMobile && i ? "-1px" : ""
+								}}
 							></T.Select>;
 						} else {
 							return <div
 								key={"role"+i} data-v={v.id} onClick={this.onChooseViaButton.bind(this)}
 								className={"btn "+(v.id==p.role? "btn-secondary active":" btn-outline-secondary")}
+								style={{
+									marginLeft: m.device.isMobile ? "-1px" : "",
+									marginTop: m.device.isMobile && i ? "-1px" : ""
+								}}
 							>
 								{v.title}
 							</div>;
@@ -152,15 +168,15 @@ class PageSignUp_page1 extends T.Page {
 		return <T.Page.PageWrapDevice m={m} pagePostfix="signup">
 			<T.Page.PageWrapHeader key="header" m={m} header="medium" {...s}>
 				<hgroup>
-					<h1>SING UP FOR INS ECOSYSTEM</h1>
-					<h2>Join the breakthrough in the consumer goods industry</h2>
+					<h1>SING UP FOR <span className="nobr-mobile">INS ECOSYSTEM</span></h1>
+					<h2>Join the breakthrough in the consumer <span className="nobr-mobile">goods industry</span></h2>
 				</hgroup>
 			</T.Page.PageWrapHeader>
 			<T.Page.PageWrapWidth key="width" m={m} {...p}>
 				<T.Form onSubmit={()=>{s.canSubmit && p.onSubmit(s)}}>
 					<ChooseRole m={m} {...p} {...s} onChoose={this.onRole.bind(this)} />
 					<div className="row d-flex justify-content-center">
-						<div className="col-6">
+						<div className="col-sm-6">
 							<T.Input.Email
 								name="email" onChange={this.onEmail.bind(this)}
 								value={s.email} required
@@ -269,7 +285,7 @@ class PageSignUp_page2 extends T.Page {
 				<T.Form onSubmit={()=>{p.onSubmit(s)}}>
 					<ChooseRole m={m} {...p} {...s} onChoose={this.onRole.bind(this)} />
 					<div className="row d-flex justify-content-center">
-						<div className="col-6">
+						<div className="col-sm-6">
 							<T.Input value={s.firstName} required
 								onChange={this.onFirstName.bind(this)} checkValid={v=>v.length}
 								type="text" name="name" placeholder="FIRST NAME" hint={s.firstName?"":"E.g. Walter"}
