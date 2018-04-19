@@ -160,7 +160,7 @@ class PageSignUp extends T.Page {
 				.then(x=>{
 					var m = this.props.m;
 					if (m.path.contains["signup"]) {
-						m.api.gotoHref(T.A.href({href:"/"},m))
+						m.api.gotoHref(T.A.href({href:"/"},m));
 					}
 				});
 			});
@@ -294,7 +294,7 @@ class PageSignUp_page2 extends T.Page {
 			<T.Page.PageWrapWidth key="width" m={m} {...p}>
 				<T.Form onSubmit={()=>{return this.onSubmit(s)}} hideServerError onServerError={()=>this.forceUpdate()} ref={el=>this.form=el}>
 					<ChooseRole m={m} {...p} {...s} onChoose={this.onRole.bind(this)} />
-					<div className="row d-flex justify-content-center">
+					<div className="row d-flex justify-content-center" style={{marginBottom:"15px"}}>
 						<div className="col-sm-6">
 							<T.Input value={s.firstName} required
 								onChange={this.onFirstName.bind(this)} checkValid={v=>v.length}
@@ -314,24 +314,20 @@ class PageSignUp_page2 extends T.Page {
 							></T.Select>
 							{extendFields}
 							{this.form && this.form.renderServerError()}
-							<div className="d-flex justify-content-between mt-4">
-								<button
-									type="button" onClick={p.onPrev.bind(this, s)}
-									className="btn btn-lg btn-outline-primary btn-with-icon-at-left-side"
+							<div className={"d-flex justify-content-between mt-4"+(m.device.isMobile?" flex-column":"")}>
+								<T.Form.SubmitButton
+									canSubmit={true} fetching={s.fetching}
+									type="button" dontChangeText onClick={p.onPrev.bind(this, s)}
+									clsColor="btn-outline-primary" cls="btn-lg btn-with-icon-at-left-side" style={{flex:1}}
 								>
 									Previous
-									<span className="icon icon-24 icon-prev icon-violet"></span>
-								</button>
-								<button type="submit"
-									className={[
-										"btn btn-lg btn-primary",
-										"btn-with-icon-at-right-side",
-										canSubmit ? "" : " disabled",
-										"ml-3"
-									].join(" ")}
-								>
-									Sign Up
-								</button>
+									<span className={"icon icon-24 icon-prev icon-"+(s.fetching?"gray":"violet")}></span>
+								</T.Form.SubmitButton>
+								<T.Form.SubmitButton
+									canSubmit={canSubmit} fetching={s.fetching}
+									text="Sign Up"
+									clsColor="btn-primary" cls={"btn-lg btn-with-icon-at-right-side "+(m.device.isMobile?"mt-3":"ml-3")} style={{flex:1}}
+								/>
 							</div>
 						</div>
 					</div>
@@ -340,13 +336,7 @@ class PageSignUp_page2 extends T.Page {
 		</T.Page.PageWrapDevice>;
 	}
 	onSubmit() {
-		return this.props.onSubmit(this.state)
-		// .catch(er=>{
-		// 	debugger;
-		// 	this.setState({serverError:er}, ()=>{this.forceUpdate()});
-		// 	er;
-		// 	this;
-		// })
+		return T.Form.wrapFetch(this, this.props.onSubmit(this.state));
 	}
 	render_extendFields(p,s,c,m) {
 		return <div>

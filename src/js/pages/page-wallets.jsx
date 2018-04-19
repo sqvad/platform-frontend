@@ -63,7 +63,7 @@ class PageWallets extends T.Page {
 	renderWallet(p,s,c,m) {
 		var wallet = m.user.wallets.filter(v=>v.symbol==p.walletId)[0];
 		var tab = s.tab || "transactions";
-		var tab = s.tab || "settings";
+		// var tab = s.tab || "settings";
 		return <T.Page.PageWrapDevice m={m} pagePostfix="wallet">
 			<T.Page.PageWrapProfile key="header" m={m} header="left" {...s}>
 				<T.Page.PageWrapProfileLeft>

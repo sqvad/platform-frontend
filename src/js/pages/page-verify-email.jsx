@@ -26,9 +26,9 @@ class PageVerifyEmail extends T.Page {
 					VERIFY EMAIL
 				</h1>
 				<div className="d-flex flex-column align-items-center">
-					<div style={{maxWidth:"600px"}}>
+					<div style={{maxWidth:"450px",width:"100%"}}>
 						<T.Form onSubmit={()=>this.onSubmit()}>
-							<T.Input 
+							<T.Input
 								value={s.code} onChange={code=>this.setState({code,error:null})}
 								placeholder={"Code from your email "}
 								hint={"Check out "+ (m.auth && m.auth.email || m.user && m.user.email)}
@@ -43,23 +43,18 @@ class PageVerifyEmail extends T.Page {
 							<T.If v={s.sendOtherCode_ready}><p className="mt-4 mb-3">
 								Sent! Please, check out your email.
 							</p></T.If>
-							<div className="d-flex justify-content-between mt-4">
-								<button
+							<div className={"d-flex justify-content-between mt-4"+(m.device.isMobile?" flex-column":"")}>
+								<T.Form.SubmitButton
 									type="button" onClick={this.sendOtherCode.bind(this)}
-									className="btn btn-lg btn-outline-primary"
-									disabled={s.sendOtherCode_pending}
-								>
-									Send other code
-								</button>
-								<button type="submit"
-									className={[
-										"btn btn-lg btn-primary",
-										canSubmit ? "" : " disabled",
-									"ml-3"
-								].join(" ")}
-							>
-								Confirm email
-							</button>
+									clsColor="btn-outline-primary" cls="btn-lg"
+									canSubmit={!s.fetching} fetching={s.sendOtherCode_pending}
+									text="Send other code" style={{flex:1}}
+								/>
+								<T.Form.SubmitButton
+									clsColor="btn-primary" cls={"btn-lg "+(m.device.isMobile?"mt-3":"ml-3")}
+									canSubmit={canSubmit} fetching={s.fetching}
+									text="Confirm email" style={{flex:1}}
+								/>
 						</div>
 					</T.Form>
 				</div>
@@ -72,15 +67,13 @@ class PageVerifyEmail extends T.Page {
 		this.props.m.api.requestCodeToVerifyEmail()
 		.then(x=>{
 			this.setState({error:null,sendOtherCode_ready:true,sendOtherCode_pending:false});
-			debugger;
-			x;
 		})
 		.catch(x=>{
 			this.setState({error:x,sendOtherCode_ready:false,sendOtherCode_pending:false});
 		});
 	}
 	onSubmit() {
-		this.props.m.api.verifyEmail(null, this.state.code)
+		return T.Form.wrapFetch(this, this.props.m.api.verifyEmail(null, this.state.code))
 		.catch(x=>{
 			this.setState({error:x});
 		});

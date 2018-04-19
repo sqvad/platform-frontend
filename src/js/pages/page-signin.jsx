@@ -4,6 +4,8 @@ import T from '../tags.jsx';
 class PageSignIn extends T.Page {
 	constructor(props) {
 		super(props);
+		this.props.m.api.getAuthData();
+		this.props.m.api.getUserData();
 		this.setState({
 			email: this.props.m && this.props.m.auth && this.props.m.auth.email || "",
 			password:"", //popupForgotPassword: true,
@@ -72,14 +74,11 @@ class PageSignIn extends T.Page {
 						</span>
 					</div>
 					<div className="d-flex justify-content-center mt-5">
-						<button type="submit"
-							className={[
-								"btn btn-lg btn-primary",
-								s.canSubmit ? "" : " disabled",
-							].join(" ")}
-						>
-							Log In
-						</button>
+						<T.Form.SubmitButton
+							clsColor="btn-primary" cls="btn-lg"
+							canSubmit={s.canSubmit} fetching={s.fetching}
+							text="Log In"
+						/>
 					</div>
 				</div>
 			</div>
@@ -98,13 +97,21 @@ class PageSignIn extends T.Page {
 		this.setState({password:v,passwordValid:valid}, ()=>{this.checkValid()});
 	}
 	onSubmit() {
-		this.props.m.api.loginEmail(this.state.email, this.state.password)
-		.then(x=>{
-			var m = this.props.m;
-			if (m.path.contains["signin"]) {
-				m.api.gotoHref(T.A.href({href:"/"},m))
-			}
-		});
+		return T.Form.wrapFetch(
+			this,
+			this.props.m.api.loginEmail(this.state.email, this.state.password)
+			.then(x=>{
+				return this.props.m.api.getUserData(true)
+				.then(()=>{
+					var m = this.props.m; // :(
+					if (m.path.contains["signin"]) {
+						if (m.signedIn) {
+							m.api.gotoHref(T.A.href({href:"/"},m))
+						}
+					}
+				})
+			})
+		)
 	}
 }
 
