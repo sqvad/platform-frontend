@@ -10,12 +10,21 @@ class PageVerifyEmail extends T.Page {
 		if (codeViaURL) {
 			this.setState({code:codeViaURL});
 			props.m.api.verifyEmail(null, codeViaURL)
+			.then(x=>{
+				this.props.m.api.gotoHref("/");
+			})
 			.catch(x=>{
 				this.setState({error:x});
 			});
 		} else {
 			this.setState({code:""});
 		}
+		props.m.api.getAuthData()
+		.then(()=>{
+			if (props.m.auth && props.m.auth.emailVerified) {
+				this.props.m.api.gotoHref("/");
+			}
+		});
 	}
 	render(p,s,c,m) {
 		var canSubmit = true;
