@@ -6,12 +6,30 @@
 	"api": {
 		"description": "information about an API",
 		"url": "https://ins-wallet-api-test.abdkconsulting.com",
-		"totpDomain": "ins-consulting.waitdomain"
+		"totpDomain": "ins.world"
 	},
 	"misc": {
 		"pathViaHash": true,
 		"defaultClassicCurrency": "USD",
+		"getUSDrateFor": ["ETH","BTC","INS","TNK"],
+		"serverSendWei": true,
 		"localStorage_prefix": "INS_",
-		"serverSendWei": false
+		"showPagesList": true,
+		"startPage": "/wallets",
+		"myETHwallet_prefix": "My ",
+		"myETHwallet_postfix": " wallet",
+
+		"etherscanPrefix": {
+			"main": "https://ropsten.etherscan.io/",
+			"testnet": "https://etherscan.io/"
+		}
+	},
+	"classicCurrencies": {
+	    "USD": {"text":"USD"},
+	    "EUR": {"text":"EUR"},
+	    "CNY": {"text":"CNY"},
+	    "JPY": {"text":"JPY"},
+	    "KOW": {"text":"KOW"},
+	    "AUD": {"text":"AUD"}
 	}
 }

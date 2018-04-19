@@ -35,6 +35,7 @@ class PageWrapDevice extends Any {
 	render(p,s,c,m) {
 		var pagePostfix = p.pagePostfix || s.pagePostfix;
 		var device = [
+			"page",
 			(pagePostfix ? "page-"+pagePostfix : ""),
 			(m.device.isMobile ? "" : "no-") + "mobile",
 			(m.device.isTablet ? "" : "no-") + "tablet",

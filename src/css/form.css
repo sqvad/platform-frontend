@@ -15,6 +15,10 @@ form {
 	color: #000000;
 }
 
+.input-group .form-control,
+.input-group .form-control:active, .input-group .form-control:focus, .input-group .form-control:hover {
+	z-index: auto;
+}
 input.form-control, select.form-control {
 	font-size: 16px;
 	line-height: 20px;
@@ -24,20 +28,6 @@ input.form-control, select.form-control {
 	border-color: #bec5d1;
 	border-width: 0 0 2px 0;
 	border-radius: 0;
-}
-.border4sides input.form-control, .border4sides.input-group.has-danger input,
-.border4sides select.form-control, .border4sides.input-group.has-danger select {
-	border-width: 1px;
-	border-color: #e5e6e7;
-	padding-left: 13px;
-	font-size: 14px;
-	padding-top: 10px;
-	padding-bottom: 8px;
-}
-.border4sides select.form-control, .border4sides.input-group.has-danger select,
-.border4sides.with-placeholder select.form-control:not([size]):not([multiple])
-{
-	height: 40px;
 }
 
 .with-placeholder {
@@ -52,6 +42,23 @@ input.form-control, select.form-control {
 .with-placeholder select.form-control, .with-placeholder select.form-control:not([size]):not([multiple]) {
 	height: 34px;
 }
+
+.border4sides input.form-control, .border4sides.input-group.has-danger input,
+.border4sides select.form-control, .border4sides.input-group.has-danger select {
+	border-width: 1px;
+	border-color: #e5e6e7;
+	padding-left: 13px;
+	font-size: 14px;
+	padding-top: 10px;
+	padding-bottom: 8px;
+	background: #ffffff;
+}
+.border4sides select.form-control, .border4sides.input-group.has-danger select,
+.border4sides.with-placeholder select.form-control:not([size]):not([multiple])
+{
+	height: 40px;
+}
+
 label.input-group {
 	padding-top: 20px;
 	padding-bottom: 20px;

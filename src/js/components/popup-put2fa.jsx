@@ -11,7 +11,7 @@ class PopupPut2fa extends Any {
 		this.setState({code2fa:""});
 	}
 	render(p,s,c,m) {
-		return <Popup onClose={p.onClose}>
+		var content = <div>
 			<h1 className="h1-center mt-0">ENTER 2-FACTOR <br />AUTHENTICATION CODE</h1>
 			<p>
 				<img
@@ -41,7 +41,15 @@ class PopupPut2fa extends Any {
 					<A m={m} className="text-muted external"><small>I’m not able to log in with 2FA</small></A>
 				</div>
 			</Form>
-		</Popup>;
+		</div>;
+		return this.renderWrap(p,s,content,m);
+	}
+	renderWrap(p,s,c,m) {
+		if (p.noPopup) {
+			return <div>{c}</div>;
+		} else {
+			return <Popup onClose={p.onClose}>{c}</Popup>;
+		}
 	}
 	onCode(code2fa,codeValid) {
 		this.setState({code2fa,codeValid,er:null}, ()=>{
@@ -49,19 +57,14 @@ class PopupPut2fa extends Any {
 		});
 	}
 	onSubmit() {
-		debugger;
-		return;
 		this.setState({pending:true});
-		this.props.m.api.confirmTotpSecretKey(this.state.code2fa)
+		this.props.m.api.login2fa(this.state.code2fa)
 		.then(x=>{
-			debugger;
-			x;
 			this.props.onClose();
 		})
 		.catch(er=>{
 			this.setState({er,pending:false})
 		})
-		;
 	}
 }
 

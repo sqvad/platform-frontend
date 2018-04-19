@@ -10,7 +10,7 @@ class ChooseRole extends T.Any {
 		var tree = JSON.parse(JSON.stringify(m.userTypes));
 		var cls = [
 			"btn-group btn-group-toggle d-flex flex-wrap",
-			m.device.isMobile ? "flex-column align-items-stretch " : " justify-content-center",
+			m.device.isMobile ? "flex-column align-items-stretch" : " justify-content-center",
 			p.forgotAboutRole ? "blink-3" : "",
 		].filter(v=>!!v).join(" ");
 		return <div className="register-as">
@@ -103,6 +103,8 @@ class PageSignUp extends T.Page {
 		// 	phoneAreaCode: "11",
 		// 	phoneNumberCode: "11",
 		// });
+		props.m.api.getAuthData();
+		props.m.api.getUserData();
 		props.m.api.getUserTypes().then(userTypes=>{
 			this.setState({userTypes:userTypes});
 		});
@@ -152,8 +154,16 @@ class PageSignUp extends T.Page {
 		});
 	}
 	register(result) {
-		this.goto1stPage(result, true, ()=>{
-			this.props.m.api.register(this.state);
+		return new Promise((resolve, reject)=>{
+			this.goto1stPage(result, true, ()=>{
+				this.props.m.api.register(this.state).then(resolve).catch(reject)
+				.then(x=>{
+					var m = this.props.m;
+					if (m.path.contains["signup"]) {
+						m.api.gotoHref(T.A.href({href:"/"},m))
+					}
+				});
+			});
 		});
 	}
 }
@@ -282,7 +292,7 @@ class PageSignUp_page2 extends T.Page {
 				</hgroup>
 			</T.Page.PageWrapHeader>
 			<T.Page.PageWrapWidth key="width" m={m} {...p}>
-				<T.Form onSubmit={()=>{p.onSubmit(s)}}>
+				<T.Form onSubmit={()=>{return this.onSubmit(s)}} hideServerError onServerError={()=>this.forceUpdate()} ref={el=>this.form=el}>
 					<ChooseRole m={m} {...p} {...s} onChoose={this.onRole.bind(this)} />
 					<div className="row d-flex justify-content-center">
 						<div className="col-sm-6">
@@ -303,6 +313,7 @@ class PageSignUp_page2 extends T.Page {
 								]}
 							></T.Select>
 							{extendFields}
+							{this.form && this.form.renderServerError()}
 							<div className="d-flex justify-content-between mt-4">
 								<button
 									type="button" onClick={p.onPrev.bind(this, s)}
@@ -328,17 +339,26 @@ class PageSignUp_page2 extends T.Page {
 			</T.Page.PageWrapWidth>
 		</T.Page.PageWrapDevice>;
 	}
+	onSubmit() {
+		return this.props.onSubmit(this.state)
+		// .catch(er=>{
+		// 	debugger;
+		// 	this.setState({serverError:er}, ()=>{this.forceUpdate()});
+		// 	er;
+		// 	this;
+		// })
+	}
 	render_extendFields(p,s,c,m) {
 		return <div>
 			<T.Input value={s.occupation} required
 				onChange={this.onOccupation.bind(this)} checkValid={v=>v.length}
 				type="text" name="occupation" placeholder="Occupation" hint={s.lastName?"":"E.g. owner or CTO"}
 			/>
-			<T.Input value={s.companyName} required
+			<T.Input value={s.companyName} required max="100"
 				onChange={this.onCompanyName.bind(this)} checkValid={v=>v.length}
 				type="text" name="company-name" placeholder="Company name" hint={s.companyName?"":"E.g. My Company"}
 			/>
-			<T.Input value={s.companyNumber} required
+			<T.Input value={s.companyNumber} required max="50"
 				onChange={this.onCompanyNumber.bind(this)} checkValid={v=>v.length}
 				type="text" name="company-number" placeholder="Company number" hint={
 					s.companyNumber?"":
@@ -350,31 +370,31 @@ class PageSignUp_page2 extends T.Page {
 								: "Unique registration code"
 				}
 			/>
-			<T.Input value={s.companyDescription} required
+			<T.Input value={s.companyDescription} required max="250"
 				onChange={this.onCompanyDescription.bind(this)} checkValid={v=>v.length}
 				type="text" name="company-description" placeholder="Company description" hint={s.companyDescription?"":"Something about your business"}
 			/>
-			<T.Input value={s.addressLine1} required
+			<T.Input value={s.addressLine1} required max="150"
 				onChange={this.onAddressLine1.bind(this)} checkValid={v=>v.length}
 				type="text" name="address-line1" placeholder="Address line 1" hint={s.addressLine1?"":"Address"}
 			/>
-			<T.Input value={s.addressLine2}
+			<T.Input value={s.addressLine2} max="150"
 				onChange={this.onAddressLine2.bind(this)} checkValid={v=>v.length}
 				type="text" name="address-line2" placeholder="Address line 2" hint={s.addressLine2?"":"Secondary addresses, PO Box numbers, or special instructions"}
 			/>
-			<T.Input value={s.city} required
+			<T.Input value={s.city} required max="100"
 				onChange={this.onCity.bind(this)} checkValid={v=>v.length}
 				type="text" name="city" placeholder="City" hint={s.city?"":"E.g. New York City"}
 			/>
-			<T.Input value={s.postcode}
+			<T.Input value={s.postcode} max="10"
 				onChange={this.onPostcode.bind(this)} checkValid={v=>v.length}
 				type="text" name="postcode" placeholder="Postcode" hint={s.postcode?"":"E.g. 10001 (if exists)"}
 			/>
-			<T.Input value={s.phoneAreaCode}
+			<T.Input value={s.phoneAreaCode} max="10"
 				onChange={this.onPhoneAreaCode.bind(this)} checkValid={v=>v.length}
 				type="text" name="phone-area-code" placeholder="Phone area code" hint={s.phoneAreaCode?"":"If exists. With no country code. For \"+358 9-123...\" is 9."}
 			/>
-			<T.Input value={s.phoneNumberCode} required
+			<T.Input value={s.phoneNumberCode} required max="60"
 				onChange={this.onPhoneNumber.bind(this)} checkValid={v=>v.length}
 				type="text" name="phone" placeholder="Phone number" hint={s.phoneNumberCode?"":"With no phone area code"}
 			/>
@@ -405,6 +425,7 @@ class PageSignUp_page2 extends T.Page {
 			// if (!s.phoneAreaCodeValid) viaExtended = false;
 			if (!s.phoneNumberCodeValid) viaExtended = false;
 		}
+		if (this.form) this.form.forgotAboutServerError();
 		this.setState({
 			canSubmit: anyway && viaExtended
 		});
