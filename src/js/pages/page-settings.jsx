@@ -136,10 +136,16 @@ class PageSettings extends T.Page {
 					/>
 					{this.form && this.form.renderServerError()}
 				</div>
+				<T.If v={s.passwordChanged}>
+					<p>
+						Password changed.
+					</p>
+				</T.If>
 				<button type="submit"
+					disabled={s.passwordChanged || !s.canSubmitPassword}
 					className={[
 						"btn btn-lg btn-primary",
-						s.canSubmitPassword ? "" : " disabled",
+						s.passwordChanged || !s.canSubmitPassword ? " disabled": "",
 					].join(" ")}
 				>
 					Save changes
@@ -166,7 +172,7 @@ class PageSettings extends T.Page {
 	onPassword_save() {
 		return this.props.m.api.changePassword(this.state.passworCur, this.state.passworConfirm)
 		.then(x=>{
-			debugger;x;this;
+			this.setState({passwordChanged:true});
 		});
 	}
 	render_2faDisable(p,s,c,m) {

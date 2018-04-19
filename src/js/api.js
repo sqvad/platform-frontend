@@ -39,9 +39,9 @@ class Api {
 		return this._fetch('POST', url, params_);
 	}
 	_fetch(method, path, params_) {
-		// if (this.logoutNow && method!="logout") {
-		// 	return Promise.reject({code:"SIGN_OUT_IN_PROGRESS"});
-		// }
+		if (this.model.logoutInProgress && path.indexOf('/auth/logout')==-1) {
+			return Promise.reject({message:"SIGN_OUT_IN_PROGRESS"});
+		}
 		var params;
 		if (params_) {
 			params = params_ ? JSON.parse(JSON.stringify(params_)) : null;
@@ -227,9 +227,11 @@ class Api {
         var origin = window.location.origin;
 		if (this.model.settings.misc.pathViaHash) {
 			if (href && href!="#") {
-				window.location.hash = href.charAt(0)=="#" ? href : "#" + href;
+				// window.location.hash = href.charAt(0)=="#" ? href : "#" + href;
+				window.history.pushState({x:Date.now()}, null, href.charAt(0)=="#" ? href : "#" + href);
 			} else {
-				window.location.hash = "";
+				// window.location.hash = "";
+				window.history.pushState({x:Date.now()}, null, "#");
 			}
 		} else {
         	var path = window.location.pathname || "/";
@@ -239,9 +241,10 @@ class Api {
 		            href = href.substr(1);
 		        }
 			}
-	        window.location.href = href;
+	        // window.location.href = href;
+			window.history.pushState({x:Date.now()}, null, href);
         }
-        window.location.reload();
+        // window.location.reload();
     }
     logout() {
         try {
@@ -249,7 +252,7 @@ class Api {
         } catch(er) {}
         try {
             this.model.logoutInProgress = true;
-            this.model.emit('change');
+            // this.model.emit('change');
         } catch(er) {}
         this._fetchPOST('/auth/logout',null)
         .then(()=>{
@@ -259,7 +262,8 @@ class Api {
         .catch(()=>{
             this.model.logoutInProgress = false;
             this.model.emit('change');
-			this.gotoHref("");
+			this.gotoHref("/");
+			window.location.reload();
         })
     }
     loginEmail(email,password) {

@@ -83,7 +83,8 @@ class App extends React.Component {
 		var spread = {m};
 		var Page;
 		if (!Page) { // for any users - via url
-			if (m.path.contains["verify-email"] || m.path.contains["start"]) Page = PageStart;
+			// if (m.path.contains["verify-email"] || m.path.contains["start"]) Page = PageStart;
+			if (m.path.contains["verify-email"]) Page = PageVerifyEmail;
 			if (m.path.contains["early-access"]) Page = PageEA;
 		}
 		if (!Page && m.settings.misc.showPagesList) { // for demo
@@ -94,11 +95,11 @@ class App extends React.Component {
 			if (m.path.contains["signin"]) Page = PageSignIn;
 		}
 		if (!Page) { // signin for anonymous
-			if (!m.auth || !m.auth.signedIn) {
+			// if (!m.auth || !m.auth.signedIn) {
 				if (m.path.contains["signup"]) Page = PageSignUp;
 				if (m.path.contains["set2fa"]) Page = PageSet2FA;
 				if (m.path.contains["signin"]) Page = PageSignIn;
-			}
+			// }
 		}
 		if (!Page) { // for authorized users...
 			if (m.auth && m.auth.signedIn || m.settings.misc.showPagesList) {

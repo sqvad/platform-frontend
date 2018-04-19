@@ -6,7 +6,9 @@
 	"api": {
 		"description": "information about an API",
 		"url": "https://ins-wallet-api-test.abdkconsulting.com",
-		"totpDomain": "ins.world"
+		"totpDomain_exaple1_someDomain": "ins.world",
+		"totpDomain_exaple2_viaURL": "window.location.hostname",
+		"totpDomain": "window.location.hostname"
 	},
 	"misc": {
 		"pathViaHash": true,
@@ -14,7 +16,7 @@
 		"getUSDrateFor": ["ETH","BTC","INS","TNK"],
 		"serverSendWei": true,
 		"localStorage_prefix": "INS_",
-		"showPagesList": true,
+		"showPagesList": false,
 		"startPage": "/wallets",
 		"myETHwallet_prefix": "My ",
 		"myETHwallet_postfix": " wallet",
