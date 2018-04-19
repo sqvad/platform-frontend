@@ -28,6 +28,11 @@ class App extends React.Component {
 				e.preventDefault();
 			}
 		};
+		if (!this.props.m.settings.misc.showPagesList) {
+			this.api.getAuthData();
+		}
+		this.api.getUserData(false);
+		this.api.getDefaultClassicCurrency();
 		this.onRAF();
 	}
 	componentWillUnmount() {
@@ -35,13 +40,13 @@ class App extends React.Component {
 	}
 	onRAF() {
 		if (this.deprecated) return;
-		if (this.href!=window.location.href) {
+		if (this.href!=window.location.href || !this.props.m.path) {
 			this.href = window.location.href;
 			this.props.m.path = this.parsePath();
 			this.needChange = true;
 		}
 		var width = window.innerWidth || document.body.clientWidth;
-		if (width!=this.widthPrev) {
+		if (width!=this.widthPrev || !this.props.m.device) {
 			this.needChange = true;
 			this.widthPrev = width;
 			if (!this.props.m.device) this.props.m.device = {};
@@ -77,25 +82,67 @@ class App extends React.Component {
 		m.api = this.api;
 		var spread = {m};
 		var Page;
-		// @todo dispatch
-		// if (!Page) Page = PageEmpty;
-		// if (!Page) Page = PageSignUp;
-		// if (!Page) Page = PageSet2FA;
-		// if (!Page) Page = PageSignIn;
-		// if (!Page) Page = PageWallets;
-		if (m.path.contains["signup"]) Page = PageSignUp;
-		if (m.path.contains["set2fa"]) Page = PageSet2FA;
-		if (m.path.contains["signin"]) Page = PageSignIn;
-		if (m.path.contains["wallets"]) {
-			Page = PageWallets;
-			if (m.path.order.length>2) {
-				spread.walletId = m.path.order[2];
+		if (!Page) { // for any users - via url
+			if (m.path.contains["verify-email"] || m.path.contains["start"]) Page = PageStart;
+			if (m.path.contains["early-access"]) Page = PageEA;
+		}
+		if (!Page && m.settings.misc.showPagesList) { // for demo
+			if (m.path.contains["signup"]) Page = PageSignUp;
+			if (m.path.contains["set2fa"]) {
+				Page = PageSet2FA;
+			}
+			if (m.path.contains["signin"]) Page = PageSignIn;
+		}
+		if (!Page) { // signin for anonymous
+			if (!m.auth || !m.auth.signedIn) {
+				if (m.path.contains["signup"]) Page = PageSignUp;
+				if (m.path.contains["set2fa"]) Page = PageSet2FA;
+				if (m.path.contains["signin"]) Page = PageSignIn;
 			}
 		}
-		if (m.path.contains["settings"]) Page = PageSettings;
-		if (m.path.contains["start"] || m.path.contains["verify-email"]) Page = PageStart;
-		if (!Page) Page = PageEA;
-		// Page = PageVerifyEmail;
+		if (!Page) { // for authorized users...
+			if (m.auth && m.auth.signedIn || m.settings.misc.showPagesList) {
+				var toWallet = false;
+				var toSettings = false;
+				// ...via url...
+				if (m.path.contains["wallets"]) {
+					toWallet = true;
+				}
+				if (m.path.contains["settings"]) {
+					toSettings = true;
+				}
+				// ...or via settings.json
+				if (!toWallet || !toSettings) {
+					if (!m.settings.misc.showPagesList) {
+						if (m.settings.misc.startPage.indexOf("wallets")>-1) {
+							toWallet = true;
+						}
+						if (m.settings.misc.startPage.indexOf("settings")>-1) {
+							toSettings = true;
+						}
+					}
+				}
+				if (toWallet) {
+					Page = PageWallets;
+					if (m.path.order.length>3) {
+						spread.tab = m.path.order[3];
+					}
+					if (m.path.order.length>2) {
+						spread.walletId = m.path.order[2];
+					}
+				}
+				if (toSettings) {
+					Page = PageSettings;
+				}
+			}
+		}
+		if (!Page || m.logoutInProgress) { // for anonymous (start or signin)
+			if (m.settings.misc.showPagesList) {
+				Page = PageEA;
+			} else {
+				Page = PageStart;
+			}
+		}
 		return <Page {...spread}></Page>;
 	}
 	parsePath(pathname, search) {

@@ -1,34 +1,69 @@
 import React from 'react';
 import T from '../tags.jsx';
 
+
 class PageWallets extends T.Page {
-	render(p,s,c,m) {
-		var _m = JSON.parse(JSON.stringify(PageWallets.mockupModel));
-		_m = Object.assign(_m, m);
-		var _p = JSON.parse(JSON.stringify(p));
-		// _p.walletId = "ETH";
-		var _s = JSON.parse(JSON.stringify(s));
-		if (!_s.tab) {
-			// _s.tab = "transactions";
-			// _s.tab = "tokens";
-			// _s.tab = "send";
-			_s.tab = "receive";
-			// _s.tab = "settings";
-		}
-		if (!_s.openedTransactions) {
-			_s.openedTransactions = {"1":true};
-		}
-		return this._render(_p,_s,c,_m);
+	constructor(props) {
+		super(props);
+		props.m.api.getCurrenciesRate();
+		props.m.api.getWallets();
 	}
-	_render(p,s,c,m) {
-		if (p.walletId || s.walletId) {
+	render(p,s,c,m) {
+		if (!m.user || !m.user.wallets) {
+			return this.renderLoading(p,s,c,m);
+		} else if (p.walletId || s.walletId) {
 			return this.renderWallet(p,s,c,m);
 		} else {
-			return this.render_walletsList(p,s,c,m);
+			return this.renderWalletsList(p,s,c,m);
 		}
 	}
+	renderLoading(p,s,c,m) {
+		return <T.Page.PageWrapDevice m={m} pagePostfix="wallet">
+			<T.Page.PageWrapProfile key="header" m={m} header="left" {...s}>
+				<T.Page.PageWrapProfileLeft>
+					<T.Headers.Left m={m} {...p} />
+				</T.Page.PageWrapProfileLeft>
+				<T.Page.PageWrapProfileWidth skipLogo={m.device.isMobile}>
+					<h1>loading...</h1>
+				</T.Page.PageWrapProfileWidth>
+			</T.Page.PageWrapProfile>
+		</T.Page.PageWrapDevice>;
+	}
+	renderWalletsList(p,s,c,m) {
+		return <T.Page.PageWrapDevice m={m} pagePostfix="wallet">
+			<T.Page.PageWrapProfile key="header" m={m} header="left" {...s}>
+				<T.Page.PageWrapProfileLeft>
+					<T.Headers.Left m={m} {...p} />
+				</T.Page.PageWrapProfileLeft>
+				<T.Page.PageWrapProfileWidth skipLogo={m.device.isMobile}>
+					<h1>Wallets</h1>
+					<div className="wallets-list">
+						{m.user.wallets.map((v,i)=>{
+							return <T.A m={m}
+									key={"wallet"+i} className={"wallet wallet-"+v.symbol}
+									href={"/wallets/"+v.symbol}
+								>
+								<div className={"icon-currency-horizontal icon-currency-"+v.symbol}></div>
+								<div className="d-flex flex-row justify-content-between">
+									{v.name}
+									<span>
+										<T.Currency m={m} {...v} id={v.symbol} />
+									</span>
+								</div>
+								<div className="in-usd">
+									<T.Currency m={m} {...v} usd />
+								</div>
+							</T.A>;
+						})}
+					</div>
+				</T.Page.PageWrapProfileWidth>
+			</T.Page.PageWrapProfile>
+		</T.Page.PageWrapDevice>;
+	}
 	renderWallet(p,s,c,m) {
-		var wallet = m.user.wallets.filter(v=>v.id==p.walletId)[0];
+		var wallet = m.user.wallets.filter(v=>v.symbol==p.walletId)[0];
+		var tab = s.tab || "transactions";
+		var tab = s.tab || "settings";
 		return <T.Page.PageWrapDevice m={m} pagePostfix="wallet">
 			<T.Page.PageWrapProfile key="header" m={m} header="left" {...s}>
 				<T.Page.PageWrapProfileLeft>
@@ -38,20 +73,21 @@ class PageWallets extends T.Page {
 					{this.renderWallet_header(p,s,c,m)}
 					<div className="profile-center">
 						{c}
-						{s.tab=="transactions"?this.renderWallet_transactions(p,s,c,m):null}
-						{0 && s.tab=="tokens"?this.renderWallet_tokens(p,s,c,m):null}
-						{s.tab=="send"?this.render_send(p,s,c,m):null}
-						{s.tab=="receive"?this.render_receive(p,s,c,m):null}
-						{s.tab=="settings"?this.render_settings(p,s,c,m):null}
+						{tab=="transactions"?this.renderWallet_transactions(p,s,c,m):null}
+						{0 && tab=="tokens"?this.renderWallet_tokens(p,s,c,m):null}
+						{tab=="send"?this.renderWallet_send(p,s,c,m):null}
+						{tab=="receive"?this.renderWallet_receive(p,s,c,m):null}
+						{tab=="settings"?this.renderWallet_settings(p,s,c,m):null}
 					</div>
 				</div>
 			</T.Page.PageWrapProfile>
 		</T.Page.PageWrapDevice>;
 	}
 	renderWallet_header(p,s,c,m) {
-		var wallet = m.user.wallets.filter(v=>v.id==(p.walletId||s.walletId))[0];
+		var wallet = m.user.wallets.filter(v=>v.symbol==(p.walletId||s.walletId))[0];
 		var style = {};
-		var img = wallet.id.toLowerCase();
+		var img = wallet.symbol.toLowerCase();
+		if (img=='tnk') img = 'ins';
 		if (m.device.isMobile) {
 			img += "-mobile-"+ m.device.retina +"x.jpg";
 			style.background = "#302840 url(./img/wallet-header-"+img+") center top no-repeat";
@@ -68,7 +104,7 @@ class PageWallets extends T.Page {
 				<h1 style={{
 					marginTop:m.device.isMobile?"-21px":"",
 					marginBottom:m.device.isMobile?"3px":""
-				}}>My {wallet.id} wallet</h1>
+				}}>{wallet.name}</h1>
 				<div className="wallet-page-stat">
 					<T.Currency m={m} {...wallet} />
 					<br />
@@ -79,7 +115,7 @@ class PageWallets extends T.Page {
 				<div className={
 					"btn-group btn-group-toggle d-flex justify-content-start flex-wrap" + (m.device.isMobile?" flex-column":"")
 				}>
-					<div className={"btn "+ ((p.tab||s.tab)=="transactions"?" btn-secondary active":" btn-outline-secondary")}
+					<div className={"btn "+ ((p.tab||s.tab||"transactions")=="transactions"?" btn-secondary active":" btn-outline-secondary")}
 						onClick={()=>this.setState({tab:"transactions"})} style={{marginLeft:m.device.isMobile?"-1px":""}}
 					>
 						TRANSACTIONS
@@ -136,124 +172,12 @@ class PageWallets extends T.Page {
 		</div>;
 	}
 	renderWallet_transactions(p,s,c,m) {
-		var transactions = [
-		  { id: 1, date: new Date(2018, 3-1, 22, 10, 56, 42),
-			type: "sent", value: "0.0001", currency: "eth", tx: "0xf064a664f6bdf6cfda604c21935bc92c5c7597a7b00f9630c1f8", desc:"thank you", confirmations: 1234 },
-		{ id: 2, date: new Date(2018, 3-1, 22, 10, 56, 41),
-		  type: "received", value: "0.0001", currency: "eth", tx: "0xf264a664f6bdf6cfda604c21935bc92c5c7597a7b00f9630c1f2", desc:"", confirmations: 1234 },
-		{ id: 3, date: new Date(2018, 3-1, 21, 7+12, 12, 13),
-		  type: "sent", value: "0.0001", currency: "eth", tx: "0xf364a664f6bdf6cfda604c21935bc92c5c7597a7b00f9630c1f3", desc:"", confirmations: 1234 },
-		];
-		var byDays = T.Date.groupByDay(JSON.parse(JSON.stringify(transactions)), v=>v.date);
-		return <div className="transactions-list">
-			<h2>TRANSACTIONS</h2>
-			{byDays.map((transactions,i)=>{
-				return <div key={i}>
-					<h3><T.Date onlyDate v={new Date(transactions[0].date)} /></h3>
-					{transactions.map((v,i)=>{
-						var opened = s.openedTransactions[""+v.id];
-						var descIsSmall = (v.desc || "").length < 100;
-						return <div key={"-"+i} className={"transaction-container" + (opened?" opened":" closed")}
-							onClick={()=>{
-								var t = JSON.parse(JSON.stringify(s.openedTransactions));
-								t[v.id] = !t[v.id];
-								this.setState({openedTransactions:t});
-							}}
-						>
-							<div className={"transaction-header d-flex"+(m.device.isMobile?" justify-content-between":"")}>
-								<div className="transaction-toggler">
-									{opened?"–":"+"}
-								</div>
-								<div className="transaction-value">
-									<span className={v.type=="received" ? "green" : v.type=="sent" ? "red" : ""}>
-										<T.Currency m={m} {...v} id={p.walletId} />
-									</span>
-								</div>
-								<div className="transaction-type">
-									{v.type}
-								</div>
-								<T.If v={!m.device.isMobile}>
-									<div className="transaction-time">
-										<T.Date onlyTime v={new Date(v.date)} />
-									</div>
-								</T.If>
-							</div>
-							{opened?
-								<div className={"transaction-details d-flex"+(m.device.isMobile?" flex-column":"")}>
-									<T.If v={m.device.isMobile}>
-										<div className="transaction-details-field">
-											<i><T.Date onlyTime v={new Date(v.date)} /></i>
-										</div>
-									</T.If>
-									<div className="transaction-details-field">
-										<i>Transaction ID</i>
-										<br />
-										<div className="text-truncate">
-											<T.TX tx={v.tx} fullAdrOnDesktop={descIsSmall} fullAdr={m.device.isMobile} {...p} />
-										</div>
-										{
-											descIsSmall?null:
-											<span>
-												<br />
-												<i>Confirmations</i>
-												<br />
-												{v.confirmations}
-											</span>
-										}
-									</div>
-									{descIsSmall?<div className="transaction-details-field">
-										<i>Confirmations</i>
-										<br />
-										{v.confirmations}
-									</div>:null}
-									<div className={"transaction-details-field" + (v.desc ? " invert" : "")} style={{flex:1,marginRight:"0"}}>
-										<i>Description</i>
-										<br />
-										{v.desc || "No description"}
-									</div>
-								</div>
-							:null}
-						</div>;
-					})}
-				</div>;
-			})}
-		</div>;
+		return <TransactionsTable {...p} {...s} />;
 	}
-	render_walletsList(p,s,c,m) {
-		return <T.Page.PageWrapDevice m={m} pagePostfix="wallet">
-			<T.Page.PageWrapProfile key="header" m={m} header="left" {...s}>
-				<T.Page.PageWrapProfileLeft>
-					<T.Headers.Left m={m} {...p} />
-				</T.Page.PageWrapProfileLeft>
-				<T.Page.PageWrapProfileWidth skipLogo={m.device.isMobile}>
-					<h1>Wallets</h1>
-					<div className="wallets-list">
-						{m.user.wallets.map((v,i)=>{
-							return <T.A m={m}
-									key={"wallet"+i} className={"wallet wallet-"+v.id}
-									href={"/wallets/"+v.id}
-								>
-								<div className={"icon-currency-horizontal icon-currency-"+v.id}></div>
-								<div className="d-flex flex-row justify-content-between">
-									My {v.id} Wallet
-									<span>
-										<T.Currency m={m} {...v} id={v.id} />
-									</span>
-								</div>
-								<div className="in-usd">
-									<T.Currency m={m} {...v} usd />
-								</div>
-							</T.A>;
-						})}
-					</div>
-				</T.Page.PageWrapProfileWidth>
-			</T.Page.PageWrapProfile>
-		</T.Page.PageWrapDevice>;
-	}
-	render_send(p,s,c,m) {
+	renderWallet_send(p,s,c,m) {
 		return <SendTokens {...p} {...s} m={m} />;
 	}
-	render_receive(p,s,c,m) {
+	renderWallet_receive(p,s,c,m) {
 		return <div>
 			<h2>RECEIVE</h2>
 			<h3>RECEIVING ADDRESS</h3>
@@ -311,20 +235,39 @@ class PageWallets extends T.Page {
 			</div>
 		</div>;
 	}
-	render_settings(p,s,c,m) {
-		var wallet = m.user.wallets.filter(v=>v.id==p.walletId)[0];
+	renderWallet_settings(p,s,c,m) {
+		return <Settings {...p} {...s} />;
+	}
+}
+
+class Settings extends T.Any {
+	constructor(props) {
+		super(props);
+		var wallet = props.m.user.wallets.filter(v=>v.symbol==props.walletId)[0];
+		this.setState({name: wallet.name});
+	}
+	render (p,s,c,m) {
+		var wallet = m.user.wallets.filter(v=>v.symbol==p.walletId)[0];
 		return <div>
 			<h2>SETTINGS</h2>
 			<h3>CHANGE WALLET NAME</h3>
-			<T.Form onSubmit={()=>{}}>
+			<code><pre>
+				{JSON.stringify(wallet,4,4)}
+			</pre></code>
+			<code><pre>
+				{s.nameValid}
+			</pre></code>
+			<T.Form onSubmit={()=>this.save()}>
 				<T.Input
-					placeholder="Wallet name" inputGroupCls="border4sides"
+					required placeholder="Wallet name" inputGroupCls="border4sides"
+					value={s.name}
+					onChange={(name,nameValid)=>{this.setState({name,nameValid})}}
 				/>
 				<div className="mt-4">
 					<button type="submit"
 						className={[
 							"btn btn-lg btn-primary",
-							false ? "" : " disabled",
+							s.nameValid ? "" : " disabled",
 						].join(" ")}
 					>
 						Save changes
@@ -333,7 +276,11 @@ class PageWallets extends T.Page {
 			</T.Form>
 		</div>;
 	}
+	save() {
+		this.props.m.api.updateWalletName(this.props.walletId, this.state.name);
+	}
 }
+
 class SendTokens extends T.Any {
 	constructor(props) {
 		super(props);
@@ -493,35 +440,154 @@ class SendTokens extends T.Any {
 	}
 }
 
-PageWallets.mockupModel = {
-	currency: [
-		{
-			id:"ETH",
-			format: 18
+class TransactionsTable extends T.Any {
+	constructor(props) {
+		super(props);
+		this.setState({page:0,transactions:[]});
+		this.load();
+	}
+	load() {
+		this.setState({loading:true});
+		this.props.m.api.getTransactions(this.props.walletId)
+		.then(transactions=>{
+			this.setState({loading:false,transactions,serverEr:null});
+		})
+		.catch(serverError=>{
+			this.setState({loading:false,transactions:null,serverError});
+		})
+	}
+	render_loading(p,s,c,m) {
+		return <div>
+			<h2>Transactions are loading...</h2>
+		</div>;
+	}
+	render_empty(p,s,c,m) {
+		return <div>
+			<h2>No transactions found</h2>
+			<T.Form.ServerError serverError={s.serverError} />
+		</div>;
+	}
+	render(p,s,c,m) {
+		if (s.loading) {
+			return this.render_loading(p,s,c,m);
 		}
-	],
-	user: {
-		userType: "...",
-		wallets: [
-			{
-				id: "ETH",
-				value: "0.1234",
-				format: 18,
-				name: "My ETH wallet"
-			},
-			{
-				id: "BTC",
-				value: "10000000.0040",
-				format: 18,
-				name: "My BTC wallet"
-			},
-			{
-				id: "INS",
-				value: "0",
-				format: 0,
-				name: "My INS wallet"
-			},
-		]
+		var transactions = s.transactions;
+		if (!transactions || !transactions.length) {
+			return this.render_empty(p,s,c,m);
+		}
+		var byDays = T.Date.groupByDay(
+			JSON.parse(JSON.stringify(transactions)),
+			v=>{
+				return v.executeDate || v.createDate;
+			}
+		);
+		return <div className="transactions-list">
+			<h2>TRANSACTIONS</h2>
+			{byDays.map((transactions,i)=>{
+				return <div key={i}>
+					<h3><T.Date onlyDate v={new Date(transactions[0].executeDate || transactions[0].createDate)} mutes={{y:1}} /></h3>
+					{transactions.map((v,i)=>{
+						var opened = (s.openedTransactions||{})[""+v.id];
+						var descIsSmall = (v.comment || "").length < 100;
+						var tx, isSystemId;// = tx in v ? v.tx || v.address
+						if ('ethereumTransactionHash' in v) {
+							isSystemId = false;
+							tx = v.ethereumTransactionHash;
+							if (!tx) {
+								isSystemId = true;
+								tx = ''+v.id;
+							}
+						} else if ('tx' in v) {
+							isSystemId = false;
+							tx = v.tx;
+						} else {
+							isSystemId = true;
+							tx = ''+v.id;
+						}
+						var isPositive = T.Currency.isPositive(v, true);
+						var colorCls = isPositive===false ? "red" : isPositive ? "green" : "" ;
+						return <div key={"-"+i} className={"transaction-container" + (opened?" opened":" closed")}
+							onClick={()=>{
+								var t = JSON.parse(JSON.stringify(s.openedTransactions||{}));
+								t[v.id] = !t[v.id];
+								this.setState({openedTransactions:t});
+							}}
+						>
+							<div className={"transaction-header d-flex"+(m.device.isMobile?" justify-content-between":"")}>
+								<div className="transaction-toggler">
+									{opened?"–":"+"}
+								</div>
+								<div className="transaction-value">
+									<span className={colorCls}>
+										<T.Currency m={m} {...v} value={v.sum} id={v.tokenContractAddress} />
+									</span>
+								</div>
+								<div className="transaction-type">
+									{v.type.replace(/_/g, ' ').toLowerCase()+', '}
+									<T.If v={v.status=="EXECUTED"}>
+										<span>{v.status.replace(/_/g, ' ').toLowerCase()}</span>
+									</T.If>
+									<T.If v={v.status!="EXECUTED"}>
+										<span className="red">{v.status.replace(/_/g, ' ').toLowerCase()}</span>
+									</T.If>
+								</div>
+								<T.If v={!m.device.isMobile}>
+									<div className="transaction-time">
+										<T.Date onlyTime v={new Date(v.date || v.executeDate || v.createDate)} />
+									</div>
+								</T.If>
+							</div>
+							{opened?
+								<div className={"transaction-details d-flex"+(m.device.isMobile?" flex-column":"")}>
+									<T.If v={m.device.isMobile}>
+										<div className="transaction-details-field">
+											<i><T.Date onlyTime v={new Date(v.date || v.executeDate || v.createDate)} /></i>
+										</div>
+									</T.If>
+									<div className="transaction-details-field">
+										<i>Transaction ID</i>
+										<br />
+										<div className="text-truncate">
+											<T.If v={isSystemId}><span>
+												systemId#{tx}
+											</span></T.If>
+											<T.If v={!isSystemId}>
+												<T.TX tx={tx} fullAdrOnDesktop={descIsSmall} fullAdr={m.device.isMobile} {...p} />
+											</T.If>
+										</div>
+										{
+											descIsSmall?null:
+											v.confirmations&&<span>
+												<br />
+												<i>Confirmations</i>
+												<br />
+												{v.confirmations}
+											</span>
+										}
+										<T.If v={v.address}><span>
+											<br />
+											<i>Address</i>
+											<br />
+											<T.TX isAdr tx={v.address} fullAdrOnDesktop={descIsSmall} fullAdr={!m.device.isMobile} {...p} />
+										</span></T.If>
+									</div>
+									{descIsSmall?v.confirmations&&<div className="transaction-details-field">
+										<i>Confirmations</i>
+										<br />
+										{v.confirmations}
+									</div>:null}
+									<div className={"transaction-details-field"} style={{flex:1,marginRight:"0"}}>
+										<i>Description</i>
+										<br />
+										{v.comment || "No description"}
+									</div>
+								</div>
+							:null}
+						</div>;
+					})}
+				</div>;
+			})}
+		</div>;
 	}
 };
 

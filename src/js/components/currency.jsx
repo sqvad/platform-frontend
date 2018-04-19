@@ -12,27 +12,32 @@ class Currency extends Any {
 	}
 	render(p,s,c,m) {
 		var rate = m && m.currenciesRate;
-		var id = p.id;
-		var isClassical = p.usd || m.CONSTS.CLASSIC_CURRENIES[id];
+		var isClassical = p.usd || m.settings.classicCurrencies[this._2id(p)];
 		return isClassical ? this.render_classical(p,s,c,m) : this.render_coin(p,s,c,m);
 	}
 	render_classical(p,s,c,m) {
 		var str = "...";
-		var classic = p.usdId || m.defaultClassicCurrency;
-		if (m.currenciesRate && classic) {
-			var isWei = ('isWei' in p) ? !!p.isWei : p.m.settings.misc.serverSendWei;
-			str = Currency._2usd(isWei, p.value, p.format, m.currenciesRate[p.id][classic]);
-			str = Currency._2number(str, false);
+		var id = this._2id(p);
+		var usdId = p.usdId || m.defaultClassicCurrency;
+		var format = this._2format(p,m,id);
+		if (m.currenciesRate && usdId && (format||format===0||format==='0')) {
+			var rate = (m.currenciesRate[id]||{})[usdId];
+			if (rate) {
+				var isWei = ('isWei' in p) ? !!p.isWei : p.m.settings.misc.serverSendWei;
+				str = Currency._2usd(isWei, this._2value(p), format, bn(1).div(rate));
+				str = Currency._2number(str, false);
+			}
 		}
 		return <span className="in-usd">
-			{str} {classic}
+			{str} {(m.settings.classicCurrencies[usdId]||{}).text||usdId}
 		</span>;
 	}
 	render_coin(p,s,c,m) {
 		var str = "...";
-		if (m.currenciesRate) {
-			var isWei = ('isWei' in p) ? !!p.isWei : p.m.settings.misc.serverSendWei;
-			str = Currency._2coin(isWei, p.value, p.format);
+		var format = this._2format(p,m,this._2id(p));
+		var isWei = ('isWei' in p) ? !!p.isWei : p.m.settings.misc.serverSendWei;
+		if ((format||format===0||format==='0')) {
+			str = Currency._2coin(isWei, this._2value(p), format);
 			if (str.isZero()) {
 				str = "0.00";
 			} else {
@@ -40,8 +45,23 @@ class Currency extends Any {
 			}
 		}
 		return <span className="in-wei">
-			{str} {p.id}
+			{str} {this._2id(p)}
 		</span>;
+	}
+	_2id(p) {
+		return p.id || p.symbol;
+	}
+	_2value(p) {
+		if ('value' in p) return p.value;
+		if ('balance' in p) return p.balance;
+		if ('sum' in p) return p.sum;
+	}
+	_2format(p,m,id) {
+		if ('format' in p) return p.format;
+		var id = id||this._2id(p);
+		if (!m.user) return;
+		if (!m.user.wallets) return;
+		return ((m.user.wallets||[]).filter(v=>v.symbol==id)[0]||{}).format;
 	}
 }
 Currency._2number = function(num_, isCoins) {
@@ -85,6 +105,17 @@ Currency.wei2usd = function(inCoin, decimalsCount, rate) {
 	// {"USD":510.68,"EUR":413.85,"CNY":3328.6,"JPY":55226.62,"AUD":653.8}
 	// rate (for ETH + USD) == 510.68
 	return Currency.wei2coin(inCoin, decimalsCount).div(bn(rate));
+};
+Currency.isPositive = function(p, trueFalse_onlyFor_depositAndWithdraw) {
+	var v = bn( Currency.prototype._2value(p) );
+	if (p.type=="WITHDRAW") {
+		return v.isNegative();
+	} else {
+		if (trueFalse_onlyFor_depositAndWithdraw && p.type!="DEPOSIT") {
+			return null;
+		}
+		return !v.isNegative();
+	}
 };
 
 export default Currency;

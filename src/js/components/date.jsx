@@ -16,6 +16,8 @@ class _Date extends Any {
         var m_ = (m<10 ? "0" : "") + m;
         var s = v.getSeconds();
         var s_ = (s<10 ? "0" : "") + s;
+		var mutes = p.mutes || {};
+		if (mutes.y) y = <span className="text-muted">{y}</span>;
         if (p.onlyDate) {
             return <span>{y}&nbsp;{mon_}&nbsp;{d}</span>;
         } else if (p.onlyTime) {

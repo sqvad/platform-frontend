@@ -12,25 +12,40 @@ class PageStart extends T.Page {
 	constructor(props) {
 		super(props);
         if (!props.m.auth) {
-            props.m.api.getUserData();
+            props.m.api.getAuthData();
         }
 	}
 	render(p,s,c,m) {
-        if (!m.auth || !m.auth.emailVerified) {
-            if (!m.auth || !m.auth.emailLastCodeSentAt) {
-                return <PageSignUp {...p} {...s} />;
-            } else {
-                return <PageVerifyEmail {...p} {...s} />;
-            }
+		var auth = m && m.auth;
+		// debugger;
+		if (!auth) return <PageSignUp {...p} {...s} />;
+		if (!auth.email) return <PageSignUp {...p} {...s} />;
+		if (auth.emailVerified && m.path.contains["verify-email"]) {
+			m.api.gotoHref(T.A.href({href:"/start"},m));
+		}
+		if (auth.signedIn) {
+			debugger;
+			m.api.gotoHref(T.A.href({href:"/"},m));
+			return <div></div>;
+		}
+		if (auth.canSignIn) return <PageSignIn {...p} {...s} />;
+        if (!auth.emailVerified) return <PageVerifyEmail {...p} {...s} />;
+		if (!auth.totpSecretKeyConfirmed) return <PageSet2FA {...p} {...s} />;
+		/*
+		if (auth && auth.emailVerified && m.path.contains["verify-email"]) {
+			m.api.gotoHref(T.A.href({href:"/start"},m));
+		}
+        if (!auth || !auth.emailVerified) {
+			if (auth && (auth.emailVerificationSent || auth.emailLastCodeSentAt)) {
+				return <PageVerifyEmail {...p} {...s} />;
+			}
+            return <PageSignUp {...p} {...s} />;
         }
-        if (m.auth && m.auth.emailVerified && !m.auth.totpSecretKeyConfirmed) {
+        if (auth && m.auth.emailVerified && !m.auth.totpSecretKeyConfirmed) {
             return <PageSet2FA {...p} {...s} />;
         }
         return <PageSignIn {...p} {...s} />;
-        return <div>
-            ...
-            <code><pre>{JSON.stringify(m,4,4)}</pre></code>
-        </div>;
+		*/
     }
 }
 

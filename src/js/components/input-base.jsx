@@ -30,7 +30,7 @@ class Input extends Any {
 		var input = <input
 			type={(p.type||'text')}
 			name={p.name}
-			value={p.value}
+			value={p.value} minLength={p.minLength||p.min||"0"} maxLength={p.maxLength||p.max||"99999"}
 			className={cls}
 			disabled={p.disabled||false}
 			readOnly={p.readonly||false}
@@ -39,8 +39,8 @@ class Input extends Any {
 			onBlur={this.onBlur.bind(this)}
 			ref={(el=>this.node=el)} />;
 		return <label className={inputGroupCls}>
-			<span className="placeholder">{p.placeholder}</span>
 			{input}
+			<span className="placeholder">{p.placeholder}</span>
 			<span className="input-hint">{hint}</span>
 		</label>;
 	}

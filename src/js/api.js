@@ -1,4 +1,4 @@
-
+/*
 var authdataMockup = {
   "canSignIn": false,
   "email": "zitrix.box+t91@gmail.com",
@@ -7,6 +7,7 @@ var authdataMockup = {
   "totpSecretKeyConfirmed": false,
   "id": 0,
 };
+*/
 // {
 // 	"canSignIn": true,
 // 	"email": "string",
@@ -97,11 +98,24 @@ class Api {
 	_fetch_transport_wrap(transport, method, path, params) {
 		// console.log(path +" ; "+ document.cookie +" ; "+ JSON.stringify(params));
 		return transport.then(x=>{
-			return typeof x.json == 'function' ? x.json() : x; // no .json() for mockups
+            return typeof x.json == 'function'
+                ? x.json().then(v=>v).catch(er=>{
+                    console.error(er);
+                    return {};
+                })
+                : x;
 		})
 		.then(x=>{
 			this._fetchesInProgress[transport.id] = null;
-			if (x.errors && x.status) throw x;
+			if (('errors' in x) && ('message' in x)) {
+                if (x.errors) {
+                    if (Array.isArray(x.errors) && x.errors.length) {
+                        throw x;
+                    }
+                } else if (x.message) {
+                    throw x;
+                }
+            }
 			return x;
 		})
 		.then(x=>{
@@ -133,11 +147,22 @@ class Api {
 				return v;
 			});
 		}
+		if (cmd=='POST/wallet/transactions/list') {
+            ret.forEach(v=>{
+                if (v.name==v.symbol) {
+                    v.name = [
+                        this.model.settings.misc.myETHwallet_prefix,
+                        v.name,
+                        this.model.settings.misc.myETHwallet_postfix,
+                    ].map(v=>!!v).join("");
+                }
+            });
+        }
 		return ret;
 	}
 	_fetch_updateModel(ret, method, path, params) {
 		var cmd = method + path;
-		if (cmd=='GET/auth') {
+		if (cmd=='GET/auth/data') {
 			this.model.auth = ret;
 			this.model.emit('change');
 		}
@@ -145,16 +170,37 @@ class Api {
 			this.model.userTypes = ret;
 			this.model.emit('change');
 		}
-		if (cmd.indexOf('/email/verification/confirm')>-1) {
+		if (cmd.indexOf('/register/email/verify/confirm')>-1) {
 			this.model.auth = ret;
 			this.model.emit('change');
 		}
-		if (cmd.indexOf('/auth/register')>-1) {
+		if (cmd.indexOf('/register/data')>-1) {
 			this.model.auth = ret;
 			this.model.emit('change');
 		}
-		if (cmd.indexOf('/totp/key/confirm')>-1) {
+		if (cmd.indexOf('/register/totp/key/confirm')>-1) {
 			this.model.auth = ret;
+			this.model.emit('change');
+		}
+		if (cmd.indexOf('/auth/login/email')>-1) {
+			this.model.auth = ret;
+			this.model.emit('change');
+		}
+		if (cmd.indexOf('/auth/login/totp')>-1) {
+			this.model.auth = ret;
+			this.model.emit('change');
+		}
+		if (cmd.indexOf('/user/profile')>-1) {
+            this.model.user = this.model.user || {};
+            var need = ret || {};
+            Object.keys(need).forEach(k=>{
+                this.model.user[k] = need[k];
+            });
+			this.model.emit('change');
+		}
+		if (cmd.indexOf('/wallet/list')>-1) {
+            this.model.user = this.model.user || {};
+            this.model.user.wallets = ret;
 			this.model.emit('change');
 		}
 		return ret;
@@ -177,36 +223,126 @@ class Api {
 			again();
 		});
 	}
+    gotoHref(href) {
+        var origin = window.location.origin;
+		if (this.model.settings.misc.pathViaHash) {
+			if (href && href!="#") {
+				window.location.hash = href.charAt(0)=="#" ? href : "#" + href;
+			} else {
+				window.location.hash = "";
+			}
+		} else {
+        	var path = window.location.pathname || "/";
+			if (href!="/") {
+		        var pathLastChar = path.charAt(path.length-1);
+		        if (pathLastChar=="/" && href.charAt(0)==pathLastChar) {
+		            href = href.substr(1);
+		        }
+			}
+	        window.location.href = href;
+        }
+        window.location.reload();
+    }
+    logout() {
+        try {
+            this.model.clear();
+        } catch(er) {}
+        try {
+            this.model.logoutInProgress = true;
+            this.model.emit('change');
+        } catch(er) {}
+        this._fetchPOST('/auth/logout',null)
+        .then(()=>{
+            this.model.logoutInProgress = false;
+            this.model.emit('change');
+        })
+        .catch(()=>{
+            this.model.logoutInProgress = false;
+            this.model.emit('change');
+			this.gotoHref("");
+        })
+    }
+    loginEmail(email,password) {
+        return this._fetchPOST('/auth/login/email',{email,password})
+        .then(x=>{
+            this.getUserData();
+            return x;
+        });
+    }
+    login2fa(code) {
+        return this._fetchPOST('/auth/login/totp',{code})
+        .then(x=>{
+            this.getUserData();
+            return x;
+        });
+    }
 	requestCodeToVerifyEmail(email) {
-		return (email?Promise.resolve():this.getUserData()).then(()=>{
-			return this._fetchGET(`/email/verification/code`, {
+		return (email?Promise.resolve():this.getAuthData()).then(()=>{
+			return this._fetchPOST(`/register/email/verify/code`, {
 				email: email || this.model.auth.email
 			});
 		});
 	}
 	isEmailAvailable(email) {
-		return this._fetchGET('/email/check', {email}).then(x=>{
+		return this._fetchPOST('/system/check/email/availability', {email}).then(x=>{
 			// if (x) this.requestCodeToVerifyEmail(email);
 			return x;
 		});
 	}
+	changePassword(cur, want) {
+		return this._fetchPOST('/user/password/reset', {oldPassword:cur,newPassword:want});
+	}
+	sendCodeForPasswordReset(email,redirect) {
+		return this._fetchPOST('/system/password/reset/request', {email,redirect})
+	}
 	getUserTypes() {
 		return this._fetchGET('/system/user/types', {lang:"EN"});
 	}
-	getUserData() {
-		return this._fetch_transport_wrap(Promise.resolve( this.model.auth || authdataMockup ), 'GET', '/auth', null);
+	getAuthData() {
+		// return this._fetch_transport_wrap(Promise.resolve( this.model.auth || authdataMockup ), 'GET', '/auth', null);
+		return this._fetchGET('/auth/data');
 	}
+	getUserData(andAllRelations) {
+		return this._fetchGET('/user/profile')
+        .then(()=>{
+            if (!andAllRelations) {
+                return;
+            }
+            Promise.all([
+                this.getWallets()
+            ]);
+        })
+        .then(()=>this.model.user);
+	}
+	getWallets() {
+		return this._fetchGET('/wallet/list').then(()=>this.model.user.wallets);
+	}
+    updateWalletName(walletId, walletName) {
+		var wallet = this.model.user.wallets.filter(v=>v.symbol==walletId)[0];
+        var params = {
+            tokenContractAddress: wallet.tokenContractAddress,
+            walletName
+        };
+        return this._fetch('PATCH','/wallet/name', params);
+    }
+    getTransactions(walletId, filters) {
+        var params = filters || {};
+        params.tokenContractAddress = walletId;
+        params.pageSize = 100000;
+        params.page = 0;
+		return this._fetchPOST('/wallet/transactions/list',params);
+    }
 	verifyEmail(email, code) {
 		var params = {code};
-		return (email?Promise.resolve():this.getUserData()).then(()=>{
+		return (email?Promise.resolve():this.getAuthData()).then(()=>{
 			var email = email || this.model.auth.email;
-			return this._fetchPOST(`/email/verification/confirm?email=${encodeURIComponent(email)}&code=${code}`);
+			return this._fetchPOST("/register/email/verify/confirm",{email,code});
 		});
 		/*
 		this._fetch_afterCheck(
-			'POST', '/email/verification/confirm', params
+			'POST', '/register/email/verify/confirm', params
 			, ()=>!email || !this.model.user
-			, ()=>this.getUserData()
+			, ()=>this.getAuthData()
 			, (method, path, params)=> {
 				params.email = email || this.model.user.email;
 			}
@@ -242,8 +378,8 @@ class Api {
 		if (skippedParams.length) {
 			// debugger;
 		}
-		this._fetch_afterCheck(
-			'POST', '/auth/register', params
+		return this._fetch_afterCheck(
+			'POST', '/register/data', params
 			, ()=>this.model.userTypes
 			, ()=>this.getUserTypes()
 			, (method, path, params)=> {
@@ -253,15 +389,16 @@ class Api {
 				// 	params.userType = this.model.userTypes.filter(v=>(v.children||[]).filter(v=>v.id==params.userType)[0])[0];
 				// }
 			}
-		).then(x=>{
-			debugger;
-		});
+		)
+        .catch(x=>{
+            throw x;
+		})
 	}
 	generateTotpSecretKey() {
-		return this._fetchGET('/totp/key');
+		return this._fetchPOST('/register/totp/key/generate');
 	}
 	confirmTotpSecretKey(code) {
-		return this._fetchPOST('/totp/key/confirm?code='+code.replace(/\D+/g,""));
+		return this._fetchPOST('/register/totp/key/confirm',{code:code.replace(/\D+/g,"")});
 	}
 	_loadLib(scripts) {
 		return Promise.all(
@@ -286,19 +423,22 @@ class Api {
     getCurrenciesRate() {
         if (this.m.currenciesRate) return Promise.resolve(this.m.currenciesRate);
         if (this.currenciesRatePromise) return this.currenciesRatePromise;
-        var keys = this.m.CONSTS.CLASSIC_CURRENIES_KEYS.join(",");
+        var keys = Object.keys(this.model.settings.classicCurrencies).join(",");
         var rate = {};
         this.currenciesRatePromise = Promise.all(
-            ['ETH','BTC','INS'].map(id=>{
+            this.model.settings.misc.getUSDrateFor.map(id=>{
                 return fetch(
                     `https://min-api.cryptocompare.com/data/price?fsym=${id}&tsyms=${keys}`,
                     {
             			method: 'GET',
             			mode: 'nocors',
-            			cache: 'default' ,
+            			cache: 'no-cache' ,
+                        credentials: 'omit'
                     }
                 ).then(x=>x.json())
                 .then(x=>{
+                    if (!x) return;
+                    if (x.Response=="Error") return;
                     rate[id] = x;
                 });
             })
@@ -312,7 +452,7 @@ class Api {
         return this.currenciesRatePromise;
     }
     getDefaultClassicCurrency() {
-        var viaLocalStorage = localStorage.getItem(this.m.settings.misc.localStorage_prefix+ "INS_defaultClassicCurrency");
+        var viaLocalStorage = localStorage.getItem(this.m.settings.misc.localStorage_prefix+ "defaultClassicCurrency");
         var viaSettings = this.m.settings.misc.defaultClassicCurrency;
         var viaHardcode = "USD";
         var ret = viaLocalStorage || viaSettings || viaHardcode;
@@ -322,6 +462,10 @@ class Api {
         }
         return Promise.resolve(ret);
     }
+	setDefaultClassicCurrency(v) {
+		localStorage.setItem(this.m.settings.misc.localStorage_prefix+ "defaultClassicCurrency", v);
+		return this.getDefaultClassicCurrency();
+	}
 }
 
 export default Api;

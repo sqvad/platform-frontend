@@ -10,7 +10,7 @@ class PageSet2FA extends T.Page {
 				this.setState({qrLibLoaded:true}, resolve);
 			});
 		});
-		props.m.api.getUserData();
+		props.m.api.getAuthData();
 		// this.showPopup_finish2fa();
 	}
 	render(p,s,c,m) {
@@ -109,23 +109,32 @@ class PageSet2FA extends T.Page {
 			<div className="row d-flex justify-content-center">
 				<div className="mb-4 col-8 d-flex flex-column justify-content-center" style={{border:"1px solid #e5e6e7",marginTop:"25px"}}>
 					<div className="row d-flex justify-content-center">
-						<div className="mb-2 col-9 pt-4">
-							<p style={{"textAlign":"center"}} className="mt-3">
-								Add a new account at authentication app and scan the QR-code or enter the key below manually.
-							</p>
-							<p style={{"textAlign":"center"}}>
-								Enter this key:
-								<br />
-								<b><T.A m={m} href={s.gaLink} external>{s.totpSecretKey}</T.A></b>
-							</p>
-							<p style={{"textAlign":"center"}}>
-								QR-code:
-								<br />
-								<T.A m={m} href={s.gaLink} external>
-									<img src={s.qrDataUrl} width="228" height="228" alt={s.qrDataUrl?"QR code is loading...":"QR code for "+ s.gaLink} />
-								</T.A>
-							</p>
-						</div>
+						<T.If v={s.totpSecretKey} key="totpSecretKey">
+							<div className="mb-2 col-9 pt-4">
+								<p style={{"textAlign":"center"}} className="mt-3">
+									Add a new account at authentication app and scan the QR-code or enter the key below manually.
+								</p>
+								<p style={{"textAlign":"center"}}>
+									Enter this key:
+									<br />
+									<b><T.A m={m} href={s.gaLink} external>{s.totpSecretKey}</T.A></b>
+								</p>
+								<p style={{"textAlign":"center"}}>
+									QR-code:
+									<br />
+									<T.A m={m} href={s.gaLink} external>
+										<img src={s.qrDataUrl} width="228" height="228" alt={s.qrDataUrl?"QR code is loading...":"QR code for "+ s.gaLink} />
+									</T.A>
+								</p>
+							</div>
+						</T.If>
+						<T.If v={!s.totpSecretKey} key="totpSecretKeyLoading">
+							<div className="mb-2 col-9 pt-4">
+								<p style={{"textAlign":"center"}} className="mt-3">
+									Fetching. Please wait...
+								</p>
+							</div>
+						</T.If>
 					</div>
 				</div>
 			</div>
@@ -147,7 +156,7 @@ class PageSet2FA extends T.Page {
 					this.setState({qrLibLoaded:true}, resolve);
 				});
 			}),
-			p.m.api.getUserData()
+			p.m.api.getAuthData()
 			.then(()=>{
 				return p.m.api.generateTotpSecretKey()
 				.then(x=>{

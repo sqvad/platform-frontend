@@ -4,16 +4,34 @@ import A from './a.jsx';
 
 class Name extends Any {
 	render(p,s,c,m) {
-		if (!p.user) return null;
-		return <A m={m} href="/profile" className="d-block mr-3 pt-2 pb-2">{userData.firstName} {userData.lastName}</A>;
+		var userData = m.user;
+		if (!userData) return null;
+		return <A m={m} href="/wallets" className="d-block mr-3 pt-2 pb-2 text-truncate">{userData.firstName}&nbsp;{userData.lastName}</A>;
 	}
 }
 class Logout extends Any {
 	render(p,s,c,m) {
-		if (!p.user) return null;
-		return <button type="button" className="btn btn-sm btn-outline-secondary">
+		return <button type="button" className="btn btn-sm btn-outline-secondary" onClick={()=>m.api.logout()}>
 			Log Out
 			<span className="icon icon-24 icon-logout" />
+		</button>;
+	}
+}
+class Login extends Any {
+	render(p,s,c,m) {
+		if (m.path.contains["signin"]) {
+			return <button type="button" className="btn btn-sm btn-outline-secondary"
+				onClick={()=>m.api.gotoHref(A.href({href:"/signup"},m))}
+			>
+				Sign Up
+				<span className="icon icon-24 icon-next" />
+			</button>;
+		}
+		return <button type="button" className="btn btn-sm btn-outline-secondary"
+			onClick={()=>m.api.gotoHref(A.href({href:"/signin"},m))}
+		>
+			Sign In
+			<span className="icon icon-24 icon-next" />
 		</button>;
 	}
 }
@@ -22,6 +40,7 @@ class HeaderShort extends Any {
 	render(p,s,c,m) {
 		var authData = m.auth || {};
 		var userData = m.user;
+		console.log(authData);
 		return <div className="header-short bg-violet">
 			<div className="container">
 				<div className="width page">
@@ -32,8 +51,8 @@ class HeaderShort extends Any {
 							</A>
 						</div>
 						<div className="col-6 pr-0 d-flex align-items-center justify-content-end">
-							<Name />
-							<Logout />
+							<Name {...p} />
+							{authData.signedIn?<Logout {...p} />:<Login {...p} />}
 						</div>
 					</div>
 				</div>
@@ -44,6 +63,9 @@ class HeaderShort extends Any {
 
 class HeaderMedium extends Any {
 	render(p,s,c,m) {
+		var authData = m.auth || {};
+		var userData = m.user;
+		console.log(authData);
 		return <div className="header-medium bg-violet d-flex" key="header">
 			<div className="container d-flex flex-column">
 				<div className="row">
@@ -53,8 +75,8 @@ class HeaderMedium extends Any {
 						</A>
 					</div>
 					<div className="col-6 pr-0 d-flex align-items-center justify-content-end">
-						<Name />
-						<Logout />
+						<Name {...p} />
+						{authData.signedIn?<Logout {...p} />:<Login {...p} />}
 					</div>
 				</div>
 				{c}
@@ -69,18 +91,18 @@ class HeaderLeft extends Any {
 	}
 	render_default(p,s,c,m) {
 		return <div className="bg-violet w-100">
-			<A className="left-menu-logo" m={m}>
+			<A className="left-menu-logo" m={m} href="">
 				<span className="left-menu-logo-img"></span>
 			</A>
 			<A className="left-menu-item active" m={m} href="/wallets">
 				<span className="icon icon-30 icon-lg icon-wallet"></span>
 				<span className="left-menu-item-label">wallets</span>
 			</A>
-			<A className="left-menu-item" m={m}>
+			<A className="left-menu-item" m={m} href="/settings">
 				<span className="icon icon-30 icon-lg icon-settings icon-white"></span>
 				<span className="left-menu-item-label">settings</span>
 			</A>
-			<A className="left-menu-item hover" m={m}>
+			<A className="left-menu-item hover" m={m} onClick={()=>m.api.logout()}>
 				<span className="icon icon-30 icon-lg icon-logout icon-white"></span>
 				<span className="left-menu-item-label">log out</span>
 			</A>

@@ -14,14 +14,14 @@ class Popup extends Any {
 		document.addEventListener('keyup', this.onKeyUp, false);
 		var fadeIn = ()=>{
 			if (this.nodeContainer) {
-				this.nodeContainer.className = (this.nodeContainer.className||'').replace('popup-hidden');
+				this.nodeContainer.className = (this.nodeContainer.className||'').replace('popup-hidden','');
 			}
 		};
 		setTimeout(fadeIn,20);
 		setTimeout(fadeIn,1000);
 	}
 	componentWillUnmount() {
-		super.componentWillUnmount(); 
+		super.componentWillUnmount();
 		document.removeEventListener('keyup', this.onKeyUp, false);
 	}
 	onClick(e) {

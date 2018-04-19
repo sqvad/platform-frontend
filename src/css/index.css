@@ -1,7 +1,9 @@
 html, body {
 	font: normal 16px/1.2 serif;
 	color: #000000;
+	height: 100%;
 }
+#root, .page { height: 100%; }
 html, body, button, input, select, h1 {
 	font-family: Roboto,-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;
 }

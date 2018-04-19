@@ -3,7 +3,14 @@ import T from '../tags.jsx';
 import PageWallets from './page-wallets.jsx';
 
 class PageSettings extends T.Page {
+	constructor(props) {
+		super(props);
+		props.m.api.getDefaultClassicCurrency().then(defaultClassicCurrency=>{
+			this.setState({defaultClassicCurrency});
+		});
+	}
 	render(p,s,c,m) {
+		return this._render(p,s,c,m);
 		var _m = JSON.parse(JSON.stringify(PageWallets.mockupModel));
 		_m = Object.assign(_m, m);
 		var _p = JSON.parse(JSON.stringify(p));
@@ -17,6 +24,7 @@ class PageSettings extends T.Page {
 		return this._render(_p,_s,c,_m);
 	}
 	_render(p,s,c,m) {
+		var tab = s.tab || "changePassword";
 		return <T.Page.PageWrapDevice m={m} pagePostfix="wallet">
 			<T.Page.PageWrapProfile key="header" m={m} header="left" {...s}>
 				<T.Page.PageWrapProfileLeft>
@@ -26,34 +34,39 @@ class PageSettings extends T.Page {
 					<T.Page.PageWrapProfileWidth>
 						<h1>Settings</h1>
 						<div
-							className="btn-group btn-group-toggle d-flex justify-content-start flex-wrap"
+							className={
+								[
+									"btn-group btn-group-toggle d-flex justify-content-start flex-wrap",
+									m.device.isMobile ? "flex-column align-items-stretch" : ""
+								].join("")
+							}
 							style={{marginBottom:"30px"}}
 						>
 							<div
-								className={"btn "+(s.tab=="general"? "btn-secondary active":" btn-outline-secondary")}
+								className={"btn "+(tab=="general"? "btn-secondary active":" btn-outline-secondary")}
 								onClick={()=>{this.setState({tab:"general"})}}
 							>General</div>
 							<div
-								className={"btn "+(s.tab=="changePassword"? "btn-secondary active":" btn-outline-secondary")}
+								className={"btn "+(tab=="changePassword"? "btn-secondary active":" btn-outline-secondary")}
 								onClick={()=>{this.setState({tab:"changePassword"})}}
 							>Change Password</div>
 							<div
-								className={"btn "+(s.tab=="2faDisable"? "btn-secondary active":" btn-outline-secondary")}
+								className={"btn "+(tab=="2faDisable"? "btn-secondary active":" btn-outline-secondary")}
 								onClick={()=>{this.setState({tab:"2faDisable"})}}
-							>SECURITY / disable 2FA</div>
+							>Disable 2FA</div>
 							<div
-								className={"btn "+(s.tab=="2faRecover"? "btn-secondary active":" btn-outline-secondary")}
+								className={"btn "+(tab=="2faRecover"? "btn-secondary active":" btn-outline-secondary")}
 								onClick={()=>{this.setState({tab:"2faRecover"})}}
-							>SECURITY / recover 2FA</div>
+							>Recover 2FA</div>
 						</div>
 					</T.Page.PageWrapProfileWidth>
 					<div style={{background:"#f3f5fa",flex:1}}>
 						<T.Page.PageWrapProfileWidth skipLogo>
 							<div style={{paddingTop:"30px"}}>
-								{s.tab=="general"? this.render_general(p,s,c,m) :null}
-								{s.tab=="changePassword"? this.render_changePassword(p,s,c,m) :null}
-								{s.tab=="2faDisable"? this.render_2faDisable(p,s,c,m) :null}
-								{s.tab=="2faRecover"? this.render_2faRecover(p,s,c,m) :null}
+								{tab=="general"? this.render_general(p,s,c,m) :null}
+								{tab=="changePassword"? this.render_changePassword(p,s,c,m) :null}
+								{tab=="2faDisable"? this.render_2faDisable(p,s,c,m) :null}
+								{tab=="2faRecover"? this.render_2faRecover(p,s,c,m) :null}
 							</div>
 						</T.Page.PageWrapProfileWidth>
 					</div>
@@ -66,11 +79,11 @@ class PageSettings extends T.Page {
 		return <div>
 			<h2>DEFAULT CURRENCY</h2>
 			<p>You can choose which currency to show by default for your crypto holdings.</p>
-			<T.Form onSubmit={()=>{}}>
+			<T.Form onSubmit={()=>this.onCurrency_save()}>
 				<div style={{maxWidth:"236px"}}>
 					<T.Select
-						value="USD" onChange={()=>{}}
-						useFormControl className="form-control" placeholder="Default currency"
+						value={s.defaultClassicCurrency||m.defaultClassicCurrency} onChange={v=>this.onCurrency_choose(v)}
+						useFormControl className="form-control" placeholder="Default currency" inputGroupCls="border4sides"
 						options={[
 							{id:"USD", text:"USD"},
 							{id:"EUR", text:"EUR"},
@@ -84,7 +97,7 @@ class PageSettings extends T.Page {
 				<button type="submit"
 					className={[
 						"btn btn-lg btn-primary",
-						false ? "" : " disabled",
+						(s.defaultClassicCurrency!=m.defaultClassicCurrency) ? "" : " disabled",
 					].join(" ")}
 				>
 					Save changes
@@ -92,32 +105,69 @@ class PageSettings extends T.Page {
 			</T.Form>
 		</div>
 	}
+	onCurrency_choose(defaultClassicCurrency) {
+		// this.props.m.api.setDefaultClassicCurrency(v);
+		this.setState({defaultClassicCurrency});
+	}
+	onCurrency_save() {
+		this.props.m.api.setDefaultClassicCurrency(this.state.defaultClassicCurrency)
+		.then(defaultClassicCurrency=>{
+			this.setState({defaultClassicCurrency});
+		});
+	}
 	render_changePassword(p,s,c,m) {
 		return <div>
 			<h2>CHANGE YOUR PASSWORD</h2>
 			<p>You will be logged out of all other devices after changing your password.</p>
-			<T.Form onSubmit={()=>{}}>
+			<T.Form onSubmit={this.onPassword_save.bind(this)} hideServerError onServerError={()=>this.forceUpdate()} ref={el=>this.form=el}>
 				<div style={{maxWidth:"482px"}}>
 					<T.Input.Password
-						value="123" onChange={()=>{}} placeholder="Current password"
+						value={s.passworCur||""} onChange={this.onPassword_cur.bind(this)}
+						inputGroupCls="border4sides" placeholder="Current password" autocomplete="off"
 					/>
 					<T.Input.Password
-						value="123" onChange={()=>{}} placeholder="New password"
+						value={s.passworNew||""} onChange={this.onPassword_new.bind(this)}
+						inputGroupCls="border4sides" placeholder="New password" autocomplete="off"
 					/>
-					<T.Input.Password
-						value="123" onChange={()=>{}} placeholder="Repeat new password"
+					<T.Input.PasswordConfirm
+						value={s.passworConfirm||""} onChange={this.onPassword_confirm.bind(this)}
+						password={s.passworNew}
+						inputGroupCls="border4sides" placeholder="Repeat new password" autocomplete="off"
 					/>
+					{this.form && this.form.renderServerError()}
 				</div>
 				<button type="submit"
 					className={[
 						"btn btn-lg btn-primary",
-						false ? "" : " disabled",
+						s.canSubmitPassword ? "" : " disabled",
 					].join(" ")}
 				>
 					Save changes
 				</button>
 			</T.Form>
 		</div>
+	}
+	password_checkValid() {
+		var s = this.state || {};
+		var passworConfirmValid = s.passworNewValid && s.passworNew==s.passworConfirm;
+		var canSubmitPassword = s.passworCurValid && passworConfirmValid;
+		if (this.form) this.form.forgotAboutServerError();
+		this.setState({passworConfirmValid,canSubmitPassword});
+	}
+	onPassword_cur(passworCur,passworCurValid) {
+		this.setState({passworCur,passworCurValid}, ()=>this.password_checkValid());
+	}
+	onPassword_new(passworNew,passworNewValid) {
+		this.setState({passworNew,passworNewValid}, ()=>this.password_checkValid());
+	}
+	onPassword_confirm(passworConfirm,passworConfirmValid) {
+		this.setState({passworConfirm,passworConfirmValid}, ()=>this.password_checkValid());
+	}
+	onPassword_save() {
+		return this.props.m.api.changePassword(this.state.passworCur, this.state.passworConfirm)
+		.then(x=>{
+			debugger;x;this;
+		});
 	}
 	render_2faDisable(p,s,c,m) {
 		return <div>

@@ -18,6 +18,10 @@ if (module.hot) {
 			return;
 		}
 		model.settings = JSON.parse(settings);
+        model.defaultKeys = [];
+        for (var k in model) {
+            model.defaultKeys.push(k);
+        }
 		render(model);
 	}
 })();
