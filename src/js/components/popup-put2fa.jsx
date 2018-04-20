@@ -36,7 +36,7 @@ class PopupPut2fa extends Any {
 							s.codeValid ? "" : " disabled",
 						].join(" ")}
 					>
-						SIGN TRANSACTION
+						SEND
 					</button>
 					<A m={m} className="text-muted external"><small>I’m not able to log in with 2FA</small></A>
 				</div>
