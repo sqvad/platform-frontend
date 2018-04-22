@@ -21,7 +21,7 @@ class PageWallets extends T.Page {
 		return <T.Page.PageWrapDevice m={m} pagePostfix="wallet">
 			<T.Page.PageWrapProfile key="header" m={m} header="left" {...s}>
 				<T.Page.PageWrapProfileLeft>
-					<T.Headers.Left m={m} {...p} />
+					<T.Headers.Left m={m} {...p}  tab="wallets" />
 				</T.Page.PageWrapProfileLeft>
 				<T.Page.PageWrapProfileWidth skipLogo={m.device.isMobile}>
 					<h1>loading...</h1>
@@ -33,7 +33,7 @@ class PageWallets extends T.Page {
 		return <T.Page.PageWrapDevice m={m} pagePostfix="wallet">
 			<T.Page.PageWrapProfile key="header" m={m} header="left" {...s}>
 				<T.Page.PageWrapProfileLeft>
-					<T.Headers.Left m={m} {...p} />
+					<T.Headers.Left m={m} {...p}  tab="wallets" />
 				</T.Page.PageWrapProfileLeft>
 				<T.Page.PageWrapProfileWidth skipLogo={m.device.isMobile}>
 					<h1>Wallets</h1>
@@ -67,7 +67,7 @@ class PageWallets extends T.Page {
 		return <T.Page.PageWrapDevice m={m} pagePostfix="wallet">
 			<T.Page.PageWrapProfile key="header" m={m} header="left" {...s}>
 				<T.Page.PageWrapProfileLeft>
-					<T.Headers.Left m={m} {...p} />
+					<T.Headers.Left m={m} {...p}  tab="wallets" />
 				</T.Page.PageWrapProfileLeft>
 				<div className="w-100">
 					{this.renderWallet_header(p,s,c,m)}

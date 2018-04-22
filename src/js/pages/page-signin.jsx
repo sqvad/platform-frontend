@@ -40,11 +40,10 @@ class PageSignIn extends T.Page {
 		</div>;
 	}
 	onForgotPasswordOk() {
-		debugger;
-		this;
+		this.setState({popupForgotPassword:false});
 	}
 	renderEmail(p,s,c,m) {
-		return <T.Form onSubmit={()=>{s.canSubmit && this.onSubmit()}}>
+		return <T.Form handler={this}>
 			<div className="row d-flex justify-content-center mt-4">
 				<div className={m.device.isMobile?"":"col-6"} style={{width:m.device.isMobile?"90%":""}}>
 					<T.Input.Email
@@ -73,6 +72,7 @@ class PageSignIn extends T.Page {
 							</T.A>
 						</span>
 					</div>
+					{this.form && this.form.renderServerError()}
 					<div className="d-flex justify-content-center mt-5">
 						<T.Form.SubmitButton
 							clsColor="btn-primary" cls="btn-lg"
@@ -99,11 +99,12 @@ class PageSignIn extends T.Page {
 	onSubmit() {
 		return T.Form.wrapFetch(
 			this,
+			false,
 			this.props.m.api.loginEmail(this.state.email, this.state.password)
 			.then(x=>{
 				return this.props.m.api.getUserData(true)
 				.then(()=>{
-					var m = this.props.m; // :(
+					var m = this.props.m;
 					if (m.path.contains["signin"]) {
 						if (m.signedIn) {
 							m.api.gotoHref(T.A.href({href:"/"},m))

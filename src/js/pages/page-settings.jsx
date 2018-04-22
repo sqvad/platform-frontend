@@ -19,16 +19,16 @@ class PageSettings extends T.Page {
 			// _s.tab = "general";
 			// _s.tab = "changePassword";
 			// _s.tab = "2faDisable";
-			_s.tab = "2faRecover";
+			// _s.tab = "2faRecover";
 		}
 		return this._render(_p,_s,c,_m);
 	}
 	_render(p,s,c,m) {
-		var tab = s.tab || "changePassword";
+		var tab = s.tab || "general";
 		return <T.Page.PageWrapDevice m={m} pagePostfix="wallet">
 			<T.Page.PageWrapProfile key="header" m={m} header="left" {...s}>
 				<T.Page.PageWrapProfileLeft>
-					<T.Headers.Left m={m} {...p} />
+					<T.Headers.Left m={m} {...p} {...s} tab="settings" />
 				</T.Page.PageWrapProfileLeft>
 				<div className="w-100 d-flex flex-column">
 					<T.Page.PageWrapProfileWidth>
@@ -37,26 +37,26 @@ class PageSettings extends T.Page {
 							className={
 								[
 									"btn-group btn-group-toggle d-flex justify-content-start flex-wrap",
-									m.device.isMobile ? "flex-column align-items-stretch" : ""
-								].join("")
+									m.device.isMobile ? "flex-column" : ""
+								].filter(v=>v).join(" ")
 							}
 							style={{marginBottom:"30px"}}
 						>
 							<div
 								className={"btn "+(tab=="general"? "btn-secondary active":" btn-outline-secondary")}
-								onClick={()=>{this.setState({tab:"general"})}}
-							>General</div>
+								onClick={()=>{this.setState({tab:"general"})}} style={{marginLeft:m.device.isMobile?"-1px":""}}
+							>General</div> 
 							<div
 								className={"btn "+(tab=="changePassword"? "btn-secondary active":" btn-outline-secondary")}
-								onClick={()=>{this.setState({tab:"changePassword"})}}
+								onClick={()=>{this.setState({tab:"changePassword"})}} style={{marginTop:m.device.isMobile?"-1px":""}}
 							>Change Password</div>
 							<div
 								className={"btn "+(tab=="2faDisable"? "btn-secondary active":" btn-outline-secondary")}
-								onClick={()=>{this.setState({tab:"2faDisable"})}}
+								onClick={()=>{this.setState({tab:"2faDisable"})}} style={{marginTop:m.device.isMobile?"-1px":""}}
 							>Disable 2FA</div>
 							<div
 								className={"btn "+(tab=="2faRecover"? "btn-secondary active":" btn-outline-secondary")}
-								onClick={()=>{this.setState({tab:"2faRecover"})}}
+								onClick={()=>{this.setState({tab:"2faRecover"})}} style={{marginTop:m.device.isMobile?"-1px":""}}
 							>Recover 2FA</div>
 						</div>
 					</T.Page.PageWrapProfileWidth>
@@ -119,7 +119,7 @@ class PageSettings extends T.Page {
 		return <div>
 			<h2>CHANGE YOUR PASSWORD</h2>
 			<p>You will be logged out of all other devices after changing your password.</p>
-			<T.Form onSubmit={this.onPassword_save.bind(this)} hideServerError onServerError={()=>this.forceUpdate()} ref={el=>this.form=el}>
+			<T.Form onSubmit={this.onPassword_save.bind(this)} handler={this}>
 				<div style={{maxWidth:"482px"}}>
 					<T.Input.Password
 						value={s.passworCur||""} onChange={this.onPassword_cur.bind(this)}
@@ -136,20 +136,16 @@ class PageSettings extends T.Page {
 					/>
 					{this.form && this.form.renderServerError()}
 				</div>
-				<T.If v={s.passwordChanged}>
+				<T.If v={s.passwordChanged && !s.serverError}>
 					<p>
 						Password changed.
 					</p>
 				</T.If>
-				<button type="submit"
-					disabled={s.passwordChanged || !s.canSubmitPassword}
-					className={[
-						"btn btn-lg btn-primary",
-						s.passwordChanged || !s.canSubmitPassword ? " disabled": "",
-					].join(" ")}
-				>
-					Save changes
-				</button>
+				<T.Form.SubmitButton
+					clsColor="btn-primary" cls="btn-lg"
+					canSubmit={s.canSubmitPassword && !s.serverError && !s.passwordChanged} fetching={s.fetching}
+					text="Save changes"
+				/>
 			</T.Form>
 		</div>
 	}
@@ -157,8 +153,8 @@ class PageSettings extends T.Page {
 		var s = this.state || {};
 		var passworConfirmValid = s.passworNewValid && s.passworNew==s.passworConfirm;
 		var canSubmitPassword = s.passworCurValid && passworConfirmValid;
-		if (this.form) this.form.forgotAboutServerError();
-		this.setState({passworConfirmValid,canSubmitPassword});
+		this.form.forgotAboutServerError();
+		this.setState({passworConfirmValid,canSubmitPassword,passwordChanged:false});
 	}
 	onPassword_cur(passworCur,passworCurValid) {
 		this.setState({passworCur,passworCurValid}, ()=>this.password_checkValid());
@@ -170,7 +166,9 @@ class PageSettings extends T.Page {
 		this.setState({passworConfirm,passworConfirmValid}, ()=>this.password_checkValid());
 	}
 	onPassword_save() {
-		return this.props.m.api.changePassword(this.state.passworCur, this.state.passworConfirm)
+		return T.Form.wrapFetch(this, true,
+			this.props.m.api.changePassword(this.state.passworCur, this.state.passworConfirm)
+		)
 		.then(x=>{
 			this.setState({passwordChanged:true});
 		});

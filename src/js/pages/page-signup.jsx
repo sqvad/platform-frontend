@@ -202,7 +202,7 @@ class PageSignUp_page1 extends T.Page {
 								value={s.passwordConfirm} required
 								password={s.password} autocomplete="off"
 							/>
-							<div className="d-flex justify-content-center mt-4">
+							<div className="d-flex justify-content-center mt-4 mb-3">
 								<button type="submit"
 									className={[
 										"btn btn-lg btn-primary",
@@ -357,7 +357,7 @@ class PageSignUp_page2 extends T.Page {
 		</T.Page.PageWrapDevice>;
 	}
 	onSubmit() {
-		return T.Form.wrapFetch(this, this.props.onSubmit(this.state));
+		return T.Form.wrapFetch(this, false, this.props.onSubmit(this.state));
 	}
 	render_extendFields(p,s,c,m) {
 		return <div>

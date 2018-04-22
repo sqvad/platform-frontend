@@ -1,5 +1,6 @@
 import React from 'react';
 import Any from '../any.jsx';
+import If from './if.jsx';
 import Popup from './popup-base.jsx';
 import Form from './form.jsx';
 import Input from './input.jsx';
@@ -16,28 +17,25 @@ class PopupForgotPassword extends Any {
 			<p style={{textAlign:"center"}}>
 				Please enter your user account login email and we will email instructions to your email address on records to complete the reset of your password.
 			</p>
-			<Form onSubmit={this.onSubmit.bind(this)}>
+			<Form handler={this}>
 				<Input.Email
 					placeholder="YOUR ACCOUNT E-MAIL"
-					hint={
-						s.sended ? "Sent! Please, check out your email."
-							: s.pending ? "Loading..."
-								: s.er ? s.er.message
-									: "E.g. my@email.com"
-					}
 					value={s.email||""} onChange={(this.onEmail.bind(this))}
-					required readonly={s.pending || s.sended}
+					required readonly={s.fetching}
 				/>
+				<If v={s.sended && !s.fetching}><p>
+					Sent! Please, check out your email.
+				</p></If>
+				<If v={s.serverError}>
+					<Form.ServerError message="Invalid email" errors={[0]}></Form.ServerError>
+				</If>
 				<div className="d-flex flex-column align-items-center justify-content-center mt-4">
-					<button type="submit"
-						disabled={!s.emailValid || s.pending || s.sended}
-						className={[
-							"btn btn-lg btn-primary", "mb-3",
-							(!s.emailValid || s.pending || s.sended) ? "disabled" : "",
-						].join(" ")}
+					<Form.SubmitButton
+						canSubmit={s.emailValid} fetching={s.fetching}
+						clsColor="btn-primary" cls="btn-lg mb-3"
 					>
 						RESET PASSWORD
-					</button>
+					</Form.SubmitButton>
 				</div>
 			</Form>
 		</div>;
@@ -51,23 +49,16 @@ class PopupForgotPassword extends Any {
 		}
 	}
 	onEmail(email,emailValid) {
-		this.setState({email,emailValid,er:null}, ()=>{
+		this.form.forgotAboutServerError();
+		this.setState({email,emailValid,er:null,serverError:null}, ()=>{
 			this.forceUpdate();
 		});
 	}
 	onSubmit() {
-		this.setState({pending:true, redirect:"#"});
-		this.props.m.api.sendCodeForPasswordReset(this.state.email, "#")
+		return Form.wrapFetch(this, false, this.props.m.api.sendCodeForPasswordReset(this.state.email, "#"))
 		.then(x=>{
-			this.setState({pending:false, sended:true},()=>{this.forceUpdate()});
+			this.setState({sended:true},()=>{this.forceUpdate()});
 		});
-		// this.props.m.api.login2fa(this.state.code2fa)
-		// .then(x=>{
-		// 	this.props.onClose();
-		// })
-		// .catch(er=>{
-		// 	this.setState({er,pending:false})
-		// })
 	}
 }
 
