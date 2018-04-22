@@ -6,10 +6,13 @@ class Form extends Any {
 	constructor(props) {
 		super(props);
 		this.setState({serverError:null});
+		if (props.handler) {
+			props.handler.form = this;
+		}
 	}
 	render(p,s,c,m) {
 		var serverError = null;
-		if (!p.hideServerError) {
+		if (!p.hideServerError && !p.handler) {
 			serverError = <div className="unexpected-server-error">{this.renderServerError()}</div>;
 		}
 		return <form onSubmit={this.onSubmit.bind(this)}><div>{c}{serverError}</div></form>
@@ -17,7 +20,12 @@ class Form extends Any {
 	onSubmit(e) {
 		if (e && e.preventDefault) e.preventDefault();
 		this.forgotAboutServerError();
-		var ret = this.props.onSubmit();
+		var ret;
+		if (this.props.onSubmit) {
+			ret = this.props.onSubmit();
+		} else if (this.props.handler && this.props.handler.onSubmit) {
+			ret = this.props.handler.onSubmit();
+		}
 		if (ret) {
 			if (typeof ret.catch == typeof function(){}) {
 				ret.catch(er=>{
@@ -36,14 +44,23 @@ class Form extends Any {
 			if (this.props.onServerError) {
 				this.props.onServerError(this);
 			}
+			var handler = this.props.handler;
+			if (handler) {
+				handler.setState({serverError}, ()=>{
+					this.forceUpdate();
+				});
+			}
 			this.forceUpdate();
 		});
 	}
 	renderServerError() {
 		var serverError = this.state.serverError;
+		if (this.props.handler) {
+			serverError = this.props.handler.state.serverError;
+		}
 		if ('serverError' in this.props) {
 			serverError = this.props.serverError;
-		};
+		}
 		return <ServerError serverError={serverError} />;
 	}
 }
@@ -74,18 +91,19 @@ class SubmitButton extends Any {
 Form.SubmitButton = SubmitButton;
 Form.ServerError = ServerError;
 Form.prototype.ServerError = ServerError;
-Form.wrapFetch = function(tag,promise) {
+Form.wrapFetch = function(tag, catchEr, promise) {
 	var putTo = tag.form || tag;
 	var startAt = Date.now();
-	tag.setState({fetching:true});
+	tag.setState({fetching:true,serverError:null});
 	return promise
 	.then(x=>{
 		after();
 		return x;
 	})
 	.catch(er=>{
+		tag.setState({serverError:er});
 		after();
-		throw er;
+		if (!catchEr) throw er;
 	});
 	function after() {
 		tag.setState({fetching:false});

@@ -258,6 +258,8 @@ class Api {
         .then(()=>{
             this.model.logoutInProgress = false;
             this.model.emit('change');
+			this.gotoHref("/");
+			window.location.reload();
         })
         .catch(()=>{
             this.model.logoutInProgress = false;
@@ -274,7 +276,7 @@ class Api {
         });
     }
     login2fa(code) {
-        return this._fetchPOST('/auth/login/totp',{code})
+        return this._fetchPOST('/auth/login/totp',{code:code.replace(/[\D]/g,'')})
         .then(x=>{
             this.getUserData();
             return x;
@@ -298,6 +300,9 @@ class Api {
 	}
 	sendCodeForPasswordReset(email,redirect) {
 		return this._fetchPOST('/system/password/reset/request', {email,redirect})
+	}
+	resetPassword(code,password) {
+		return this._fetchPOST('/system/password/reset/confirm', {code,password})
 	}
 	getUserTypes() {
 		return this._fetchGET('/system/user/types', {lang:"EN"});

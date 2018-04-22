@@ -90,19 +90,19 @@ class HeaderLeft extends Any {
 		return m.device.isMobile ? this.render_mobile(p,s,c,m) : this.render_default(p,s,c,m);
 	}
 	render_default(p,s,c,m) {
-		return <div className="bg-violet w-100">
+		return <div className="bg-violet w-100"> 
 			<A className="left-menu-logo" m={m} href="">
 				<span className="left-menu-logo-img"></span>
 			</A>
-			<A className="left-menu-item active" m={m} href="/wallets">
-				<span className="icon icon-30 icon-lg icon-wallet"></span>
+			<A className={"left-menu-item"+(p.tab=="wallets"?" active":"")} m={m} href="/wallets">
+				<span className={"icon icon-30 icon-lg icon-wallet"+(p.tab!="wallets"?" icon-white":"")}></span>
 				<span className="left-menu-item-label">wallets</span>
 			</A>
-			<A className="left-menu-item" m={m} href="/settings">
-				<span className="icon icon-30 icon-lg icon-settings icon-white"></span>
+			<A className={"left-menu-item"+(p.tab=="settings"?" active":"")} m={m} href="/settings">
+				<span className={"icon icon-30 icon-lg icon-settings"+(p.tab!="settings"?" icon-white":"")}></span>
 				<span className="left-menu-item-label">settings</span>
 			</A>
-			<A className="left-menu-item hover" m={m} onClick={()=>m.api.logout()}>
+			<A className="left-menu-item" m={m} onClick={()=>m.api.logout()}>
 				<span className="icon icon-30 icon-lg icon-logout icon-white"></span>
 				<span className="left-menu-item-label">log out</span>
 			</A>
@@ -124,17 +124,17 @@ class HeaderLeft extends Any {
 			spread.style = {borderTop:"1px solid #302c43"};
 		}
 		return <div {...spread}>
-			<A className="left-menu-item active" m={m} href="/wallets"
+			<A className={"left-menu-item"+(p.tab=="wallets"?" active":"")} m={m} href="/wallets"
 				style={{paddingLeft:m.device.isMobile?"15px":""}}
 			>
-				<span className="icon icon-30 icon-lg icon-wallet"></span>
+				<span className={"icon icon-30 icon-lg icon-wallet"+(p.tab!="wallets"?" icon-white":"")}></span>
 				<span className="left-menu-item-label">wallets</span>
 			</A>
-			<A className="left-menu-item" m={m}>
-				<span className="icon icon-30 icon-lg icon-settings icon-white"></span>
+			<A className={"left-menu-item"+(p.tab=="settings"?" active":"")} m={m} href="/settings">
+				<span className={"icon icon-30 icon-lg icon-settings"+(p.tab!="settings"?" icon-white":"")}></span>
 				<span className="left-menu-item-label">settings</span>
 			</A>
-			<A className="left-menu-item hover" m={m}
+			<A className="left-menu-item" m={m}
 				style={{paddingRight:m.device.isMobile?"15px":""}}
 			>
 				<span className="icon icon-30 icon-lg icon-logout icon-white"></span>

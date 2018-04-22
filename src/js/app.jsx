@@ -9,6 +9,7 @@ import PageSettings from './pages/page-settings.jsx';
 import PageStart from './pages/page-start.jsx';
 import PageVerifyEmail from './pages/page-verify-email.jsx';
 import PageEA from './pages/page-early-access.jsx';
+import PageResetPassword from './pages/page-reset-password.jsx';
 
 class App extends React.Component {
 	componentWillMount() {
@@ -84,6 +85,7 @@ class App extends React.Component {
 		var Page;
 		if (!Page) { // for any users - via url
 			// if (m.path.contains["verify-email"] || m.path.contains["start"]) Page = PageStart;
+			if (m.path.contains["reset-password"]) Page = PageResetPassword;
 			if (m.path.contains["verify-email"]) Page = PageVerifyEmail;
 			if (m.path.contains["early-access"]) Page = PageEA;
 		}
