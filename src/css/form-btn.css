@@ -44,7 +44,7 @@
 }
 .btn-outline-primary:hover, .btn-outline-primary.hover, .btn-outline-primary:active, .btn-outline-primary.active {
 	border-color: #4224c5;
-	background: #f1eeff;
+	background: rgba(66,36,197,0.07);
 	color: #4224c5;
 }
 .btn-outline-primary.disabled {

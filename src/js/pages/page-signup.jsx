@@ -156,13 +156,14 @@ class PageSignUp extends T.Page {
 	register(result) {
 		return new Promise((resolve, reject)=>{
 			this.goto1stPage(result, true, ()=>{
-				this.props.m.api.register(this.state).then(resolve).catch(reject)
+				this.props.m.api.register(this.state)
 				.then(x=>{
 					var m = this.props.m;
 					if (m.path.contains["signup"]) {
 						m.api.gotoHref(T.A.href({href:"/"},m));
 					}
-				});
+				})
+				.then(resolve).catch(reject);
 			});
 		});
 	}

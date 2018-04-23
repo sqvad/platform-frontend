@@ -12,7 +12,7 @@ class Select extends Any {
 	}
 	renderWrap(p,s,c,m) {
 		var haveValue = p.value && (p.value.length!=0);
-		var inputGroupCls = "input-group with-placeholder";
+		var inputGroupCls = "input-group input-group-with-select with-placeholder";
 		inputGroupCls += haveValue ? " filled placeholder-to-up" : " empty";
 		if (s.focused) inputGroupCls += " focused";
 		if (p.hasError || s.errorViaRequied) inputGroupCls += " has-danger";

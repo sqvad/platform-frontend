@@ -100,7 +100,9 @@ class Api {
 		return transport.then(x=>{
             return typeof x.json == 'function'
                 ? x.json().then(v=>v).catch(er=>{
-                    console.error(er);
+					try {
+						console.error(er);
+					} catch(er2) {}
                     return {};
                 })
                 : x;
@@ -112,6 +114,9 @@ class Api {
                     if (Array.isArray(x.errors) && x.errors.length) {
                         throw x;
                     }
+                } else if (x.message===null && x.errors===null && Object.keys(x).length==2) {
+					x.message = "Unknown error";
+					throw x;
                 } else if (x.message) {
                     throw x;
                 }
@@ -386,6 +391,10 @@ class Api {
 		});
 		if (skippedParams.length) {
 			// debugger;
+		}
+		if (params.phoneNumberCode) {
+			params.phoneNumber = params.phoneNumberCode;
+			delete params.phoneNumberCode;
 		}
 		return this._fetch_afterCheck(
 			'POST', '/register/data', params

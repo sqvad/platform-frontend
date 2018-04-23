@@ -40,21 +40,16 @@ class HeaderShort extends Any {
 	render(p,s,c,m) {
 		var authData = m.auth || {};
 		var userData = m.user;
-		console.log(authData);
 		return <div className="header-short bg-violet">
-			<div className="container">
-				<div className="width page">
-					<div className="row">
-						<div className="col-6 pl-0">
-							<A m={m} href="/" className="for-logo">
-								<div className={m.device.isMobile?"logo logo-nopad-100x33":"logo logo-nopad-131x43"} />
-							</A>
-						</div>
-						<div className="col-6 pr-0 d-flex align-items-center justify-content-end">
-							<Name {...p} />
-							{authData.signedIn?<Logout {...p} />:<Login {...p} />}
-						</div>
-					</div>
+			<div className="row">
+				<div className="col-6 pl-0">
+					<A m={m} href="/" className="for-logo">
+						<div className={m.device.isMobile?"logo logo-nopad-100x33":"logo logo-nopad-131x43"} />
+					</A>
+				</div>
+				<div className="col-6 pr-0 d-flex align-items-center justify-content-end">
+					{authData.signedIn?<Name {...p} />:<span className="d-block mr-3 pt-2 pb-2 text-uppercase">Already member?</span>}
+					{authData.signedIn?<Logout {...p} />:<Login {...p} />}
 				</div>
 			</div>
 		</div>;
@@ -65,20 +60,19 @@ class HeaderMedium extends Any {
 	render(p,s,c,m) {
 		var authData = m.auth || {};
 		var userData = m.user;
-		console.log(authData);
-		return <div className="header-medium bg-violet d-flex" key="header">
-			<div className="container d-flex flex-column">
-				<div className="row">
-					<div className="col-6 pl-0">
-						<A m={m} href="/" className="for-logo">
-							<div className={m.device.isMobile?"logo logo-nopad-100x33":"logo logo-nopad-131x43"} />
-						</A>
-					</div>
-					<div className="col-6 pr-0 d-flex align-items-center justify-content-end">
-						<Name {...p} />
-						{authData.signedIn?<Logout {...p} />:<Login {...p} />}
-					</div>
+		return <div className="header-medium bg-violet d-flex flex-column" key="header">
+			<div className="row">
+				<div className="col-6 pl-0">
+					<A m={m} href="/" className="for-logo">
+						<div className={m.device.isMobile?"logo logo-nopad-100x33":"logo logo-nopad-131x43"} />
+					</A>
 				</div>
+				<div className="col-6 pr-0 d-flex align-items-center justify-content-end">
+					{authData.signedIn?<Name {...p} />:<span className="d-block mr-3 pt-2 pb-2 text-uppercase">Already member?</span>}
+					{authData.signedIn?<Logout {...p} />:<Login {...p} />}
+				</div>
+			</div>
+			<div className="container d-flex flex-column">
 				{c}
 			</div>
 		</div>;
@@ -90,7 +84,7 @@ class HeaderLeft extends Any {
 		return m.device.isMobile ? this.render_mobile(p,s,c,m) : this.render_default(p,s,c,m);
 	}
 	render_default(p,s,c,m) {
-		return <div className="bg-violet w-100"> 
+		return <div className="bg-violet w-100">
 			<A className="left-menu-logo" m={m} href="">
 				<span className="left-menu-logo-img"></span>
 			</A>

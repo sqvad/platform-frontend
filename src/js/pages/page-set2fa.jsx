@@ -28,8 +28,8 @@ class PageSet2FA extends T.Page {
 					Security is in high priority for us, so we ensure that all users setup 2FA.
 				</p>
 				<div className="d-flex flex-column align-items-center">
-					{s.helpOpened ? this.render_helpOpened(p,s,c,m) : this.render_helpClosed(p,s,c,m)}
-					{s.generateOpened ? this.render_generateOpened(p,s,c,m) : null}
+					{this.render_helpOpened(p,s,c,m)}
+					{this.render_generateOpened(p,s,c,m)}
 					{!s.generateOpened ? this.render_generateClosed(p,s,c,m) : this.render_check2fa(p,s,c,m)}
 				</div>
 				<p className="p-muted" style={{"textAlign":"center"}}>
@@ -47,19 +47,24 @@ class PageSet2FA extends T.Page {
 	render_helpOpened(p,s,c,m) {
 		var country = (m && m.user && m.user.country || "us").toLowerCase();
 		return <div>
-			<div className="row d-flex justify-content-center">
-				<div className="mb-2 col-8 d-flex flex-column justify-content-center" style={{border:"1px solid #e5e6e7",marginTop:"25px"}}>
+			<div className={"row d-flex justify-content-center smooth-opening-"+(s.helpOpened?"opened":"closed")}>
+				<div className={[
+					"d-flex flex-column justify-content-center smooth-opening-border",
+					m.device.isDesktop ? "col-8" : "mr-1 ml-1"
+				].filter(v=>!!v).join(" ")}>
 					<div className="d-flex justify-content-center" style={{position:"relative",top:"-1.6em"}}>
-						<button className="btn btn-lg btn-outline-primary" onClick={()=>{this.setState({helpOpened:false})}} style={{minWidth:"200px"}}>
+						<button className="btn btn-lg btn-outline-primary"
+							onClick={()=>{this.setState({helpOpened:!this.state.helpOpened})}}
+						style={{minWidth:"200px"}}>
 							How It Works
 						</button>
 					</div>
-					<div className="row d-flex justify-content-center">
+					<div className="row d-flex justify-content-center smooth-opening-content">
 						<div className="mb-2 col-10">
 							<p style={{"textAlign":"center"}}>You must have an authentication app installed on your phone or tablet. This app generates access codes for your Populous account. We will ask you to enter these codes to confirm some important actions for your account, like login or changing account settings.</p>
 							<p style={{"textAlign":"center"}}>If you lost your authentication app or device, you can reset 2FA via email, like your password.</p>
 							<p style={{"textAlign":"center"}}>Authentication apps we can recommend are:</p>
-							<div className="d-flex align-items-space-between justify-content-between apps-block">
+							<div className="d-flex align-items-space-between justify-content-between apps-block mb-4">
 								<div className="app-block">
 									<img src="/img/set2fa-ga.png" width="49" height="55" style={{borderBottom:"6px solid transparent"}}/>
 									<br />
@@ -71,7 +76,7 @@ class PageSet2FA extends T.Page {
 									</span>
 								</div>
 								<div className="app-block">
-									<T.A href="https://authy.com/" external><img src="/img/set2fa-authy.png" width="49" height="55" style={{borderBottom:"6px solid transparent"}}/></T.A>
+									<img src="/img/set2fa-authy.png" width="49" height="55" style={{borderBottom:"6px solid transparent"}}/>
 									<br />
 									<b>Authy</b>
 									<br />
@@ -81,7 +86,7 @@ class PageSet2FA extends T.Page {
 									</span>
 								</div>
 								<div className="app-block">
-									<T.A href="https://duo.com/" external><img src="/img/set2fa-duo.png" width="49" height="55" style={{borderBottom:"6px solid transparent"}}/></T.A>
+									<img src="/img/set2fa-duo.png" width="49" height="55" style={{borderBottom:"6px solid transparent"}}/>
 									<br />
 									<b>Duo Mobile</b>
 									<br />
@@ -106,9 +111,17 @@ class PageSet2FA extends T.Page {
 	}
 	render_generateOpened(p,s,c,m) {
 		return <div className="w-100">
-			<div className="row d-flex justify-content-center">
-				<div className="mb-4 col-8 d-flex flex-column justify-content-center" style={{border:"1px solid #e5e6e7",marginTop:"25px"}}>
-					<div className="row d-flex justify-content-center">
+			<div
+				className={"row d-flex justify-content-center smooth-opening-"+(s.generateOpened?"opened":"closed")}
+				style={{
+					marginBottom: s.generateOpened ? "" : "-51px"
+				}}
+			>
+				<div className={[
+					"mb-4 d-flex flex-column justify-content-center smooth-opening-border",
+					m.device.isDesktop ? "col-8" : "mr-1 ml-1"
+				].filter(v=>!!v).join(" ")}>
+					<div className="row d-flex justify-content-center smooth-opening-content">
 						<T.If v={s.totpSecretKey} key="totpSecretKey">
 							<div className="mb-2 col-9 pt-4">
 								<p style={{"textAlign":"center"}} className="mt-3">

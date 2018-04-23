@@ -1,5 +1,9 @@
 @import "./form-btn.css";
 
+button, select {
+	cursor: pointer;
+}
+
 form {
 	display: block;
 }
@@ -84,6 +88,9 @@ label.input-group {
 	color: #353535;
 	top: 12px;
 	font-weight: bold;
+}
+.input-group.placeholder-to-up.input-group-with-select .placeholder {
+	left: 4px;
 }
 .border4sides.input-group.placeholder-to-up  .placeholder {
 	top: 2px;
