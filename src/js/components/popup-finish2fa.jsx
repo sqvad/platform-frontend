@@ -54,8 +54,6 @@ class PopupFinish2fa extends Any {
 		this.setState({pending:true});
 		this.props.m.api.confirmTotpSecretKey(this.state.code2fa)
 		.then(x=>{
-			debugger;
-			x;
 			this.props.onClose();
 		})
 		.catch(er=>{

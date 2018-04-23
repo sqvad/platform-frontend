@@ -15,7 +15,7 @@ class PageSet2FA extends T.Page {
 	}
 	render(p,s,c,m) {
 		return <T.Page.PageWrapDevice m={m} pagePostfix="set2fa" popup={s.popup}>
-			<T.Page.PageWrapHeader key="header" m={m} header="short" {...s}></T.Page.PageWrapHeader>
+			<T.Page.PageWrapHeader key="header" m={m} header="short" {...s} noSignIn={true}></T.Page.PageWrapHeader>
 			<T.Page.PageWrapWidth key="width" m={m} {...p}>
 				<h1 className="h1-center d-flex flex-column align-items-center">
 					<img src="/img/set2fa-header.png" width="311" height="122" className="d-block mb-4"/>
@@ -47,10 +47,10 @@ class PageSet2FA extends T.Page {
 	render_helpOpened(p,s,c,m) {
 		var country = (m && m.user && m.user.country || "us").toLowerCase();
 		return <div>
-			<div className={"row d-flex justify-content-center smooth-opening-"+(s.helpOpened?"opened":"closed")}>
+			<div className={"row d-flex justify-content-center smooth-opening-"+(s.helpOpened?"opened":"closed")} style={{marginTop:"-10px"}}>
 				<div className={[
 					"d-flex flex-column justify-content-center smooth-opening-border",
-					m.device.isDesktop ? "col-8" : "mr-1 ml-1"
+					m.device.isDesktop ? "col-9" : "mr-1 ml-1"
 				].filter(v=>!!v).join(" ")}>
 					<div className="d-flex justify-content-center" style={{position:"relative",top:"-1.6em"}}>
 						<button className="btn btn-lg btn-outline-primary"
@@ -119,8 +119,8 @@ class PageSet2FA extends T.Page {
 			>
 				<div className={[
 					"mb-4 d-flex flex-column justify-content-center smooth-opening-border",
-					m.device.isDesktop ? "col-8" : "mr-1 ml-1"
-				].filter(v=>!!v).join(" ")}>
+					m.device.isDesktop ? "col-9" : "mr-1 ml-1"
+				].filter(v=>!!v).join(" ")} style={{marginTop: "0px"}}>
 					<div className="row d-flex justify-content-center smooth-opening-content">
 						<T.If v={s.totpSecretKey} key="totpSecretKey">
 							<div className="mb-2 col-9 pt-4">

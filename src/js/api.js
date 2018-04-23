@@ -1,29 +1,3 @@
-/*
-var authdataMockup = {
-  "canSignIn": false,
-  "email": "zitrix.box+t91@gmail.com",
-  "emailVerified": false,
-  "fullVerified": false,
-  "totpSecretKeyConfirmed": false,
-  "id": 0,
-};
-*/
-// {
-// 	"canSignIn": true,
-// 	"email": "string",
-// 	"emailCodeResendAfterPeriod": 0,
-// 	"emailCodeValidPeriod": 0,
-// 	"emailLastCodeSentAt": "2018-04-11T14:42:58.236Z",
-// 	"emailVerificationAttemptsCount": 0,
-// 	"emailVerified": true,
-// 	"fullVerified": true,
-// 	"id": 0,
-// 	"passwordResetCodeResendAfterPeriod": 0,
-// 	"passwordResetCodeValidPeriod": 0,
-// 	"passwordResetLastCodeSentAt": "2018-04-11T14:42:58.236Z",
-// 	"totpSecretKeyConfirmed": true
-// };
-
 class Api {
 	constructor(model) {
 		this.model = model;
@@ -229,7 +203,6 @@ class Api {
 		});
 	}
     gotoHref(href) {
-        var origin = window.location.origin;
 		if (this.model.settings.misc.pathViaHash) {
 			if (href && href!="#") {
 				// window.location.hash = href.charAt(0)=="#" ? href : "#" + href;
@@ -246,11 +219,18 @@ class Api {
 		            href = href.substr(1);
 		        }
 			}
-	        // window.location.href = href;
 			window.history.pushState({x:Date.now()}, null, href);
         }
-        // window.location.reload();
     }
+	hrefForEmail(href) {
+		var useHash = this.model.settings.misc.pathViaHash;
+		if (href.charAt(0)=="/" && !useHash) href = href.substr(1);
+		return [
+			window.location[useHash?'origin':'href'],
+			useHash?"#":"",
+			href
+		].filter(v=>!!v).join("");
+	}
     logout() {
         try {
             this.model.clear();
@@ -346,28 +326,16 @@ class Api {
         params.page = 0;
 		return this._fetchPOST('/wallet/transactions/list',params);
     }
-	verifyEmail(email, code) {
-		var params = {code};
-		return (email?Promise.resolve():this.getAuthData()).then(()=>{
-			var email = email || this.model.auth.email;
-			return this._fetchPOST("/register/email/verify/confirm",{email,code});
-		});
-		/*
-		this._fetch_afterCheck(
-			'POST', '/register/email/verify/confirm', params
-			, ()=>!email || !this.model.user
-			, ()=>this.getAuthData()
-			, (method, path, params)=> {
-				params.email = email || this.model.user.email;
-			}
-		).then(x=>{
-			debugger;
-		});
-		*/
+	verifyEmail(emailVerificationCode) {
+		return this._fetchPOST("/register/email/verify/confirm",{emailVerificationCode});
 	}
 	register(params) {
 		var params = JSON.parse(JSON.stringify(params));
 		params.userType = params.role;
+		var verificationEndpoint = params.verificationEndpoint;
+		if (!verificationEndpoint) {
+			verificationEndpoint = this.hrefForEmail("/verify-email/%s");
+		}
 		var whitelist = {
 			'userType':1,
 			'addressLine1':1,'addressLine2':1,'city':1,'companyDescription':1,'companyName':1,'companyNumber':1,'country':1,'email':1,'firstName':1,'lastName':1,'password':1,'phoneAreaCode':1,'phoneNumberCode':1,'postcode':1,
@@ -396,6 +364,10 @@ class Api {
 			params.phoneNumber = params.phoneNumberCode;
 			delete params.phoneNumberCode;
 		}
+		params = {
+			user: params,
+			verificationEndpoint
+		};
 		return this._fetch_afterCheck(
 			'POST', '/register/data', params
 			, ()=>this.model.userTypes

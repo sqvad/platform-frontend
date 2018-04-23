@@ -35,6 +35,16 @@ A.href = function(p,m) {
 	}
 	return href;
 }
+A.forEmail = function(href, m) {
+	if (m.settings.misc.pathViaHash) {
+		if (href=="/") {
+			href = window.location.href;
+		} else {
+			href = window.location.href + "#" + href;
+		}
+	}
+	return href;
+}
 
 A.propTypes = {
 	href: Any.PropTypes.string,

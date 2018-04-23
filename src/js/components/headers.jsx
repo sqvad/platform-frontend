@@ -40,6 +40,11 @@ class HeaderShort extends Any {
 	render(p,s,c,m) {
 		var authData = m.auth || {};
 		var userData = m.user;
+		var signIn = <div className="col-6 pr-0 d-flex align-items-center justify-content-end">
+			{authData.signedIn?<Name {...p} />:<span className="d-block mr-3 pt-2 pb-2 text-uppercase">Already member?</span>}
+			{authData.signedIn?<Logout {...p} />:<Login {...p} />}
+		</div>;
+		if (p.noSignIn) signIn = null;
 		return <div className="header-short bg-violet">
 			<div className="row">
 				<div className="col-6 pl-0">
@@ -47,10 +52,7 @@ class HeaderShort extends Any {
 						<div className={m.device.isMobile?"logo logo-nopad-100x33":"logo logo-nopad-131x43"} />
 					</A>
 				</div>
-				<div className="col-6 pr-0 d-flex align-items-center justify-content-end">
-					{authData.signedIn?<Name {...p} />:<span className="d-block mr-3 pt-2 pb-2 text-uppercase">Already member?</span>}
-					{authData.signedIn?<Logout {...p} />:<Login {...p} />}
-				</div>
+				{signIn}
 			</div>
 		</div>;
 	}

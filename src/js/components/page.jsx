@@ -19,10 +19,10 @@ class PageWrapWidth extends Any {
 class PageWrapHeader extends Any {
 	render(p,s,c,m) {
 		if (p.header=="short") {
-			return <Headers.Short m={m}>{c}</Headers.Short>;
+			return <Headers.Short m={m} noSignIn={!!p.noSignIn}>{c}</Headers.Short>;
 		}
 		if (p.header=="medium") {
-			return <Headers.Medium m={m}>{c}</Headers.Medium>;
+			return <Headers.Medium m={m} noSignIn={!!p.noSignIn}>{c}</Headers.Medium>;
 		}
 		return null;
 	}
