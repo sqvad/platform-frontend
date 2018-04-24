@@ -30,7 +30,7 @@ class Login extends Any {
 		return <button type="button" className="btn btn-sm btn-outline-secondary"
 			onClick={()=>m.api.gotoHref(A.href({href:"/signin"},m))}
 		>
-			Sign In
+			Log In
 			<span className="icon icon-24 icon-next" />
 		</button>;
 	}
