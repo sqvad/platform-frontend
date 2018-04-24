@@ -11,18 +11,22 @@ class TX extends Any {
 		} else {
 			txFormatted = this.format(tx);
 		}
-		// https://ropsten.etherscan.io/address/0xBA46454801BBFB741FFc6Addf58dc6C2cC061FD7
-		// var prefix =
-		// var prefix = m.settings.misc["@server@isTestnet"] || 1 ? m.settings.misc.testnetEtherscanPrefix : m.settings.misc.mainnetEtherscanPrefix;
-		var prefix = "https://etherscan.io/";
-		if (p.isAdr) {
-			return <A external m={m} href={prefix+"address/"+tx}>{txFormatted}</A>;
-		} else {
-			return <A external m={m} href={prefix+"tx/"+tx}>{txFormatted}</A>;
-		}
+		var href = TX.href(m, p.isAdr, tx);
+		return <A external m={m} href={href}>{txFormatted}</A>;
 	}
 	format(txHash) {
 		return txHash.substr(0,7) +"..."+ txHash.substr(txHash.length-7);
+	}
+}
+TX.href = function(m,isAdr,tx) {
+	// https://ropsten.etherscan.io/address/0xBA46454801BBFB741FFc6Addf58dc6C2cC061FD7
+	// var prefix =
+	// var prefix = m.settings.misc["@server@isTestnet"] || 1 ? m.settings.misc.testnetEtherscanPrefix : m.settings.misc.mainnetEtherscanPrefix;
+	var prefix = "https://etherscan.io/";
+	if (isAdr) {
+		return prefix+"address/"+tx;
+	} else {
+		return prefix+"tx/"+tx;
 	}
 }
 

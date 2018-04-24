@@ -4,7 +4,9 @@ import Any from '../any.jsx';
 class ServerError extends Any {
 	render(p,s,c,m) {
 		var src = p.serverError || p;
-		if (!src || !src.message && (!src.errors || src.errors.length==0)) return null;
+		if (!src || !src.message && (!src.errors || src.errors.length==0)) {
+			return null;
+		}
 		return <div className="server-errors">
 			<div className="server-error-message">
 				{(src.message||'').trim()}

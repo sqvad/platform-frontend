@@ -63,7 +63,7 @@ class PageWallets extends T.Page {
 	renderWallet(p,s,c,m) {
 		var wallet = m.user.wallets.filter(v=>v.symbol==p.walletId)[0];
 		var tab = s.tab || "transactions";
-		// var tab = s.tab || "settings";
+		// var tab = s.tab || "receive";
 		return <T.Page.PageWrapDevice m={m} pagePostfix="wallet">
 			<T.Page.PageWrapProfile key="header" m={m} header="left" {...s}>
 				<T.Page.PageWrapProfileLeft>
@@ -175,9 +175,34 @@ class PageWallets extends T.Page {
 		return <TransactionsTable {...p} {...s} />;
 	}
 	renderWallet_send(p,s,c,m) {
-		return <SendTokens {...p} {...s} m={m} />;
+		return <SendTokens {...p} {...s} m={m} after={()=>this.setState({tab:"transactions"})} />;
 	}
 	renderWallet_receive(p,s,c,m) {
+		return <Receiver {...p} {...s} />;
+	}
+	renderWallet_settings(p,s,c,m) {
+		return <Settings {...p} {...s} />;
+	}
+}
+
+class Receiver extends T.Any {
+	constructor(props) {
+		super(props);
+		props.m.api.loadLib_clipboardjs()
+		.then(()=>{
+			new ClipboardJS(this.copy);
+		});
+		props.m.api.loadLib_qrcode()
+		.then(()=>{
+			var p = this.props;
+			var wallet = p.m.user.wallets.filter(v=>v.symbol==p.walletId)[0];
+			qrcodelib.toDataURL(T.TX.href(p.m, true, wallet.address||"n/a"), (err, url)=>{
+				this.setState({qrDataUrl:url});
+			});
+		});
+	}
+	render(p,s,c,m) {
+		var wallet = p.m.user.wallets.filter(v=>v.symbol==p.walletId)[0];
 		return <div>
 			<h2>RECEIVE</h2>
 			<h3>RECEIVING ADDRESS</h3>
@@ -186,21 +211,46 @@ class PageWallets extends T.Page {
 					border:"1px solid #e5e6e7",padding:"15px",
 					marginBottom:m.device.isMobile?"15px":""
 				}}
-				className={"d-flex align-items-center"+(m.device.isMobile?" flex-column":"")}
+				className={"d-flex align-items-center"+(m.device.isMobile?" flex-column":" justify-content-stretch")}
 			>
-				<img src="/img/qr-test.png" width="145" height="145" />
-				<span style={{
-					display:m.device.isMobile?"block":"",
-					wordBreak:m.device.isMobile?"break-all":"",
-					textAlign:m.device.isMobile?"center":"",
-				}}>
-					<div style={{
-						margin:m.device.isMobile?"2px 0 8px 0":"",
-					}}>
-						0x298DB031c12294c7235D00ef6380a4B53c9619a3
+				<T.A external m={m} href={T.TX.href(p.m, true, wallet.address||"n/a")}>
+					<img src={s.qrDataUrl} width="228" height="228" alt={s.qrDataUrl?"QR code is loading...":"QR code for "+ wallet.address} />
+				</T.A>
+				<div
+					className={(m.device.isMobile?" d-flex flex-column align-items-center":"")}
+					style={{
+						display:m.device.isMobile?"block":"",
+						wordBreak:m.device.isMobile?"break-all":"",
+						textAlign:m.device.isMobile?"center":"",
+						flex:1,
+						width:"100%"
+					}}
+				>
+					<input
+						id="receiverId"
+						readOnly value={wallet.address}
+						style={{
+							margin: m.device.isMobile ? "2px 0 8px 0" : "",
+							border: 0,
+							padding: 0,
+							width: "100%",
+							textAlign: m.device.isMobile ? "center" : ""
+						}}
+					/>
+					<div className="mr-2 mb-2">
+						Receiver
 					</div>
-					Receiver
-				</span>
+					<div>
+						<button
+							type="button" ref={el=>this.copy=el} data-clipboard-target="#receiverId"
+							className="btn-link pl-0 mr-0"
+							style={{color:"inherit"}}
+						>
+							Copy
+							<span className="icon icon-24 icon-copy" />
+						</button>
+					</div>
+				</div>
 			</div>
 			<h3 style={{display:"none"}}>OTHER ADDRESSES</h3>
 			<div
@@ -235,8 +285,8 @@ class PageWallets extends T.Page {
 			</div>
 		</div>;
 	}
-	renderWallet_settings(p,s,c,m) {
-		return <Settings {...p} {...s} />;
+	rename() {
+
 	}
 }
 
@@ -251,49 +301,55 @@ class Settings extends T.Any {
 		return <div>
 			<h2>SETTINGS</h2>
 			<h3>CHANGE WALLET NAME</h3>
-			<code><pre>
-				{JSON.stringify(wallet,4,4)}
-			</pre></code>
-			<code><pre>
-				{s.nameValid}
-			</pre></code>
-			<T.Form onSubmit={()=>this.save()}>
+			<T.Form handler={this}>
 				<T.Input
 					required placeholder="Wallet name" inputGroupCls="border4sides"
-					value={s.name}
-					onChange={(name,nameValid)=>{this.setState({name,nameValid})}}
+					value={s.name||""}
+					onChange={(name,nameValid)=>{this.setState({name,nameValid:!!nameValid})}}
 				/>
 				<div className="mt-4">
-					<button type="submit"
-						className={[
-							"btn btn-lg btn-primary",
-							s.nameValid ? "" : " disabled",
-						].join(" ")}
-					>
-						Save changes
-					</button>
+					<T.Form.SubmitButton
+						canSubmit={s.name && s.name!=wallet.name} fetching={s.fetching}
+						clsColor="btn-primary" cls="btn-lg"
+						text="Save changes"
+					/>
 				</div>
 			</T.Form>
 		</div>;
 	}
-	save() {
-		this.props.m.api.updateWalletName(this.props.walletId, this.state.name);
+	onSubmit() {
+		return this.props.m.api.updateWalletName(this.props.walletId, this.state.name)
+		.then(()=>{
+			this.props.m.api.getWallets();
+		});
 	}
 }
 
 class SendTokens extends T.Any {
 	constructor(props) {
 		super(props);
+		// debugger;
 		this.setState({
-			currency: props.currency || "ETH",
+			currency: props.currency || props.walletId || "ETH",
 			priority: props.priority || "medium",
+			to: null,// "0xBA46454801BBFB741FFc6Addf58dc6C2cC061FD7",
 			specifyCustomGasLimit: false,
 			isReview: false,
-			isReport: false
+			isReport: false,
+			transactionSending: 0,
+			transactionSent: 0,
+			transactionSendEr: 0 && {
+				message: "khm",
+				errors: null
+			}
 		});
 	}
 	render(p,s,c,m) {
-		if (!s.isReview && !s.isReport) {
+		if (s.transactionSending) {
+			return this.render_report(p,s,c,m);
+		} else if (s.transactionSent) {
+			return this.render_sent(p,s,c,m);
+		} else if (!s.isReview && !s.isReport) {
 			return this.render_form(p,s,c,m);
 		} else if (s.isReview) {
 			return this.render_review(p,s,c,m);
@@ -302,13 +358,28 @@ class SendTokens extends T.Any {
 		}
 	}
 	render_form(p,s,c,m) {
+		var wallet = m.user.wallets.filter(v=>v.symbol==s.currency)[0];
+		// wallet = JSON.parse(JSON.stringify(wallet));
+		// wallet.balance = 12345 * Math.pow(10,wallet.format*1) +'';
+		var inUsd = null;
+		if (wallet) {
+			var inUsd = T.Currency.asText(p,false,true,s.currency,s.amount);
+			var inWei = "";
+			if (s.amount) {
+				inWei = T.Currency.coin2wei(s.amount||0, wallet.format) + "wei";
+				inWei = T.Currency._2number(T.Currency.coin2wei(s.amount||0, wallet.format), true) + "wei";
+			}
+			inUsd = [inUsd, inWei].filter(v=>!!v).join(" ");
+		}
+		var max = T.Currency.maxNoWei(m,wallet);
+		var maxIsZero = max.isZero();
 		return <div>
 			<h2>SEND</h2>
 			<p>This form allows you to spend funds from your wallet. Always double check your destination address!</p>
-				<T.If v={1}><div style={{maxWidth:"482px"}}><T.Form>
+				<T.If v={1}><div style={{maxWidth:"482px"}}><T.Form handler={this}>
 					<T.Input.TxAdr
 						name="to" placeholder="Send to" inputGroupCls="border4sides"
-						onChange={this.onTo.bind(this)} value={s.to} required
+						onChange={this.onTo.bind(this)} value={s.to||""} required
 					/>
 					<div className="d-flex">
 						<T.Select
@@ -317,14 +388,16 @@ class SendTokens extends T.Any {
 							required onChange={this.onCurrency.bind(this)} value={s.currency}
 							options={
 								m.user.wallets.map(v=>{
-									return {value:v.id,title:v.id};
+									return {value:v.symbol,title:v.symbol +" - "+ v.name};
 								})
 							}
 						/>
 						<T.Input.Float
-							name="amount" placeholder="Amount" min={0} aboveMin={true} max={5} belowMax={false}
-							onChange={this.onAmount.bind(this)} value={s.amount} required
-							inputGroupCls="border4sides"
+							bn min={0} aboveMin={true} max={max} belowMax={false} required
+							onChange={this.onAmount.bind(this)} value={wallet ? s.amount : ""}
+							hint={maxIsZero ? "Low funds" : s.amountValid ? inUsd : null}
+							hasError={maxIsZero}
+							placeholder="Amount" autocomplete="off" inputGroupCls="border4sides"
 						/>
 					</div>
 					<div style={{display:"none"}}>
@@ -355,26 +428,34 @@ class SendTokens extends T.Any {
 					</div>
 					<T.Textarea v={s.note||""} onChange={this.onNote.bind(this)} />
 					<div className="mt-4">
-						<button type="submit"
-							className={[
-								"btn btn-lg btn-primary",
-								false ? "" : " disabled",
-							].join(" ")}
-						>
-							Sign Up
-						</button>
+						<T.Form.SubmitButton
+							clsColor="btn-primary" cls="btn-lg"
+							canSubmit={s.canSubmit} fetching={s.fetching}
+							text="REVIEW"
+						/>
 					</div>
 				</T.Form></div></T.If>
 		</div>;
 	}
+	onSubmit() {
+		return new Promise(resolve=>{
+			this.setState({isReview:true}, ()=>{resolve();});
+		});
+	}
+	checkValid(partial) {
+		var s = this.state;
+		var wallet = this.props.m.user.wallets.filter(v=>v.symbol==s.currency)[0];
+		var canSubmit = !!wallet;
+		this.form.changeFormState(this, ['toValid','amountValid'], canSubmit, partial);
+	}
 	onTo(to,toValid) {
-		this.setState({to:to.trim(),toValid});
+		this.checkValid({to:to.trim(),toValid});
 	}
 	onCurrency(currency,currencyValid) {
-		this.setState({currency,currencyValid});
+		this.checkValid({currency,currencyValid});
 	}
 	onAmount(amount,amountValid) {
-		this.setState({amount,amountValid});
+		this.checkValid({amount,amountValid});
 	}
 	onCustomGasLimit(customGasLimit,customGasLimitValid) {
 		this.setState({customGasLimit,customGasLimitValid});
@@ -399,26 +480,26 @@ class SendTokens extends T.Any {
 					<div style={{}}>
 						You are about to send the following transaction:
 						<br />
-						<b>{s.amount} {s.currency}</b> to <b>{s.to}</b>
-						<br />
-						<b>{s.customFee} {s.currency}</b> as a transaction fee to miners.
+						<b><T.Currency {...p} id={s.currency} isWei={false} value={s.amount} /></b> to <b>{s.to}</b>
 					</div>
 					<div style={{borderTop: "1px solid #e5e6e7", paddingTop:"15px", marginTop:"15px"}}>
-						<b>{s.amount + s.customFee} {s.currency}</b> ETH in total.
+						<b><T.Currency {...p} id={s.currency} isWei={false} value={s.amount} /></b> in total.
 						<div className="mt-4">
-							<button type="submit"
+							<button type="button"
 								className={[
 									"btn btn-lg btn-outline-primary",
 									"mr-2"
 								].join(" ")}
 								style={{fontWeight:600}}
+								onClick={()=>{this.setState({isReview:false});}}
 							>
 								Cancel
 							</button>
-							<button type="submit"
+							<button type="button"
 								className={[
 									"btn btn-lg btn-primary",
 								].join(" ")}
+								onClick={()=>{this.setState({isReview:false,isReport:true});}}
 							>
 								Sign transaction
 							</button>
@@ -431,12 +512,114 @@ class SendTokens extends T.Any {
 	render_report(p,s,c,m) {
 		return <div>
 			{this.render_review(p,s,c,m)}
-			<T.Popup.Put2fa onClose={()=>{this.on2faOk()}} {...p} />
+			<T.Popup.Put2fa
+				{...p}
+				makePromise={code=>{
+					var s = this.state;
+					var wallet = this.props.m.user.wallets.filter(v=>v.symbol==s.currency)[0];
+					this.setState({transactionSent:false,transactionSending:true,transactionSendEr:null});
+					var inWei = T.Currency.coin2wei(s.amount, wallet.format);
+					return this.props.m.api.withdraw(
+						s.note,
+						code,
+						inWei,
+						s.to,
+						wallet.tokenContractAddress
+					)
+					.then(x=>{
+						this.setState({transactionSent:true,transactionSending:false,transactionSendEr:null});
+						return this.props.m.api.getWallets();
+					})
+					.catch(x=>{
+						if ((x && x.message||"").toLowerCase().indexOf("Verification code".toLowerCase())>-1) {
+							throw x;
+						}
+						if ((x && x.message||"").toLowerCase().indexOf("Verification code".toLowerCase())==-1) {
+							this.setState({transactionSent:true,transactionSending:false,transactionSendEr:x});
+						}
+					});
+				}}
+			/>
 		</div>;
 	}
-	on2faOk() {
-		debugger;
-		this;
+	render_sending(p,s,c,m) {
+		return <div>
+			<h2>Sending...</h2>
+			<T.If v={s.transactionSendEr}><div>
+				<T.Form.ServerError {...s.transactionSendEr} />
+			</div></T.If>
+			<div>
+				<br />
+				<button type="button"
+					className={[
+						"btn btn-lg btn-outline-primary",
+						s.transactionSending ? "disabled" : ""
+					].filter(v=>!!v).join(" ")}
+					style={{fontWeight:600}}
+					disabled={s.transactionSending}
+					onClick={()=>{this.setState({
+						transactionSendEr: null,
+						isReview: false,
+						isReport: false,
+						transactionSending:false,
+						transactionSent:false,
+					});}}
+				>
+					Back
+				</button>
+			</div>
+		</div>;
+	}
+	render_sent(p,s,c,m) {
+		var wallet = m.user.wallets.filter(v=>v.symbol==p.walletId)[0];
+		return <div>
+			<T.If v={!s.transactionSendEr}><div>
+				<h2>YOUR TRANSACTION HAS BEEN SENT</h2>
+				<p>
+					You transaction has been successfully sent to the network.
+					<br />
+					Please remember that it may take some time for your transcation to hit the network.
+				</p>
+				<div className="mt-4">
+					<T.A
+						{...p}
+						href={"/wallets/"}
+						className={[
+							"btn btn-lg btn-outline-primary mr-3",
+						].filter(v=>!!v).join(" ")}
+						style={{fontWeight:600}}
+					>BACK</T.A>
+					<button
+						{...p}
+						href={"/wallets/"+wallet.symbol}
+						onClick={p.after}
+						className={[
+							"btn btn-lg btn-primary",
+						].filter(v=>!!v).join(" ")}
+						style={{fontWeight:400}}
+					>VIEW ON BLOCHAIN EXPLORER</button>
+				</div>
+			</div></T.If>
+			<T.If v={s.transactionSendEr}><div>
+				<h2>ERROR</h2>
+				<T.Form.ServerError {...s.transactionSendEr} />
+				<div className="mt-4">
+					<button type="button"
+						className={[
+							"btn btn-lg btn-primary mr-3",
+						].filter(v=>!!v).join(" ")}
+						style={{fontWeight:600}}
+						onClick={()=>{this.setState({
+							transactionSendEr: null,
+							isReview: false,
+							isReport: false,
+							transactionSending:false,
+							transactionSent:false,
+						});}}
+					>BACK</button>
+				</div>
+			</div></T.If>
+		</div>;
 	}
 }
 

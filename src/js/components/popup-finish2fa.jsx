@@ -40,7 +40,7 @@ class PopupFinish2fa extends Any {
 					>
 						FINISH 2FA SETUP
 					</button>
-					<A m={m} className="text-muted external"><small>I’m not able to log in with 2FA</small></A>
+					<A m={m} className="text-muted external" href="forgot2fa"><small>I’m not able to log in with 2FA</small></A>
 				</div>
 			</Form>
 		</Popup>;
@@ -54,8 +54,6 @@ class PopupFinish2fa extends Any {
 		this.setState({pending:true});
 		this.props.m.api.confirmTotpSecretKey(this.state.code2fa)
 		.then(x=>{
-			debugger;
-			x;
 			this.props.onClose();
 		})
 		.catch(er=>{

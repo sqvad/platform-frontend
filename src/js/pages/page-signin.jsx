@@ -28,7 +28,11 @@ class PageSignIn extends T.Page {
 	}
 	render2fa(p,s,c,m) {
 		return <div>
-			<T.Popup.Put2fa {...p} onClose={()=>this.on2faOk()} />
+			<T.Popup.Put2fa {...p} onClose={()=>this.on2faOk()}
+				makePromise={code=>{
+					return p.m.api.login2fa(code);
+				}}
+			/>
 		</div>;
 	}
 	on2faOk() {
