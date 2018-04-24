@@ -1,5 +1,9 @@
 import React from 'react';
 import Input from './input-base.jsx';
+import Currency from './currency.jsx';
+import BigNumber from 'bignumber.js';
+
+var bn = x => new BigNumber(x);
 
 class InputFloat extends Input {
 	constructor(props) {
@@ -13,38 +17,60 @@ class InputFloat extends Input {
 		});
 	}
 	formatDefaultHint(props, exampleNum) {
-		if (typeof exampleNum != typeof 42) exampleNum = 12.34;
+		if (!(exampleNum && exampleNum.isBigNumber) && typeof exampleNum != typeof 42) exampleNum = 12.34;
 		var ret = "";
 		if ('defaultHint' in props) {
 			ret = props.defaultHint;
 		} else {
 			ret = "E.g. ";
-			var useMin = typeof props.min == typeof 42;
-			var useMax = typeof props.max == typeof 42;
-			var onlyPositive = props.min==0 && props.aboveMin;
+			var useMin = typeof props.min == typeof 42 || props.min && props.min.isBigNumber;
+			var useMax = typeof props.max == typeof 42 || props.max && props.max.isBigNumber;
+			var min = props.min;
+			var max = props.max;
+			var minIsZero = min==0;
+			var half = (min + (max - min)/2).toFixed(2);
+			var minOrExampleNum = Math.max(min, exampleNum);
+			var maxOrExampleNum = Math.min(max, exampleNum);
+			if (props.bn) {
+				exampleNum = bn(exampleNum);
+				min = bn(props.min);
+				max = bn(props.max);
+				minIsZero = min.isZero();
+				half = min.plus( max.minus(min).div(bn(2)) );
+				minOrExampleNum = min.greaterThan(exampleNum) ? min : exampleNum;
+				maxOrExampleNum = max.lessThan(exampleNum) ? max : exampleNum;
+				var format = (v)=>Currency._2number(v, !props.isUsd);
+				exampleNum = format(exampleNum);
+				min = format(min);
+				max = format(max);
+				half = format(half);
+				minOrExampleNum = format(minOrExampleNum);
+				maxOrExampleNum = format(maxOrExampleNum);
+			}
+			var onlyPositive = minIsZero && props.aboveMin;
 			if (useMin && useMax) {
-				ret += (props.min+(props.max-props.min)/2).toFixed(2);
+				ret += half
 				if (onlyPositive) {
 					ret += ` (positive, `;
 				} else if (props.aboveMin) {
-					ret += ` (above the ${props.min}, `;
+					ret += ` (above the ${min}, `;
 				} else {
-					ret += ` (minimum is ${props.min}, `;
+					ret += ` (minimum is ${min}, `;
 				}
 				if (props.belowMax) {
-					ret += ` below the ${props.max})`;
+					ret += ` below the ${max})`;
 				} else {
-					ret += ` maximum is ${props.max})`;
+					ret += ` maximum is ${max})`;
 				}
 			} else if (useMin) {
-				ret += `${Math.max(props.min, exampleNum)} `;
+				ret += `${minOrExampleNum} `;
 				if (onlyPositive) {
 					ret += `(only positive)`;
 				} else {
-					ret += `(${props.aboveMin?"above the":"minimum is"} ${props.min})`;
+					ret += `(${props.aboveMin?"above the":"minimum is"} ${min})`;
 				}
 			} else if (useMax) {
-				ret += `${Math.min(props.max, exampleNum)} (${props.belowMax?"below the":"maximum is"} ${props.max})`;
+				ret += `${maxOrExampleNum} (${props.belowMax?"below the":"maximum is"} ${max})`;
 			} else {
 				ret += exampleNum;
 			}
@@ -52,7 +78,8 @@ class InputFloat extends Input {
 		return ret;
 	}
 	render(p,s,c,m) {
-		return <Input {...p} {...s} m={m} />;
+		var hint = p.hint || this.formatDefaultHint(p, p.exampleNum);
+		return <Input {...p} {...s} hint={hint} max="100" m={m} />;
 	}
 	onValid(valid, validOld, input) {
 		input._onValid.call(this, valid, validOld, input);
@@ -66,21 +93,63 @@ class InputFloat extends Input {
 		input._onInvalid.call(this, valid, validOld, input, error, this.defaultHint, v);
 	}
 	checkValid(str, falseIsValid) {
-		var num = parseFloat(str);
-		if (!this.checkValid_isNaN(num)) return falseIsValid ? 10 : false;
-		if (!this.checkValid_min(num)) return falseIsValid ? 20 : false;
-		if (!this.checkValid_max(num)) return falseIsValid ? 30 : false;
+		if (this.props.bn) {
+			return this.checkValidViaBN(str, falseIsValid);
+		} else {
+			return this.checkValidViaFloat(str, falseIsValid);
+		}
+	}
+	checkValidViaBN(str, falseIsValid) {
+		var num;
+		var isNum = false;
+		try {
+			num = bn(str);
+			isNum = this.checkValidViaBN_isNaN(num);
+		} catch(er) {}
+		if (!isNum) return falseIsValid ? 10 : false;
+		if (!this.checkValidViaBN_min(num)) return falseIsValid ? 20 : false;
+		if (!this.checkValidViaBN_max(num)) return falseIsValid ? 30 : false;
 		return !falseIsValid;
 	}
-	checkValid_isNaN(num) {
-		return !isNaN(num);
+	checkValidViaBN_isNaN(num) {
+		return !num.isNaN() && num.isFinite();
 	}
-	checkValid_min(num) {
+	checkValidViaBN_min(num) {
 		var min = this.props.min;
-		if (typeof min != typeof 42) return true;
+		if (typeof min == typeof 42) {
+			min = bn(min);
+		} else if (min && max.isBigNumber) {
+		} else {
+			return true;
+		}
+		return this.props.aboveMin ? num.greaterThan(min) : num.greaterThanOrEqualTo(min);
+	}
+	checkValidViaBN_max(num) {
+		var max = this.props.max;
+		if (typeof max == typeof 42) {
+			max = bn(max);
+		} else if (max && max.isBigNumber) {
+		} else {
+			return true;
+		}
+		return this.props.belowMax ? num.lessThan(max) : num.lessThanOrEqualTo(max);
+	}
+	checkValidViaFloat(str, falseIsValid) {
+		var num = parseFloat(str);
+		if (!this.checkValidViaFloat_isNaN(num)) return falseIsValid ? 10 : false;
+		if (!this.checkValidViaFloat_min(num)) return falseIsValid ? 20 : false;
+		if (!this.checkValidViaFloat_max(num)) return falseIsValid ? 30 : false;
+		return !falseIsValid;
+	}
+	checkValidViaFloat_isNaN(num) {
+		return typeof num == 'number' && !isNaN(num);
+	}
+	checkValidViaFloat_min(num) {
+		var min = this.props.min;
+		if (typeof max != typeof 42) return true;
 		return this.props.aboveMin ? num > min : num >= min;
 	}
-	checkValid_max(num) {
+	checkValidViaFloat_max(num) {
 		var max = this.props.max;
 		if (typeof max != typeof 42) return true;
 		return this.props.belowMax ? num < max : num <= max;

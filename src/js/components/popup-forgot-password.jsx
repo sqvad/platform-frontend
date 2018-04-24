@@ -55,9 +55,11 @@ class PopupForgotPassword extends Any {
 		});
 	}
 	onSubmit() {
-		return Form.wrapFetch(this, false, this.props.m.api.sendCodeForPasswordReset(this.state.email, "#"))
+		this.setState({sended:false,serverError:null});
+
+		return Form.wrapFetch(this, false, this.props.m.api.sendCodeForPasswordReset(this.state.email))
 		.then(x=>{
-			this.setState({sended:true},()=>{this.forceUpdate()});
+			this.setState({sended:true,serverError:null},()=>{this.forceUpdate()});
 		});
 	}
 }

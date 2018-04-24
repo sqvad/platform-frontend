@@ -18,11 +18,20 @@ class Api {
 		}
 		var params;
 		if (params_) {
-			params = params_ ? JSON.parse(JSON.stringify(params_)) : null;
+			if (params_ instanceof FormData) {
+				params = {
+					isFormData_: true
+				};
+			} else {
+				params = params_ ? JSON.parse(JSON.stringify(params_)) : null;
+			}
 		}
 		var id = method + path +"###"+ JSON.stringify(params);
 		if (this._fetchesInProgress[id]) return this._fetchesInProgress[id];
 		var domain = this._fetch_domain(method, path, params);
+		if (params_ && params_ instanceof FormData) {
+			params.formData = params_;
+		}
 		var ret = this._fetch_transport(id, method, params, domain, path);
 		this._fetchesInProgress[id] = ret;
 		return ret;
@@ -55,9 +64,19 @@ class Api {
 					return k +"="+ encodeURIComponent(v);
 				}).join("&");
 			} else {
-				headers.body = JSON.stringify(params);
+				if (params.isFormData_) {
+					headers.body = params.formData
+				} else {
+					headers.body = JSON.stringify(params);
+				}
 			}
 			if (method=='POST') {
+				if (params.isFormData_) {
+				} else {
+					headers.headers["Content-Type"] = "application/json"; // application/x-www-form-urlencoded, multipart/form-data
+				}
+			}
+			if (method=='PATCH') {
 				headers.headers["Content-Type"] = "application/json"; // application/x-www-form-urlencoded, multipart/form-data
 			}
 		}
@@ -71,7 +90,9 @@ class Api {
 	}
 	_fetch_transport_wrap(transport, method, path, params) {
 		// console.log(path +" ; "+ document.cookie +" ; "+ JSON.stringify(params));
+		var isOk;
 		return transport.then(x=>{
+			isOk = x.status==200;
             return typeof x.json == 'function'
                 ? x.json().then(v=>v).catch(er=>{
 					try {
@@ -95,6 +116,12 @@ class Api {
                     throw x;
                 }
             }
+			if (!isOk) {
+				throw {
+					message: "Unknown error",
+					errors: null
+				};
+			}
 			return x;
 		})
 		.then(x=>{
@@ -283,8 +310,11 @@ class Api {
 	changePassword(cur, want) {
 		return this._fetchPOST('/user/password/reset', {oldPassword:cur,newPassword:want});
 	}
-	sendCodeForPasswordReset(email,redirect) {
-		return this._fetchPOST('/system/password/reset/request', {email,redirect})
+	sendCodeForPasswordReset(email,verificationEndpoint) {
+		if (!verificationEndpoint) {
+			verificationEndpoint = this.hrefForEmail("/reset-password/%s");
+		}
+		return this._fetchPOST('/system/password/reset/request', {email,verificationEndpoint:verificationEndpoint})
 	}
 	resetPassword(code,password) {
 		return this._fetchPOST('/system/password/reset/confirm', {code,password})
@@ -311,11 +341,11 @@ class Api {
 	getWallets() {
 		return this._fetchGET('/wallet/list').then(()=>this.model.user.wallets);
 	}
-    updateWalletName(walletId, walletName) {
+    updateWalletName(walletId, name) {
 		var wallet = this.model.user.wallets.filter(v=>v.symbol==walletId)[0];
         var params = {
             tokenContractAddress: wallet.tokenContractAddress,
-            walletName
+            name
         };
         return this._fetch('PATCH','/wallet/name', params);
     }
@@ -390,6 +420,19 @@ class Api {
 	confirmTotpSecretKey(code) {
 		return this._fetchPOST('/register/totp/key/confirm',{code:code.replace(/\D+/g,"")});
 	}
+	sendTotpResetRequest(files) {
+		var formData = new FormData();
+		formData.append('array', files);
+		return this._fetchPOST('/system/totp/reset/send',formData);
+	}
+	withdraw(comment,confirmationCode,sum,toAddress,tokenContractAddress) {
+		return this._fetchPOST('/wallet/transactions/withdraw',{
+			comment:comment||"",
+			confirmationCode,
+			sum: (sum&&sum.toString) ? sum.toString() : "",
+			toAddress,tokenContractAddress
+		});
+	}
 	_loadLib(scripts) {
 		return Promise.all(
 			scripts.map(filename=>{
@@ -409,6 +452,10 @@ class Api {
 	loadLib_qrcode() {
 		// https://www.npmjs.com/package/qrcode
 		return this._loadLib(['./qrcode.min.js']);
+	}
+	loadLib_clipboardjs() {
+		// https://clipboardjs.com/
+		return this._loadLib(['./clipboard.min.js']);
 	}
     getCurrenciesRate() {
         if (this.m.currenciesRate) return Promise.resolve(this.m.currenciesRate);

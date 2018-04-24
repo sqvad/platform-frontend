@@ -35,7 +35,7 @@ class PopupPut2fa extends Any {
 					>
 						SEND
 					</Form.SubmitButton>
-					<A m={m} className="text-muted external"><small>I’m not able to log in with 2FA</small></A>
+					<A m={m} className="text-muted external" href="forgot2fa"><small>I’m not able to log in with 2FA</small></A>
 				</div>
 			</Form>
 		</div>;
@@ -55,12 +55,15 @@ class PopupPut2fa extends Any {
 		});
 	}
 	onSubmit() {
-		this.setState({fetching:true});
-		Form.wrapFetch(this, false, this.props.m.api.login2fa(this.state.code2fa))
-		.then(x=>{
-			this.props.onClose();
-		})
-		.catch(()=>{})
+		var p = this.props;
+		if (p.makePromise) {
+			return Form.wrapFetch(this, false, p.makePromise(this.state.code2fa,this))
+			.then(x=>{
+				if (p.onClose) return p.onClose(this.state.code2fa, this);
+			});
+		} else {
+			p.onClose(this.state.code2fa, this);
+		}
 	}
 }
 

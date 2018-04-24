@@ -17,6 +17,22 @@ class Form extends Any {
 		}
 		return <form onSubmit={this.onSubmit.bind(this)}><div>{c}{serverError}</div></form>
 	}
+	changeFormState(handler, requiredPropNames, canSubmitDefaultValue, partial) {
+		var s = handler.state || {};
+		var canSubmit = canSubmitDefaultValue;
+		var propNames = ['toValid','amountValid'];
+		requiredPropNames.forEach(k=>{
+			if (k in partial) {
+				if (!partial[k]) canSubmit = false;
+			} else if (k in s) {
+				if (!s[k]) canSubmit = false;
+			} else {
+				canSubmit = false;
+			}
+		});
+		partial.canSubmit = canSubmit;
+		handler.setState(partial,()=>{this.forgotAboutServerError();});
+	}
 	onSubmit(e) {
 		if (e && e.preventDefault) e.preventDefault();
 		this.forgotAboutServerError();
