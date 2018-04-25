@@ -44,7 +44,7 @@ class InputEmail extends Input {
 InputEmail.defaultProps = {
 	name: "email",
 	type: "email",
-	placeholder: "EMAIL",
+	placeholder: "Email",
 	unavaibleForRegistration: false,
 };
 

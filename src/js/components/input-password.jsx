@@ -30,7 +30,7 @@ class InputPassword extends Input {
 InputPassword.defaultProps = {
 	name: "password",
 	type: "password",
-	placeholder: "PASSWORD",
+	placeholder: "Password",
 };
 
 export default InputPassword;

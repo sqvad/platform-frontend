@@ -323,15 +323,15 @@ class PageSignUp_page2 extends T.Page {
 						<div className="col-sm-6">
 							<T.Input value={s.firstName} required
 								onChange={this.onFirstName.bind(this)} checkValid={v=>v.length}
-								type="text" name="name" placeholder="FIRST NAME" hint={s.firstName?"":"E.g. Walter"}
+								type="text" name="name" placeholder="First name" hint={s.firstName?"":"E.g. Walter"}
 							/>
 							<T.Input value={s.lastName} required
 								onChange={this.onLastName.bind(this)} checkValid={v=>v.length}
-								type="text" name="second-name" placeholder="LAST NAME" hint={s.lastName?"":"E.g. Skinner"}
+								type="text" name="second-name" placeholder="Last name" hint={s.lastName?"":"E.g. Skinner"}
 							/>
 							<T.Select value={s.country} required
 								onChange={this.onCountry.bind(this)}
-								useFormControl className="form-control" placeholder="COUNTRY"
+								useFormControl className="form-control" placeholder="Country"
 								name="country" options={this.countries}
 							></T.Select>
 							{extendFields}

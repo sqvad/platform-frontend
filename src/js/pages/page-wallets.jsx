@@ -597,7 +597,7 @@ class SendTokens extends T.Any {
 							"btn btn-lg btn-primary",
 						].filter(v=>!!v).join(" ")}
 						style={{fontWeight:400}}
-					>VIEW ON BLOCHAIN EXPLORER</button>
+					>VIEW ON BLOCKCHAIN EXPLORER</button>
 				</div>
 			</div></T.If>
 			<T.If v={s.transactionSendEr}><div>

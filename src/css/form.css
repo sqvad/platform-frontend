@@ -75,13 +75,14 @@ label.input-group {
 	left: 0px;
 	top: 30px;
 	font-size: 14px;
-	text-transform: capitalize;
+	text-transform: uppercase;
 	color: #7e8593;
 	transition: color 0.1s linear, font-size 0.1s linear, left 0.1s linear, top 0.1s linear;
 }
 .border4sides .placeholder {
 	left: 13px;
 	top: 33px;
+	text-transform: capitalize;
 }
 .input-group.placeholder-to-up .placeholder {
 	font-size: 12px;

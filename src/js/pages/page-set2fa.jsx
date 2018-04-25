@@ -61,7 +61,7 @@ class PageSet2FA extends T.Page {
 					</div>
 					<div className="row d-flex justify-content-center smooth-opening-content">
 						<div className="mb-2 col-10">
-							<p style={{"textAlign":"center"}}>You must have an authentication app installed on your phone or tablet. This app generates access codes for your Populous account. We will ask you to enter these codes to confirm some important actions for your account, like login or changing account settings.</p>
+							<p style={{"textAlign":"center"}}>You must have an authentication app installed on your phone or tablet. This app generates access codes for your INS account. We will ask you to enter these codes to confirm some important actions for your account, like login or changing account settings.</p>
 							<p style={{"textAlign":"center"}}>If you lost your authentication app or device, you can reset 2FA via email, like your password.</p>
 							<p style={{"textAlign":"center"}}>Authentication apps we can recommend are:</p>
 							<div className="d-flex align-items-space-between justify-content-between apps-block mb-4">
