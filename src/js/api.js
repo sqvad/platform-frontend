@@ -422,7 +422,10 @@ class Api {
 	}
 	sendTotpResetRequest(files) {
 		var formData = new FormData();
-		formData.append('array', files);
+		// formData.append('files', files);
+		files.forEach(v=>{
+			formData.append('requestData', v);
+		});
 		return this._fetchPOST('/system/totp/reset/send',formData);
 	}
 	withdraw(comment,confirmationCode,sum,toAddress,tokenContractAddress) {

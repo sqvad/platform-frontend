@@ -38,7 +38,7 @@ class InputPasswordConfirm extends Input {
 InputPasswordConfirm.defaultProps = {
 	name: "password-confirm",
 	type: "password",
-	placeholder: "CONFIRM PASSWORD",
+	placeholder: "Confirm Password",
 };
 
 export default InputPasswordConfirm;
