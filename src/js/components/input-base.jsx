@@ -38,10 +38,11 @@ class Input extends Any {
 			onFocus={this.onFocus.bind(this)}
 			onBlur={this.onBlur.bind(this)}
 			ref={(el=>this.node=el)} />;
+		var hintWrapped = p.hintWrapped ? hint : <span className="input-hint">{hint}</span>;
 		return <label className={inputGroupCls}>
 			{input}
 			<span className="placeholder">{p.placeholder}</span>
-			<span className="input-hint">{hint}</span>
+			{hintWrapped}
 		</label>;
 	}
 	componentDidMount() {
@@ -137,7 +138,9 @@ Input.propTypes = {
 	hint: Any.PropTypes.oneOfType([
 		Any.PropTypes.string,
 		Any.PropTypes.number,
+		Any.PropTypes.element,
 	]),
+	hintWrapped: Any.PropTypes.bool,
 	checkValid: Any.PropTypes.func,
 	required: Any.PropTypes.bool,
 	onValid: Any.PropTypes.func,

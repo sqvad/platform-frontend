@@ -11,6 +11,7 @@ class PageSignIn extends T.Page {
 			password:"", //popupForgotPassword: true,
 		});
 	}
+	 // || m.auth && m.auth.signedInEmail
 	render(p,s,c,m) {
 		return <T.Page.PageWrapDevice m={m} pagePostfix="signup">
 			<T.Page.PageWrapHeader key="header" m={m} header="medium" {...s}>
@@ -20,22 +21,43 @@ class PageSignIn extends T.Page {
 				</hgroup>
 			</T.Page.PageWrapHeader>
 			<T.Page.PageWrapWidth key="width" m={m} {...p}>
-				{this.renderEmail(p,s,c,m)}
-				{s.popup2fa || m.auth && m.auth.signedInEmail ? this.render2fa(p,s,c,m) : null}
+				<T.If v={!(m.auth && m.auth.signedInEmail)}>
+					{this.renderEmail(p,s,c,m)}
+				</T.If>
+				<T.If v={s.popup2fa}>
+					{s.popup2fa ? this.render2fa(p,s,c,m) : null}
+				</T.If>
+				<T.If v={!s.popup2fa && m.auth && m.auth.signedInEmail}>
+					{this.render2fa(p,s,c,m)}
+				</T.If>
 				{s.popupForgotPassword ? this.renderForgotPassword(p,s,c,m) : null}
 			</T.Page.PageWrapWidth>
 		</T.Page.PageWrapDevice>;
 	}
 	render2fa(p,s,c,m) {
-		return <div>
-			<T.Popup.Put2fa {...p} onClose={()=>this.on2faOk()}
-				makePromise={code=>{
-					return p.m.api.login2fa(code);
-				}}
-			/>
-		</div>;
+		var noPopup = !s.popup2fa && m.auth && m.auth.signedInEmail;
+		var popup = <T.Popup.Put2fa {...p} onClose={()=>this.on2faOk()}
+			noPopup={noPopup}
+			makePromise={code=>{
+				return p.m.api.login2fa(code);
+			}}
+		/>;
+		if (noPopup) {
+			return <div className="d-flex flex-row justify-content-center mt-5">
+				<div
+					className={[
+						m.device.isMobile ? "" : "col-6"
+					].filter(v=>!!v).join(" ")}
+				>
+					{popup}
+				</div>
+			</div>;
+		} else {
+			return popup;
+		}
 	}
 	on2faOk() {
+		this.setState({popup2fa:false});
 		this.props.m.api.gotoHref("/");
 	}
 	renderForgotPassword(p,s,c,m) {
@@ -53,6 +75,7 @@ class PageSignIn extends T.Page {
 					<T.Input.Email
 						name="email" onChange={this.onEmail.bind(this)}
 						value={s.email} required
+						autofocus m={m}
 					/>
 					<T.Input.Password
 						name="password" onChange={this.onPassword.bind(this)}
@@ -104,8 +127,9 @@ class PageSignIn extends T.Page {
 		return T.Form.wrapFetch(
 			this,
 			false,
-			this.props.m.api.loginEmail(this.state.email, this.state.password)
+			this.props.m.api.loginEmail(this.state.email, this.state.password, this.state.keepSignedIn)
 			.then(x=>{
+				this.setState({popup2fa:true});
 				return this.props.m.api.getUserData(true)
 				.then(()=>{
 					var m = this.props.m;

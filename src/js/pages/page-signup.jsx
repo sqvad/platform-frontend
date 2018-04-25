@@ -177,7 +177,7 @@ class PageSignUp_page1 extends T.Page {
 		var emailUnavaible = s.emailAvaible===false;
 		var emailFetching = s.emailAvaible===null;
 		return <T.Page.PageWrapDevice m={m} pagePostfix="signup">
-			<T.Page.PageWrapHeader key="header" m={m} header="medium" {...s}>
+			<T.Page.PageWrapHeader key="header" m={m} header="medium" {...s} isSingupPage={true}>
 				<hgroup>
 					<h1>SING UP FOR <span className="nobr-mobile">INS ECOSYSTEM</span></h1>
 					<h2>Join the breakthrough in the consumer <span className="nobr-mobile">goods industry</span></h2>
@@ -193,6 +193,7 @@ class PageSignUp_page1 extends T.Page {
 								value={s.email} required
 								unavaibleForRegistration={emailUnavaible}
 								emailFetching={emailFetching}
+								autofocus m={m}
 							/>
 							<T.Input.Password
 								name="password" onChange={this.onPassword.bind(this)}
@@ -310,7 +311,7 @@ class PageSignUp_page2 extends T.Page {
 			extendFields = this.render_extendFields(p,s,c,m);
 		}
 		return <T.Page.PageWrapDevice m={m} pagePostfix="signup">
-			<T.Page.PageWrapHeader key="header" m={m} header="medium" {...p}>
+			<T.Page.PageWrapHeader key="header" m={m} header="medium" {...p} isSingupPage={true}>
 				<hgroup>
 					<h1>SING UP FOR INS ECOSYSTEM</h1>
 					<h2>Join the breakthrough in the consumer goods industry</h2>

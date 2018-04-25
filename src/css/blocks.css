@@ -180,6 +180,9 @@
 .icon-download {
 	background-position-y: -400px;
 }
+.icon-rename {
+	background-position-y: -350px;
+}
 .retina-2 .icon-24 {
 	background-image: url(../img/sprite-2x.png);
 	background-size: 300px 400px;

@@ -13,7 +13,12 @@ class InputTxAdr extends Input {
 		});
 	}
 	render(p,s,c,m) {
-		return <Input {...p} {...s} m={m} />;
+		if (!this.fullValid && this.avaible) {
+			var hint = <span className="input-hint" style={{color:"orange"}}>Wrong control sum</span>;
+			return <Input {...p} {...s} m={m} hint={hint} hintWrapped={true} />;
+		} else {
+			return <Input {...p} {...s} m={m} />;
+		}
 	}
 	onValid(valid, validOld, input) {
 		input._onValid.call(this, valid, validOld, input);
@@ -22,7 +27,16 @@ class InputTxAdr extends Input {
 		input._onInvalid.call(this, valid, validOld, input, "Address is invalid", this.defaultHint);
 	}
 	checkValid(txAdr) {
-		return window.Web3.prototype.isAddress(txAdr||'');
+		txAdr = txAdr || "";
+		var avaible = false;
+		if (txAdr.toLowerCase().indexOf("0x")==0) {
+			avaible = txAdr.length == 42;
+		} else {
+			avaible = txAdr.length == 40;
+		}
+		this.avaible = avaible;
+		this.fullValid = window.Web3.prototype.isAddress(txAdr);
+		return this.fullValid || this.avaible;
 	}
 }
 

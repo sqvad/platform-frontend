@@ -85,6 +85,8 @@ class PageVerifyEmail extends T.Page {
 		return T.Form.wrapFetch(this, false, this.props.m.api.verifyEmail(this.state.code))
 		.catch(x=>{
 			this.setState({error:x});
+			this.props.m.getAuthData();
+			this.props.m.getUserData();
 		});
 	}
 }

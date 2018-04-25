@@ -19,14 +19,6 @@ class Logout extends Any {
 }
 class Login extends Any {
 	render(p,s,c,m) {
-		if (m.path.contains["signin"]) {
-			return <button type="button" className="btn btn-sm btn-outline-secondary"
-				onClick={()=>m.api.gotoHref(A.href({href:"/signup"},m))}
-			>
-				Sign Up
-				<span className="icon icon-24 icon-next" />
-			</button>;
-		}
 		return <button type="button" className="btn btn-sm btn-outline-secondary"
 			onClick={()=>m.api.gotoHref(A.href({href:"/signin"},m))}
 		>
@@ -35,24 +27,57 @@ class Login extends Any {
 		</button>;
 	}
 }
+class Signup extends Any {
+	render(p,s,c,m) {
+		return <button type="button" className="btn btn-sm btn-outline-secondary"
+			onClick={()=>m.api.gotoHref(A.href({href:"/signup"},m))}
+		>
+			Sign Up
+			<span className="icon icon-24 icon-next" />
+		</button>;
+	}
+}
 
-class HeaderShort extends Any {
+class HeaderButtons extends Any {
 	render(p,s,c,m) {
 		var authData = m.auth || {};
 		var userData = m.user;
-		var signIn = <div className="col-6 pr-0 d-flex align-items-center justify-content-end">
-			{authData.signedIn?<Name {...p} />:<span className="d-block mr-3 pt-2 pb-2 text-uppercase">Already member?</span>}
-			{authData.signedIn?<Logout {...p} />:<Login {...p} />}
-		</div>;
-		if (p.noSignIn) signIn = null;
+		if (authData.signedIn) {
+			return <div className="d-flex align-items-center">
+				<Name {...p} />
+				<Logout {...p} />
+			</div>;
+		} else if (authData.signedInEmail) {
+			return <div className="d-flex align-items-center">
+				{userData?<span className="d-block mr-3 pt-2 pb-2 text-uppercase">{userData.firstName} {userData.lastName}</span>:null}
+				{!userData && authData.email?<span className="d-block mr-3 pt-2 pb-2">{authData.email}</span>:null}
+				<Logout {...p} />
+			</div>;
+		} else {
+			if (p.isSingupPage) {
+				return <div className="d-flex align-items-center">
+					<span className="d-block mr-3 pt-2 pb-2 text-uppercase">Already member?</span>
+					<Login {...p} />
+				</div>;
+			} else {
+				return <div className="d-flex align-items-center">
+					<Signup {...p} />
+				</div>;
+			}
+		}
+	}
+}
+class HeaderShort extends Any {
+	render(p,s,c,m) {
+		var authData = m.auth || {};
 		return <div className="header-short bg-violet">
-			<div className="row">
+			<div className="row d-flex flex-row justify-content-between">
 				<div className="col-6 pl-0">
 					<A m={m} href="/" className="for-logo">
 						<div className={m.device.isMobile?"logo logo-nopad-100x33":"logo logo-nopad-131x43"} />
 					</A>
 				</div>
-				{signIn}
+				<HeaderButtons {...p} />
 			</div>
 		</div>;
 	}
@@ -69,9 +94,8 @@ class HeaderMedium extends Any {
 						<div className={m.device.isMobile?"logo logo-nopad-100x33":"logo logo-nopad-131x43"} />
 					</A>
 				</div>
-				<div className="col-6 pr-0 d-flex align-items-center justify-content-end">
-					{authData.signedIn?<Name {...p} />:<span className="d-block mr-3 pt-2 pb-2 text-uppercase">Already member?</span>}
-					{authData.signedIn?<Logout {...p} />:<Login {...p} />}
+				<div className="col-6 d-flex pr-0 justify-content-end">
+					<HeaderButtons {...p} />
 				</div>
 			</div>
 			<div className="container d-flex flex-column">

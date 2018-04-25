@@ -110,7 +110,7 @@ Form.prototype.ServerError = ServerError;
 Form.wrapFetch = function(tag, catchEr, promise) {
 	var putTo = tag.form || tag;
 	var startAt = Date.now();
-	tag.setState({fetching:true,serverError:null});
+	tag.setState({fetching:true,serverError:null,sent:false});
 	return promise
 	.then(x=>{
 		after();
@@ -122,7 +122,7 @@ Form.wrapFetch = function(tag, catchEr, promise) {
 		if (!catchEr) throw er;
 	});
 	function after() {
-		tag.setState({fetching:false});
+		tag.setState({fetching:false,sent:true});
 	}
 };
 

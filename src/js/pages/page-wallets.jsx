@@ -188,18 +188,13 @@ class PageWallets extends T.Page {
 class Receiver extends T.Any {
 	constructor(props) {
 		super(props);
+		this.fetchDepositData();
 		props.m.api.loadLib_clipboardjs()
 		.then(()=>{
 			new ClipboardJS(this.copy);
 		});
 		props.m.api.loadLib_qrcode()
-		.then(()=>{
-			var p = this.props;
-			var wallet = p.m.user.wallets.filter(v=>v.symbol==p.walletId)[0];
-			qrcodelib.toDataURL(T.TX.href(p.m, true, wallet.address||"n/a"), (err, url)=>{
-				this.setState({qrDataUrl:url});
-			});
-		});
+		.then(this.refreshQR.bind(this));
 	}
 	render(p,s,c,m) {
 		var wallet = p.m.user.wallets.filter(v=>v.symbol==p.walletId)[0];
@@ -213,8 +208,8 @@ class Receiver extends T.Any {
 				}}
 				className={"d-flex align-items-center"+(m.device.isMobile?" flex-column":" justify-content-stretch")}
 			>
-				<T.A external m={m} href={T.TX.href(p.m, true, wallet.address||"n/a")}>
-					<img src={s.qrDataUrl} width="228" height="228" alt={s.qrDataUrl?"QR code is loading...":"QR code for "+ wallet.address} />
+				<T.A external m={m} href={T.TX.href(p.m, true, s.depositAdr||"n/a")}>
+					<img src={s.qrDataUrl} width="228" height="228" alt={s.qrDataUrl?"QR code is loading...":"QR code for "+ s.depositAdr} />
 				</T.A>
 				<div
 					className={(m.device.isMobile?" d-flex flex-column align-items-center":"")}
@@ -228,7 +223,7 @@ class Receiver extends T.Any {
 				>
 					<input
 						id="receiverId"
-						readOnly value={wallet.address}
+						readOnly value={s.depositAdr}
 						style={{
 							margin: m.device.isMobile ? "2px 0 8px 0" : "",
 							border: 0,
@@ -237,20 +232,37 @@ class Receiver extends T.Any {
 							textAlign: m.device.isMobile ? "center" : ""
 						}}
 					/>
-					<div className="mr-2 mb-2">
-						Receiver
+					<div className="mt-2 mb-1">
+						{s.depositName||"Loading..."}
 					</div>
 					<div>
 						<button
 							type="button" ref={el=>this.copy=el} data-clipboard-target="#receiverId"
 							className="btn-link pl-0 mr-0"
-							style={{color:"inherit"}}
+							style={{color:"inherit",borderLeft:"0"}}
 						>
 							Copy
 							<span className="icon icon-24 icon-copy" />
 						</button>
+						<button
+							onClick={()=>{this.setState({renamePopup:true})}}
+							type="button" className="btn-link pl-0 mr-0"
+							style={{color:"inherit"}}
+						>
+							Rename&nbsp;
+							<span className="icon icon-24 icon-rename" />
+						</button>
 					</div>
 				</div>
+				<T.If v={s.renamePopup}>
+					<DepositAdrRename
+						{...p} {...s} wallet={wallet}
+						onOk={()=>{
+							this.setState({renamePopup:false});
+							this.fetchDepositData();
+						}} onCancel={()=>this.setState({renamePopup:false})}
+					/>
+				</T.If>
 			</div>
 			<h3 style={{display:"none"}}>OTHER ADDRESSES</h3>
 			<div
@@ -285,8 +297,79 @@ class Receiver extends T.Any {
 			</div>
 		</div>;
 	}
+	fetchDepositData() {
+		var p = this.props;
+		var wallet = p.m.user.wallets.filter(v=>v.symbol==p.walletId)[0];
+		p.m.api.getDepositAddresses(wallet.tokenContractAddress)
+		.then(x=>{
+			var depositAdr = x[0].address;
+			var depositName = x[0].name || "Receiver";
+			this.setState({depositAdr,depositName}, this.refreshQR.bind(this));
+		});
+	}
+	refreshQR() {
+		var p = this.props;
+		var s = this.state||{};
+		if (typeof qrcodelib != typeof undefined) {
+			qrcodelib.toDataURL(T.TX.href(p.m, true, s.depositAdr||"n/a"), (err, url)=>{
+				this.setState({qrDataUrl:url},()=>{this.forceUpdate()});
+			});
+		}
+	}
 	rename() {
 
+	}
+}
+class DepositAdrRename extends T.Any {
+	constructor(props) {
+		super(props);
+	}
+	render(p,s,c,m) {
+		return <T.Popup onClose={this.onClose.bind(this)}>
+			<h1 className="h1-center mt-0">RENAME</h1>
+			<T.Form handler={this}>
+				<T.Input
+					placeholder="YOUR DESPODIT ADDRESS NAME"
+					value={s.depositName||p.depositName}
+					checkValid={str=>!!(str||"").length}
+					onChange={(depositName,depositNameValid)=>this.checkValid({depositName,depositNameValid})}
+					required readonly={s.fetching}
+				/>
+				<T.Form.SubmitButton
+					canSubmit={s.canSubmit} fetching={s.fetching}
+					clsColor="btn-primary" cls="btn-lg"
+				>
+					RENAME
+				</T.Form.SubmitButton>
+			</T.Form>
+		</T.Popup>;
+	}
+	onTo(to,toValid) {
+		this.checkValid({to:to.trim(),toValid});
+	}
+	checkValid(partial) {
+		var p = this.props;
+		var s = this.state||{};
+		var canSubmit = s.depositName!=p.depositName;
+		this.form.changeFormState(this, ['depositNameValid'], canSubmit, partial);
+	}
+	onSubmit() {
+		var s = this.state;
+		var p = this.props;
+		var depositName = s.depositName || p.depositName;
+		return T.Form.wrapFetch(this, true,
+			this.props.m.api.updateDepositAddressName(depositName, p.depositAdr, p.wallet.tokenContractAddress)
+		)
+		.then(()=>this.onClose())
+	}
+	onClose() {
+		var p = this.props;
+		var s = this.state || {};
+		if (s.sent) {
+			if (p.onOk) p.onOk();
+		} else {
+			if (p.onCancel) p.onCancel();
+		}
 	}
 }
 
@@ -369,7 +452,8 @@ class SendTokens extends T.Any {
 				inWei = T.Currency.coin2wei(s.amount||0, wallet.format) + "wei";
 				inWei = T.Currency._2number(T.Currency.coin2wei(s.amount||0, wallet.format), true) + "wei";
 			}
-			inUsd = [inUsd, inWei].filter(v=>!!v).join(" ");
+			// inUsd = [inUsd, inWei].filter(v=>!!v).join(" ");
+			inUsd = [inUsd].filter(v=>!!v).join(" ");
 		}
 		var max = T.Currency.maxNoWei(m,wallet);
 		var maxIsZero = max.isZero();
@@ -396,7 +480,6 @@ class SendTokens extends T.Any {
 							bn min={0} aboveMin={true} max={max} belowMax={false} required
 							onChange={this.onAmount.bind(this)} value={wallet ? s.amount : ""}
 							hint={maxIsZero ? "Low funds" : s.amountValid ? inUsd : null}
-							hasError={maxIsZero}
 							placeholder="Amount" autocomplete="off" inputGroupCls="border4sides"
 						/>
 					</div>

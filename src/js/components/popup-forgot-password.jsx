@@ -22,6 +22,7 @@ class PopupForgotPassword extends Any {
 					placeholder="YOUR ACCOUNT E-MAIL"
 					value={s.email||""} onChange={(this.onEmail.bind(this))}
 					required readonly={s.fetching}
+					autofocus m={m}
 				/>
 				<If v={s.sended && !s.fetching}><p>
 					Sent! Please, check out your email.
@@ -56,7 +57,6 @@ class PopupForgotPassword extends Any {
 	}
 	onSubmit() {
 		this.setState({sended:false,serverError:null});
-
 		return Form.wrapFetch(this, false, this.props.m.api.sendCodeForPasswordReset(this.state.email))
 		.then(x=>{
 			this.setState({sended:true,serverError:null},()=>{this.forceUpdate()});

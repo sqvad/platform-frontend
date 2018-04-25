@@ -27,6 +27,7 @@ class PopupPut2fa extends Any {
 					value={s.code2fa} onChange={(this.onCode.bind(this))}
 					hasError={!s.codeValid || !!s.serverError}
 					checkValid={str=>(str+'').replace(/\D+/g, "").length==6} required
+					autofocus m={m}
 				/>
 				<div className="d-flex flex-column align-items-center justify-content-center mt-4">
 					<Form.SubmitButton

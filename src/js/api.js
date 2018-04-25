@@ -280,8 +280,8 @@ class Api {
 			window.location.reload();
         })
     }
-    loginEmail(email,password) {
-        return this._fetchPOST('/auth/login/email',{email,password})
+    loginEmail(email,password,keepSignedIn) {
+        return this._fetchPOST('/auth/login/email',{email,password,keepSignedIn:!!keepSignedIn})
         .then(x=>{
             this.getUserData();
             return x;
@@ -434,6 +434,15 @@ class Api {
 			confirmationCode,
 			sum: (sum&&sum.toString) ? sum.toString() : "",
 			toAddress,tokenContractAddress
+		});
+	}
+	getDepositAddresses(tokenContractAddress) {
+		return this._fetchPOST('/wallet/deposit_address/list',{tokenContractAddress});
+	}
+	updateDepositAddressName(name,depositAdr,tokenContractAddress) {
+		return this._fetch('PATCH','/wallet/deposit_address/name',{
+			name, tokenContractAddress,
+			address: depositAdr
 		});
 	}
 	_loadLib(scripts) {
