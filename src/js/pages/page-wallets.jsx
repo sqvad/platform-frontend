@@ -714,7 +714,8 @@ class TransactionsTable extends T.Any {
 	}
 	load() {
 		this.setState({loading:true});
-		this.props.m.api.getTransactions(this.props.walletId)
+		var wallet = this.props.m.user.wallets.filter(v=>v.symbol==this.props.walletId)[0];
+		this.props.m.api.getTransactions(wallet.tokenContractAddress)
 		.then(transactions=>{
 			this.setState({loading:false,transactions,serverEr:null});
 		})
@@ -737,6 +738,7 @@ class TransactionsTable extends T.Any {
 		if (s.loading) {
 			return this.render_loading(p,s,c,m);
 		}
+		var wallet = this.props.m.user.wallets.filter(v=>v.symbol==this.props.walletId)[0];
 		var transactions = s.transactions;
 		if (!transactions || !transactions.length) {
 			return this.render_empty(p,s,c,m);
@@ -785,7 +787,7 @@ class TransactionsTable extends T.Any {
 								</div>
 								<div className="transaction-value">
 									<span className={colorCls}>
-										<T.Currency m={m} {...v} value={v.sum} id={v.tokenContractAddress} />
+										<T.Currency m={m} {...v} value={v.sum} id={wallet.symbol} />
 									</span>
 								</div>
 								<div className="transaction-type">
