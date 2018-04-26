@@ -196,10 +196,6 @@ class Api {
 			this.model.auth = ret;
 			this.model.emit('change');
 		}
-		if (cmd.indexOf('/user/totp/setting/toggle')>-1) {
-			this.model.auth = ret;
-			this.model.emit('change');
-		}
 		if (cmd.indexOf('/user/profile')>-1) {
             this.model.user = this.model.user || {};
             var need = ret || {};
@@ -343,7 +339,15 @@ class Api {
         .then(()=>this.model.user);
 	}
 	toggle2FASetting(is2FAOn, code) {
-		return this._fetchPOST('/user/totp/setting/toggle',{is2FAOn:!!is2FAOn,code});
+		return this._fetchPOST('/user/totp/setting/toggle',{is2FAOn:!!is2FAOn,code})
+		.then(x=>{
+			if (x.is2FAOn && !x.signedIn2FA) {
+				return this.login2fa(code);
+			}
+			this.model.auth = x;
+			this.model.emit('change');
+			return x;
+		});
 	}
 	getWallets() {
 		return this._fetchGET('/wallet/list').then(()=>this.model.user.wallets);

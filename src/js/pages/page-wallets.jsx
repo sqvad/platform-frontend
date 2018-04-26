@@ -771,13 +771,14 @@ class TransactionsTable extends T.Any {
 						var isPositive = T.Currency.isPositive(v, true);
 						var colorCls = isPositive===false ? "red" : isPositive ? "green" : "" ;
 						return <div key={"-"+i} className={"transaction-container" + (opened?" opened":" closed")}
-							onClick={()=>{
-								var t = JSON.parse(JSON.stringify(s.openedTransactions||{}));
-								t[v.id] = !t[v.id];
-								this.setState({openedTransactions:t});
-							}}
 						>
-							<div className={"transaction-header d-flex"+(m.device.isMobile?" justify-content-between":"")}>
+							<div className={"transaction-header d-flex"+(m.device.isMobile?" justify-content-between":"")}
+								onClick={()=>{
+									var t = JSON.parse(JSON.stringify(s.openedTransactions||{}));
+									t[v.id] = !t[v.id];
+									this.setState({openedTransactions:t});
+								}}
+							>
 								<div className="transaction-toggler">
 									{opened?"–":"+"}
 								</div>
