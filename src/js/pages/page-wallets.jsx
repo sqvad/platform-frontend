@@ -595,16 +595,16 @@ class SendTokens extends T.Any {
 	render_report(p,s,c,m) {
 		return <div>
 			{this.render_review(p,s,c,m)}
-			<T.Popup.Put2fa
+			<T.Popup.Confirm
 				{...p}
-				makePromise={code=>{
+				makePromise={confirmInfo=>{
 					var s = this.state;
 					var wallet = this.props.m.user.wallets.filter(v=>v.symbol==s.currency)[0];
 					this.setState({transactionSent:false,transactionSending:true,transactionSendEr:null});
 					var inWei = T.Currency.coin2wei(s.amount, wallet.format);
 					return this.props.m.api.withdraw(
 						s.note,
-						code,
+						confirmInfo.value,
 						inWei,
 						s.to,
 						wallet.tokenContractAddress
@@ -612,16 +612,12 @@ class SendTokens extends T.Any {
 					.then(x=>{
 						this.setState({transactionSent:true,transactionSending:false,transactionSendEr:null});
 						return this.props.m.api.getWallets();
-					})
-					.catch(x=>{
-						if ((x && x.message||"").toLowerCase().indexOf("Verification code".toLowerCase())>-1) {
-							throw x;
-						}
-						if ((x && x.message||"").toLowerCase().indexOf("Verification code".toLowerCase())==-1) {
-							this.setState({transactionSent:true,transactionSending:false,transactionSendEr:x});
-						}
 					});
 				}}
+				catchPromise={er=>{
+					this.setState({transactionSent:true,transactionSending:false,transactionSendEr:er});
+				}}
+				onClose={()=>{this.setState({isReview:false,isReport:false});}}
 			/>
 		</div>;
 	}

@@ -15,14 +15,15 @@ class InputEmail extends Input {
 		});
 	}
 	render(p,s,c,m) {
+		var valid = InputEmail.validate(p.value||"");
 		var my = {};
 		if (p.unavaibleForRegistration) {
-			my = {hasError:true, hint:this.unavaibleForRegistrationHint}
+			my = {hasError:true, hint:this.unavaibleForRegistrationHint};
 		}
 		if (p.emailFetching) {
-			my = {hasError:true, hint:this.emailFetchingHint}
+			my = {hasError:true, hint:this.emailFetchingHint};
 		}
-		return <Input {...p} {...s} {...my} m={m} />;
+		return <Input {...p} {...s} valid={valid} {...my} m={m} />;
 	}
 	onValid(valid, validOld, input) {
 		input._onValid.call(this, valid, validOld, input);
@@ -31,16 +32,19 @@ class InputEmail extends Input {
 		input._onInvalid.call(this, valid, validOld, input, "Email is invalid", this.defaultHint);
 	}
 	checkValid(email) {
-		var email = (email||'').trim();
-		var example = 'a@1.ua';
-		if (email.length<example.length) return false;
-		if (email.indexOf('@')<example.indexOf('@')) return false;
-		if (email.indexOf('.',email.indexOf('@'))<example.indexOf('.')) return false;
-		if (email[email.length-1]=='.') return false;
-		return true;
+		return InputEmail.validate(email);
 	}
 }
 
+InputEmail.validate = function(email) {
+	var email = (email||'').trim();
+	var example = 'a@1.ua';
+	if (email.length<example.length) return false;
+	if (email.indexOf('@')<example.indexOf('@')) return false;
+	if (email.indexOf('.',email.indexOf('@'))<example.indexOf('.')) return false;
+	if (email[email.length-1]=='.') return false;
+	return true;
+};
 InputEmail.defaultProps = {
 	name: "email",
 	type: "email",

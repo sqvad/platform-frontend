@@ -18,7 +18,7 @@ class PageSettings extends T.Page {
 		if (!_s.tab) {
 			// _s.tab = "general";
 			// _s.tab = "changePassword";
-			// _s.tab = "2faDisable";
+			_s.tab = "2faDisable";
 			// _s.tab = "2faRecover";
 		}
 		return this._render(_p,_s,c,_m);
@@ -45,7 +45,7 @@ class PageSettings extends T.Page {
 							<div
 								className={"btn "+(tab=="general"? "btn-secondary active":" btn-outline-secondary")}
 								onClick={()=>{this.setState({tab:"general"})}} style={{marginLeft:m.device.isMobile?"-1px":""}}
-							>General</div> 
+							>General</div>
 							<div
 								className={"btn "+(tab=="changePassword"? "btn-secondary active":" btn-outline-secondary")}
 								onClick={()=>{this.setState({tab:"changePassword"})}} style={{marginTop:m.device.isMobile?"-1px":""}}
@@ -53,7 +53,7 @@ class PageSettings extends T.Page {
 							<div
 								className={"btn "+(tab=="2faDisable"? "btn-secondary active":" btn-outline-secondary")}
 								onClick={()=>{this.setState({tab:"2faDisable"})}} style={{marginTop:m.device.isMobile?"-1px":""}}
-							>Disable 2FA</div>
+							>{m.auth&&!m.auth.is2FAOn?"Enable 2FA":"Disable 2FA"}</div>
 							<div
 								className={"btn "+(tab=="2faRecover"? "btn-secondary active":" btn-outline-secondary")}
 								onClick={()=>{this.setState({tab:"2faRecover"})}} style={{marginTop:m.device.isMobile?"-1px":""}}
@@ -174,23 +174,13 @@ class PageSettings extends T.Page {
 		});
 	}
 	render_2faDisable(p,s,c,m) {
-		return <div>
-			<h2>2-FACTOR AUTHENTICATION</h2>
-			<p>
-				You currently have 2FA enabled.
-				<br />
-				You can change the 2FA method by first disabling the current one and afterwards setting up the new method.
-			</p>
-			<T.Form onSubmit={()=>{}}>
-				<button type="submit"
-					className={[
-						"btn btn-lg btn-primary",
-					].join(" ")}
-				>
-					DISABLE 2FA
-				</button>
-			</T.Form>
-		</div>
+		return <Disable2FA {...p} {...s} onDisabled={this.on2faDisabled.bind(this)}/>;
+	}
+	on2faDisabled() {
+		var s = this.state || {};
+		if (s.tab=="2faDisable") {
+			this.setState({tab:"general"});
+		}
 	}
 	render_2faRecover(p,s,c,m) {
 		var country = (m && m.user && m.user.country || "us").toLowerCase();
@@ -263,6 +253,146 @@ class PageSettings extends T.Page {
 					<img src="./img/qr-test.png" width="164" height="164" style={{marginLeft:"-16px",marginTop:"-5px"}}/>
 				</div>
 			</div>
+		</div>
+	}
+}
+
+class Disable2FA extends T.Any {
+	constructor(props) {
+		super(props);
+		this.setState({wasEnable:props.m.auth.is2FAOn});
+	}
+	render(p,s,c,m) {
+		var ok = s.sent && !s.serverError;
+		var canSubmit = !s.fetching || !s.sent;
+		var strNow = s.wasEnable ? "enabled" : "disabled";
+		var strSwitch = s.wasEnable ? "disable" : "enable";
+		var strSwitched = s.wasEnable ? "disabled" : "enabled";
+		return <div>
+			<h2 className="mb-3">2-FACTOR AUTHENTICATION</h2>
+			<p>
+				You currently have 2FA&nbsp;
+				<T.If v={s.enableAgainSent}><b>
+					{strNow}.
+				</b></T.If>
+				<T.If v={!s.enableAgainSent}><span>
+					<T.If v={!ok}><span>
+						{strNow}.
+					</span></T.If>
+					<T.If v={ok}><span>
+						<del>{strNow}</del> <b>{strSwitched}.</b>
+					</span></T.If>
+				</span></T.If>
+			</p>
+			<p>
+				<T.If v={s.wasEnable}><span>
+					You can change the 2FA method by
+					<T.If v={ok}><span className="text-muted">
+						{" ✔"}&nbsp;first disabling the current one
+					</span></T.If>
+					<T.If v={!ok}><span>
+						first disabling the current one
+					</span></T.If>
+					{" and afterwards "}
+					<T.If v={s.enableAgainSent}><span><span className="text-muted">
+						✔&nbsp;setting up the new method
+					</span>.</span></T.If>
+					<T.If v={!s.enableAgainSent}><span>
+						setting up the new method.
+					</span></T.If>
+				</span></T.If>
+			</p>
+			<T.If v={!ok}>
+				<button type="submit"
+					className={[
+						"btn btn-lg btn-primary mt-3",
+						canSubmit ? "" : "disabled"
+					].filter(v=>!!v).join(" ")}
+					disabled={!canSubmit}
+					onClick={()=>this.setState({popup:true})}
+				>
+					{strSwitch} 2FA
+				</button>
+			</T.If>
+			<T.If v={ok}>
+				<button type="submit"
+					className={[
+						"btn btn-lg btn-outline-primary mt-3"
+					].filter(v=>!!v).join(" ")}
+					onClick={()=>p.onDisabled()}
+				>OK</button>
+			</T.If>
+			<T.If v={s.wasEnable && !s.enableAgainSent}>
+				<T.If v={ok || s.popupEnableAgain}>
+					<button type="submit"
+						className={[
+							"btn btn-lg btn-outline-primary mt-3 ml-3",
+							s.fetching ? " disabled" : ""
+						].filter(v=>!!v).join(" ")}
+						disabled={s.fetching}
+						onClick={()=>{
+							this.setState({popupEnableAgain:true});
+						}}
+					>Enable</button>
+				</T.If>
+			</T.If>
+			<T.If v={s.popup}>
+				<T.Popup.Confirm
+					{...p} use2fa={true}
+					makePromise={(confirmInfo,popup)=>{
+						var p = this.props;
+						return this.props.m.api.toggle2FASetting(!s.wasEnable, confirmInfo.value)
+						.then(x=>{
+							var ps = popup && popup.state || {};
+							this.setState({fetching:ps.fetching,sent:ps.sent,serverError:ps.serverError});
+							return x;
+						});
+					}}
+					catchPromise={er=>{
+						this.setState({popup:false,fetching:false,sent:true,serverError:er});
+						throw er;
+					}}
+					onClose={(code,popup)=>{
+						if (!popup) {
+							this.setState({popup:false});
+							return;
+						}
+						var ret = Promise.resolve();
+						var ps = popup.state || {};
+						this.setState({popup:false,fetching:ps.fetching,sent:ps.sent,serverError:ps.serverError});
+						return ret;
+					}}
+				/>
+			</T.If>
+			<T.If v={s.popupEnableAgain}>
+				<T.Popup.Put2fa
+					{...p}
+					makePromise={(code,popup)=>{
+						var p = this.props;
+						return this.props.m.api.toggle2FASetting(true, code)
+						.then(()=>{
+							var ps = popup.state || {};
+							this.setState({fetching:ps.fetching,sent:ps.sent,serverError:ps.serverError});
+						})
+					}}
+					onClose={(code,popup)=>{
+						if (!popup) {
+							this.setState({popupEnableAgain:false});
+							return;
+						}
+						var ret = Promise.resolve();
+						var ps = popup.state || {};
+						this.setState({
+							popupEnableAgain:false,
+							fetching:false,
+							sent:ps.sent,
+							serverError:ps.serverError,
+							enableAgainSent:ps.sent,
+						});
+						return ret;
+					}}
+				/>
+			</T.If>
 		</div>
 	}
 }

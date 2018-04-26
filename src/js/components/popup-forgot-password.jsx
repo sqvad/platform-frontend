@@ -9,7 +9,10 @@ import A from './a.jsx';
 class PopupForgotPassword extends Any {
 	constructor(props) {
 		super(props);
-		this.setState({code2fa:""});
+		var authData = props.m && props.m.auth || {};
+		var email = authData.email||"";
+		var emailValid = Input.Email.validate(email);
+		this.setState({email,emailValid});
 	}
 	render(p,s,c,m) {
 		var content = <div>

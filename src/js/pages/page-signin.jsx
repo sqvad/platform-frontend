@@ -4,7 +4,13 @@ import T from '../tags.jsx';
 class PageSignIn extends T.Page {
 	constructor(props) {
 		super(props);
-		this.props.m.api.getAuthData();
+		this.props.m.api.getAuthData()
+		.then(()=>{
+			var m = this.props.m;
+			if (m.auth && m.auth.signedIn) {
+				m.api.gotoHref(T.A.href({href:"/"},m))
+			}
+		});
 		this.props.m.api.getUserData();
 		this.setState({
 			email: this.props.m && this.props.m.auth && this.props.m.auth.email || "",
@@ -129,13 +135,17 @@ class PageSignIn extends T.Page {
 			false,
 			this.props.m.api.loginEmail(this.state.email, this.state.password, this.state.keepSignedIn)
 			.then(x=>{
-				this.setState({popup2fa:true});
-				return this.props.m.api.getUserData(true)
+				this.props.m.api.getUserData();
+				return this.props.m.api.getAuthData(true)
 				.then(()=>{
 					var m = this.props.m;
-					if (m.path.contains["signin"]) {
-						if (m.signedIn) {
-							m.api.gotoHref(T.A.href({href:"/"},m))
+					if (m.path.contains["signin"] && m.auth.signedIn) {
+						m.api.gotoHref(T.A.href({href:"/"},m));
+					} else {
+						if (!m.auth.signedIn) {
+							this.setState({popup2fa:true});
+						} else {
+							window.location.refresh();
 						}
 					}
 				})

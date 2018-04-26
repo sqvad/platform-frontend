@@ -21,7 +21,7 @@ class _Date extends Any {
         if (p.onlyDate) {
             return <span>{y}&nbsp;{mon_}&nbsp;{d}</span>;
         } else if (p.onlyTime) {
-            return <span>{h}:{m}:{s}&nbsp;{isPM?"pm":"am"}</span>;
+            return <span>{h_}:{m_}:{s_}&nbsp;{isPM?"pm":"am"}</span>;
         }
 	}
 }

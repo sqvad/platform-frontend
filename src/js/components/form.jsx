@@ -120,6 +120,7 @@ Form.wrapFetch = function(tag, catchEr, promise) {
 		tag.setState({serverError:er});
 		after();
 		if (!catchEr) throw er;
+		return er;
 	});
 	function after() {
 		tag.setState({fetching:false,sent:true});

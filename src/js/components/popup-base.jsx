@@ -39,7 +39,6 @@ class Popup extends Any {
 		if (e.keyCode===27) this.close();
 	}
 	close() {
-		debugger;
 		if (this.props.onClose) {
 			this.props.onClose();
 		}
