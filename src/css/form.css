@@ -1,6 +1,6 @@
 @import "./form-btn.css";
 
-button, select {
+button, select, .btn {
 	cursor: pointer;
 }
 
@@ -118,7 +118,7 @@ label.input-group {
 	position: absolute;
 	top: 58px;
 	font-size: 12px;
-	color: #7e8593;
+	color: #c4c8ce;
 }
 .border4sides.input-group .input-hint {
 	top: 64px;

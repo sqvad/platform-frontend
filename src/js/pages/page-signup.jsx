@@ -42,8 +42,8 @@ class ChooseRole extends T.Any {
 								placeholderOnFocus="Please choose..."
 								onBlur={this.onChooseViaSelect.bind(this)}
 								style={{
-									marginLeft: m.device.isMobile ? "-1px" : "",
-									marginTop: m.device.isMobile && i ? "-1px" : ""
+									marginLeft: "-1px",
+									marginTop: "-1px",
 								}}
 							></T.Select>;
 						} else {
@@ -51,8 +51,8 @@ class ChooseRole extends T.Any {
 								key={"role"+i} data-v={v.id} onClick={this.onChooseViaButton.bind(this)}
 								className={"btn "+(v.id==p.role? "btn-secondary active":" btn-outline-secondary")}
 								style={{
-									marginLeft: m.device.isMobile ? "-1px" : "",
-									marginTop: m.device.isMobile && i ? "-1px" : ""
+									marginLeft: "-1px",
+									marginTop: "-1px",
 								}}
 							>
 								{v.title}
@@ -193,7 +193,7 @@ class PageSignUp_page1 extends T.Page {
 								value={s.email} required
 								unavaibleForRegistration={emailUnavaible}
 								emailFetching={emailFetching}
-								autofocus m={m}
+								m={m}
 							/>
 							<T.Input.Password
 								name="password" onChange={this.onPassword.bind(this)}
@@ -341,7 +341,12 @@ class PageSignUp_page2 extends T.Page {
 								<T.Form.SubmitButton
 									canSubmit={true} fetching={s.fetching}
 									type="button" dontChangeText onClick={p.onPrev.bind(this, s)}
-									clsColor="btn-outline-primary" cls="btn-lg btn-with-icon-at-left-side" style={{flex:1}}
+									clsColor="btn-outline-primary"
+									cls={"btn-lg btn-with-icon-at-left-side" + (m.device.isMobile?" mt-3":"") }
+									style={{
+										flex:1,
+										"order": m.device.isMobile ? "3" : "1"
+									}}
 								>
 									Previous
 									<span className={"icon icon-24 icon-prev icon-"+(s.fetching?"gray":"violet")}></span>
@@ -349,7 +354,10 @@ class PageSignUp_page2 extends T.Page {
 								<T.Form.SubmitButton
 									canSubmit={canSubmit} fetching={s.fetching}
 									text="Sign Up"
-									clsColor="btn-primary" cls={"btn-lg btn-with-icon-at-right-side "+(m.device.isMobile?"mt-3":"ml-3")} style={{flex:1}}
+									clsColor="btn-primary" cls={"btn-lg "+(m.device.isMobile?"mt-3":"ml-3")} style={{
+										flex:1,
+										"order": "2"
+									}}
 								/>
 							</div>
 						</div>

@@ -18,12 +18,17 @@ class PageSet2FA extends T.Page {
 			<T.Page.PageWrapHeader key="header" m={m} header="short" {...s} noSignIn={true}></T.Page.PageWrapHeader>
 			<T.Page.PageWrapWidth key="width" m={m} {...p}>
 				<h1 className="h1-center d-flex flex-column align-items-center">
-					<img src="/img/set2fa-header.png" width="311" height="122" className="d-block mb-4"/>
-					PLEASE SETUP 2-FACTOR AUTHENTICATION
+					<T.If v={!m.device.isMobile}>
+						<img src="/img/set2fa-header.png" width="311" height="122" className="d-block mb-4"/>
+					</T.If>
+					<T.If v={m.device.isMobile}>
+						<img src="/img/set2fa-header.png" width="240" height="94" className="d-block mb-4"/>
+					</T.If>
+					PLEASE SETUP <nobr>2-FACTOR</nobr> AUTHENTICATION
 					<br />
 				</h1>
 				<p className="h1-addition">
-					2-factor authentication (2FA) is a reliable and simple way to keep the account safe.
+					2-factor authentication (2FA) <nobr>is a reliable</nobr> and simple way to keep <nobr>the account safe.</nobr>
 					<br />
 					Security is in high priority for us, so we ensure that all users setup 2FA.
 				</p>
@@ -32,7 +37,10 @@ class PageSet2FA extends T.Page {
 					{this.render_generateOpened(p,s,c,m)}
 					{!s.generateOpened ? this.render_generateClosed(p,s,c,m) : this.render_check2fa(p,s,c,m)}
 				</div>
-				<p className="p-muted" style={{"textAlign":"center"}}>
+				<p className="p-muted" style={{
+					"textAlign":"center",
+					"marginTop": p.m.device.isMobile ? "8px" : "",
+				}}>
 					Had problems with setup? Please check our tutorials:
 					<br />
 					<br />
@@ -50,7 +58,7 @@ class PageSet2FA extends T.Page {
 			<div className={"row d-flex justify-content-center smooth-opening-"+(s.helpOpened?"opened":"closed")} style={{marginTop:"-10px"}}>
 				<div className={[
 					"d-flex flex-column justify-content-center smooth-opening-border",
-					m.device.isDesktop ? "col-9" : "mr-1 ml-1"
+					m.device.isDesktop ? "col-9" : "mr-3 ml-3"
 				].filter(v=>!!v).join(" ")}>
 					<div className="d-flex justify-content-center" style={{position:"relative",top:"-1.6em"}}>
 						<button className="btn btn-lg btn-outline-primary"
@@ -60,11 +68,17 @@ class PageSet2FA extends T.Page {
 						</button>
 					</div>
 					<div className="row d-flex justify-content-center smooth-opening-content">
-						<div className="mb-2 col-10">
+						<div className={[
+							m.device.isDesktop ? "mb-2 col-10" : "mb-2 col-11"
+						].filter(v=>!!v).join(" ")}>
 							<p style={{"textAlign":"center"}}>You must have an authentication app installed on your phone or tablet. This app generates access codes for your INS account. We will ask you to enter these codes to confirm some important actions for your account, like login or changing account settings.</p>
 							<p style={{"textAlign":"center"}}>If you lost your authentication app or device, you can reset 2FA via email, like your password.</p>
 							<p style={{"textAlign":"center"}}>Authentication apps we can recommend are:</p>
-							<div className="d-flex align-items-space-between justify-content-between apps-block mb-4">
+							<div
+								className={[
+								"d-flex justify-content-between apps-block mb-4",
+								m.device.isMobile ? "flex-column align-items-center" : " align-items-space-between"
+							].filter(v=>!!v).join(" ")}>
 								<div className="app-block">
 									<img src="/img/set2fa-ga.png" width="49" height="55" style={{borderBottom:"6px solid transparent"}}/>
 									<br />
@@ -112,20 +126,23 @@ class PageSet2FA extends T.Page {
 	render_generateOpened(p,s,c,m) {
 		return <div className="w-100">
 			<div
-				className={"row d-flex justify-content-center smooth-opening-"+(s.generateOpened?"opened":"closed")}
+				className={[
+					"row d-flex justify-content-center",
+					"smooth-opening-" + (s.generateOpened?"opened":"closed"),
+				].filter(v=>!!v).join(" ")}
 				style={{
 					marginBottom: s.generateOpened ? "" : "-51px"
 				}}
 			>
 				<div className={[
 					"mb-4 d-flex flex-column justify-content-center smooth-opening-border",
-					m.device.isDesktop ? "col-9" : "mr-1 ml-1"
+					m.device.isDesktop ? "col-9" : "mr-3 ml-3",
 				].filter(v=>!!v).join(" ")} style={{marginTop: "0px"}}>
 					<div className="row d-flex justify-content-center smooth-opening-content">
 						<T.If v={s.totpSecretKey} key="totpSecretKey">
 							<div className="mb-2 col-9 pt-4">
 								<p style={{"textAlign":"center"}} className="mt-3">
-									Add a new account at authentication app and scan the QR-code or enter the key below manually.
+									Add a new account at authentication app and scan <nobr>the QR-code</nobr> or enter the key below manually.
 								</p>
 								<p style={{"textAlign":"center"}}>
 									Enter this key:
@@ -136,7 +153,12 @@ class PageSet2FA extends T.Page {
 									QR-code:
 									<br />
 									<T.A m={m} href={s.gaLink} external>
-										<img src={s.qrDataUrl} width="228" height="228" alt={s.qrDataUrl?"QR code is loading...":"QR code for "+ s.gaLink} />
+										<T.If v={p.m.device.isMobile}>
+											<img src={s.qrDataUrl} width="212" height="212" alt={s.qrDataUrl?"QR code is loading...":"QR code for "+ s.gaLink} />
+										</T.If>
+										<T.If v={!p.m.device.isMobile}>
+											<img src={s.qrDataUrl} width="228" height="228" alt={s.qrDataUrl?"QR code is loading...":"QR code for "+ s.gaLink} />
+										</T.If>
 									</T.A>
 								</p>
 							</div>

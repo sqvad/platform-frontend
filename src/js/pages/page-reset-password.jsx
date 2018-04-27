@@ -37,7 +37,7 @@ class PageResetPassword extends T.Page {
 								/>
 							</T.If>
 							<T.Input.Password
-								name="password" onChange={this.onPassword.bind(this)}
+								name="new password" onChange={this.onPassword.bind(this)}
 								value={s.password} required
 							/>
 							<T.Input.PasswordConfirm
@@ -46,11 +46,13 @@ class PageResetPassword extends T.Page {
 								password={s.password} autocomplete="off"
 							/>
 							{this.form && this.form.renderServerError()}
-							<T.Form.SubmitButton 
-								clsColor="btn-primary" cls="btn-lg"
-								canSubmit={canSubmit} fetching={s.fetching}
-								text="Change password"
-							/>
+							<div className="d-flex justify-content-center mt-4 mb-4">
+								<T.Form.SubmitButton
+									clsColor="btn-primary" cls="btn-lg"
+									canSubmit={canSubmit} fetching={s.fetching}
+									text="Change password"
+								/>
+							</div>
 					</T.Form>
 				</div>
 				</div>

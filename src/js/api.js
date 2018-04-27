@@ -104,13 +104,16 @@ class Api {
 		})
 		.then(x=>{
 			this._fetchesInProgress[transport.id] = null;
-			if (('errors' in x) && ('message' in x)) {
+			if (('message' in x)) {
                 if (x.errors) {
                     if (Array.isArray(x.errors) && x.errors.length) {
                         throw x;
                     }
                 } else if (x.message===null && x.errors===null && Object.keys(x).length==2) {
 					x.message = "Unknown error";
+					throw x;
+                } else if ('message' in x && Object.keys(x).length==1) {
+					x.errors = null;
 					throw x;
                 } else if (x.message) {
                     throw x;

@@ -25,6 +25,7 @@ class PageSettings extends T.Page {
 	}
 	_render(p,s,c,m) {
 		var tab = s.tab || "general";
+		var tab = s.tab || "2faRecover";
 		return <T.Page.PageWrapDevice m={m} pagePostfix="wallet">
 			<T.Page.PageWrapProfile key="header" m={m} header="left" {...s}>
 				<T.Page.PageWrapProfileLeft>
@@ -183,77 +184,7 @@ class PageSettings extends T.Page {
 		}
 	}
 	render_2faRecover(p,s,c,m) {
-		var country = (m && m.user && m.user.country || "us").toLowerCase();
-		return <div style={{maxWidth:"550px"}}>
-			<h2>2-FACTOR AUTHENTICATION</h2>
-			<p>
-				INS encourages two factor authentication (2FA) to protect your account.
-				<br />
-				Two factor authentication protects your account with your phone as well as your password.
-			</p>
-			<p>
-				Authentication apps we can recommend are:
-			</p>
-			<div className="d-flex align-items-space-between justify-content-between apps-block">
-				<div className="app-block">
-					<img src="/img/set2fa-ga.png" width="49" height="55" style={{borderBottom:"6px solid transparent"}}/>
-					<br />
-					<b style={{display:"block",textAlign:"left"}}>Google Authenticator</b>
-					<span style={{display:"block",textAlign:"left"}}>
-						<T.A href={"https://itunes.apple.com/"+country+"/app/google-authenticator/id388497605"} external className="mr-1">App Store</T.A>
-						<T.A href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" external className="ml-1">Google Play</T.A>
-					</span>
-				</div>
-				<div className="app-block">
-					<T.A href="https://authy.com/" external><img src="/img/set2fa-authy.png" width="49" height="55" style={{borderBottom:"6px solid transparent"}}/></T.A>
-					<br />
-					<b>Authy</b>
-					<br />
-					<span>
-						<T.A href={"https://itunes.apple.com/"+country+"/app/authy/id494168017"} external className="mr-1">App Store</T.A>
-						<T.A href="https://play.google.com/store/apps/details?id=com.authy.authy" external className="ml-1">Google Play</T.A>
-					</span>
-				</div>
-				<div className="app-block">
-					<T.A href="https://duo.com/" external><img src="/img/set2fa-duo.png" width="49" height="55" style={{borderBottom:"6px solid transparent"}}/></T.A>
-					<br />
-					<b>Duo Mobile</b>
-					<br />
-					<span>
-						<T.A href={"https://itunes.apple.com/"+country+"/app/duo-mobile/id422663827"} external className="mr-1">App Store</T.A>
-						<T.A href="https://play.google.com/store/apps/details?id=com.duosecurity.duomobile" external className="ml-1">Google Play</T.A>
-					</span>
-				</div>
-			</div>
-			<div style={{marginTop:"36px"}}>
-				<T.Form onSubmit={()=>{}}>
-					<button type="submit"
-						className={[
-							"btn btn-lg btn-primary",
-						].join(" ")}
-						style={{}}
-					>
-						Generate key
-					</button>
-				</T.Form>
-			</div>
-			<div style={{maxWidth:"606px"}}>
-				<div style={{border:"1px solid #e5e6e7", background:"white", padding:"29px"}}>
-					Add a new account at authentication app and scan the QR-code or enter the key below manually.
-					<br /><br />
-					Save the code below:<br />
-					<b>ZSQS6TWCQRTXPRVL</b>
-					<br /><br />
-					Enter this key:<br />
-					<b>NZZUI4ZIPI5SS2CAERWVESRDOVQXK32U</b>
-					<br /><br />
-					<span style={{position:"relative",zIndex:2}}>
-						QR-code:<br />
-					</span>
-					<img src="./img/qr-test.png" width="164" height="164" style={{marginLeft:"-16px",marginTop:"-5px"}}/>
-				</div>
-			</div>
-		</div>
+		return <Recover2FA {...p} />;
 	}
 }
 
@@ -394,6 +325,96 @@ class Disable2FA extends T.Any {
 				/>
 			</T.If>
 		</div>
+	}
+}
+
+class Recover2FA extends T.Any {
+	constructor(props) {
+		super(props);
+		this.setState({wasEnable:props.m.auth.is2FAOn});
+	}
+	render(p,s,c,m) {
+		var country = (m && m.user && m.user.country || "us").toLowerCase();
+		return <div style={{maxWidth:"550px"}}>
+			<h2>2-FACTOR AUTHENTICATION</h2>
+			<p>
+				INS encourages two factor authentication (2FA) to protect your account.
+				<br />
+				Two factor authentication protects your account with your phone as well as your password.
+			</p>
+			<p>
+				Authentication apps we can recommend are:
+			</p>
+			<div className="d-flex align-items-space-between justify-content-between apps-block">
+				<div className="app-block">
+					<div style={{width:"95%"}}>
+						<img src="/img/set2fa-ga.png" width="49" height="55" style={{borderBottom:"6px solid transparent"}}/>
+					</div>
+					<b style={{display:"block",textAlign:"left"}}>Google Authenticator</b>
+					<span style={{display:"block",textAlign:"left"}}>
+						<T.A href={"https://itunes.apple.com/"+country+"/app/google-authenticator/id388497605"} external className="mr-1">App Store</T.A>
+						<T.A href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" external className="ml-1">Google Play</T.A>
+					</span>
+				</div>
+				<div className="app-block">
+					<T.A href="https://authy.com/" external><img src="/img/set2fa-authy.png" width="49" height="55" style={{borderBottom:"6px solid transparent"}}/></T.A>
+					<br />
+					<b>Authy</b>
+					<br />
+					<span>
+						<T.A href={"https://itunes.apple.com/"+country+"/app/authy/id494168017"} external className="mr-1">App Store</T.A>
+						<T.A href="https://play.google.com/store/apps/details?id=com.authy.authy" external className="ml-1">Google Play</T.A>
+					</span>
+				</div>
+				<div className="app-block">
+					<T.A href="https://duo.com/" external><img src="/img/set2fa-duo.png" width="49" height="55" style={{borderBottom:"6px solid transparent"}}/></T.A>
+					<br />
+					<b>Duo Mobile</b>
+					<br />
+					<span>
+						<T.A href={"https://itunes.apple.com/"+country+"/app/duo-mobile/id422663827"} external className="mr-1">App Store</T.A>
+						<T.A href="https://play.google.com/store/apps/details?id=com.duosecurity.duomobile" external className="ml-1">Google Play</T.A>
+					</span>
+				</div>
+			</div>
+			<div style={{marginTop:"36px"}}>
+				<T.Form onSubmit={()=>{}}>
+					<button type="submit"
+						className={[
+							"btn btn-lg btn-primary",
+						].join(" ")}
+						onClick={this.generateKey.bind(this)}
+					>
+						Generate key
+					</button>
+				</T.Form>
+			</div>
+			<div style={{maxWidth:"606px"}}>
+				<div style={{border:"1px solid #e5e6e7", background:"white", padding:"29px"}}>
+					Add a new account at authentication app and scan the QR-code or enter the key below manually.
+					<br /><br />
+					Save the code below:<br />
+					<b>ZSQS6TWCQRTXPRVL</b>
+					<br /><br />
+					Enter this key:<br />
+					<b>NZZUI4ZIPI5SS2CAERWVESRDOVQXK32U</b>
+					<br /><br />
+					<span style={{position:"relative",zIndex:2}}>
+						QR-code:<br />
+					</span>
+					<img src="./img/qr-test.png" width="164" height="164" style={{marginLeft:"-16px",marginTop:"-5px"}}/>
+				</div>
+			</div>
+		</div>;
+	}
+	generateKey() {
+		this.setState({fetching:true});
+		var m = this.props.m;
+		m.api.generateTotpSecretKey()
+		.then(x=>{
+			debugger;
+			this;x;
+		});
 	}
 }
 

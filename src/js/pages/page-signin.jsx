@@ -17,7 +17,6 @@ class PageSignIn extends T.Page {
 			password:"", //popupForgotPassword: true,
 		});
 	}
-	 // || m.auth && m.auth.signedInEmail
 	render(p,s,c,m) {
 		return <T.Page.PageWrapDevice m={m} pagePostfix="signup">
 			<T.Page.PageWrapHeader key="header" m={m} header="medium" {...s}>
@@ -87,7 +86,7 @@ class PageSignIn extends T.Page {
 						name="password" onChange={this.onPassword.bind(this)}
 						value={s.password} required
 					/>
-					<div className="d-flex justify-content-between">
+					<div className="d-flex justify-content-between mt-4">
 						<span>
 							<T.Checkbox checked={s.keepMySignedIn} onChange={(on)=>this.setState({keepMySignedIn:on})}>
 								Keep me signed in
@@ -98,15 +97,17 @@ class PageSignIn extends T.Page {
 								className="external text-muted" style={{fontSize:"0.8em",position:"relative",top:"0.2em"}}
 							>
 								<span style={{
-									fontSize: m.device.isMobile ? "0.8em" : ""
+									fontSize: m.device.isMobile ? "0.9em" : "",
+									position: m.device.isMobile ? "relative" : "",
+									top: m.device.isMobile ? "-0.2em" : "",
 								}}>
 									Forgot your password?
 								</span>
 							</T.A>
 						</span>
 					</div>
-					{this.form && this.form.renderServerError()}
-					<div className="d-flex justify-content-center mt-5">
+					{this.form && <div className="mt-4">{this.form.renderServerError()}</div>}
+					<div className="d-flex justify-content-center mt-4 mb-4">
 						<T.Form.SubmitButton
 							clsColor="btn-primary" cls="btn-lg"
 							canSubmit={s.canSubmit} fetching={s.fetching}

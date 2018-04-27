@@ -23,7 +23,7 @@ class Login extends Any {
 			onClick={()=>m.api.gotoHref(A.href({href:"/signin"},m))}
 		>
 			Log In
-			<span className="icon icon-24 icon-next" />
+			<span className="icon icon-24 " />
 		</button>;
 	}
 }
@@ -33,7 +33,7 @@ class Signup extends Any {
 			onClick={()=>m.api.gotoHref(A.href({href:"/signup"},m))}
 		>
 			Sign Up
-			<span className="icon icon-24 icon-next" />
+			<span className="icon icon-24 icon-avatar" />
 		</button>;
 	}
 }
@@ -42,25 +42,30 @@ class HeaderButtons extends Any {
 	render(p,s,c,m) {
 		var authData = m.auth || {};
 		var userData = m.user;
+		var valign = {};
+		if (m.device.isMobile) {
+			valign.marginTop = "-7px";
+		}
 		if (authData.signedIn) {
-			return <div className="d-flex align-items-center">
+			return <div className="d-flex align-items-center" style={valign}>
 				<Name {...p} />
 				<Logout {...p} />
 			</div>;
 		} else if (authData.signedInEmail) {
-			return <div className="d-flex align-items-center">
+			return <div className="d-flex align-items-center" style={valign}>
 				{userData?<span className="d-block mr-3 pt-2 pb-2 text-uppercase">{userData.firstName} {userData.lastName}</span>:null}
-				{!userData && authData.email?<span className="d-block mr-3 pt-2 pb-2">{authData.email}</span>:null}
+				{!userData && authData.email && !m.device.isMobile?<span className="d-block mr-3 pt-2 pb-2">{authData.email}</span>:null}
 				<Logout {...p} />
 			</div>;
 		} else {
 			if (p.isSingupPage) {
-				return <div className="d-flex align-items-center">
-					<span className="d-block mr-3 pt-2 pb-2 text-uppercase">Already member?</span>
+				return <div className="d-flex align-items-center" style={valign}>
+					{p.m.device.isMobile?null:<span className="d-block mr-3 pt-2 pb-2 text-uppercase">Already member?</span>}
 					<Login {...p} />
 				</div>;
 			} else {
-				return <div className="d-flex align-items-center">
+				return <div className="d-flex align-items-center" style={valign}>
+					{p.m.device.isMobile?null:<span className="d-block mr-3 pt-2 pb-2 text-uppercase">New here?</span>}
 					<Signup {...p} />
 				</div>;
 			}

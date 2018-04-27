@@ -13,12 +13,16 @@ a.external:hover {
     font-weight: 800;
     color: #fc4c04;
 }
+.mobile .h1-center {
+    font-size: 26px;
+    line-height: 32px;
+}
+.mobile .h1-addition {
+    margin-top: -31px;
+}
 .h1-addition {
     margin-top: -35px;
     margin-bottom: 40px;
-    text-align: center;
-}
-.h1-center + .h1-addition {
     text-align: center;
 }
 

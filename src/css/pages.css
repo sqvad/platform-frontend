@@ -5,6 +5,13 @@
     width: 32%;
     text-align: center;
 }
+.mobile .app-block {
+    width: 100%;
+    margin-bottom: 10px;
+}
+.mobile .app-block + .app-block {
+    margin-top: 30px;
+}
 .app-block a {
     color: #4224c5;
     font-size: 14px;
