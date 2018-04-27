@@ -13,11 +13,25 @@ class InputTxAdr extends Input {
 		});
 	}
 	render(p,s,c,m) {
+		var style = {};
+		if (m && m.device.isMobile) {
+			style = {
+				fontSize: "0.73em",
+				paddingLeft: "3px",
+				paddingRight: "3px",
+			};
+		}
+		var hint = p.hint || this.defaultHint;
 		if (!this.fullValid && this.avaible) {
-			var hint = <span className="input-hint" style={{color:"orange"}}>Wrong control sum</span>;
-			return <Input {...p} {...s} m={m} hint={hint} hintWrapped={true} />;
+			hint = <span className="input-hint" style={{color:"orange"}}>Wrong control sum</span>;
+			return <Input {...p} {...s} m={m} hint={hint} inputStyle={style} hintWrapped={true} />;
 		} else {
-			return <Input {...p} {...s} m={m} />;
+			if (m && m.device.isMobile) {
+				hint = <span className="input-hint" style={{fontSize:"0.75em"}}>{hint}</span>;
+				return <Input {...p} {...s} m={m} hint={hint} inputStyle={style} hintWrapped={true} />;
+			} else {
+				return <Input {...p} {...s} m={m} hint={hint} inputStyle={style} />;
+			}
 		}
 	}
 	onValid(valid, validOld, input) {

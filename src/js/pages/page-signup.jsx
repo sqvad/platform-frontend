@@ -334,6 +334,7 @@ class PageSignUp_page2 extends T.Page {
 								onChange={this.onCountry.bind(this)}
 								useFormControl className="form-control" placeholder="Country"
 								name="country" options={this.countries}
+								hint="E.g. USA"
 							></T.Select>
 							{extendFields}
 							{this.form && this.form.renderServerError()}

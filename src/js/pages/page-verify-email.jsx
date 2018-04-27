@@ -37,12 +37,19 @@ class PageVerifyEmail extends T.Page {
 				<div className="d-flex flex-column align-items-center">
 					<div style={{maxWidth:"450px",width:"100%"}}>
 						<T.Form onSubmit={()=>this.onSubmit()}>
-							<T.Input
-								value={s.code} onChange={code=>this.setState({code,error:null})}
-								placeholder={"Code from your email "}
-								hint={"Check out "+ (m.auth && m.auth.email || m.user && m.user.email)}
-								required
-							/>
+							<div style={{display:"none"}}>
+								<T.Input
+									value={s.code} onChange={code=>this.setState({code,error:null})}
+									placeholder={"Code from your email "}
+									hint={"Check out "+ (m.auth && m.auth.email || m.user && m.user.email)}
+									required
+								/>
+							</div>
+							<T.If v={!s.error && !s.sendOtherCode_pending && !s.sendOtherCode_ready}>
+								<T.If v={m.auth && m.auth.email || m.user && m.user.email}>
+									<span>Check out {(m.auth && m.auth.email || m.user && m.user.email)}.</span>
+								</T.If>
+							</T.If>
 							<T.If v={s.error}><p className="mt-4 mb-3" style={{color:"red"}}>
 								{s.error && s.error.message}
 							</p></T.If>
@@ -59,11 +66,13 @@ class PageVerifyEmail extends T.Page {
 									canSubmit={!s.fetching} fetching={s.sendOtherCode_pending}
 									text="Send other code" style={{flex:1}}
 								/>
-								<T.Form.SubmitButton
-									clsColor="btn-primary" cls={"btn-lg "+(m.device.isMobile?"mt-3":"ml-3")}
-									canSubmit={canSubmit} fetching={s.fetching}
-									text="Confirm email" style={{flex:1}}
-								/>
+								<div style={{display:"none"}}>
+									<T.Form.SubmitButton
+										clsColor="btn-primary" cls={"btn-lg "+(m.device.isMobile?"mt-3":"ml-3")}
+										canSubmit={canSubmit} fetching={s.fetching}
+										text="Confirm email" style={{flex:1}}
+									/>
+								</div>
 						</div>
 					</T.Form>
 				</div>

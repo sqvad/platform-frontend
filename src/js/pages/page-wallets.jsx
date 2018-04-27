@@ -229,7 +229,8 @@ class Receiver extends T.Any {
 							border: 0,
 							padding: 0,
 							width: "100%",
-							textAlign: m.device.isMobile ? "center" : ""
+							textAlign: m.device.isMobile ? "center" : "",
+							fontSize: m.device.isMobile ? "0.65em" : ""
 						}}
 					/>
 					<div className="mt-2 mb-1">
@@ -329,7 +330,7 @@ class DepositAdrRename extends T.Any {
 			<h1 className="h1-center mt-0">RENAME</h1>
 			<T.Form handler={this}>
 				<T.Input
-					placeholder="YOUR DESPODIT ADDRESS NAME"
+					placeholder="YOUR DEPOSIT ADDRESS NAME"
 					value={s.depositName||p.depositName}
 					checkValid={str=>!!(str||"").length}
 					onChange={(depositName,depositNameValid)=>this.checkValid({depositName,depositNameValid})}
@@ -460,10 +461,10 @@ class SendTokens extends T.Any {
 		return <div>
 			<h2>SEND</h2>
 			<p>This form allows you to spend funds from your wallet. Always double check your destination address!</p>
-				<T.If v={1}><div style={{maxWidth:"482px"}}><T.Form handler={this}>
+				<div style={{maxWidth:"482px"}}><T.Form handler={this}>
 					<T.Input.TxAdr
 						name="to" placeholder="Send to" inputGroupCls="border4sides"
-						onChange={this.onTo.bind(this)} value={s.to||""} required
+						onChange={this.onTo.bind(this)} value={s.to||""} required m={m}
 					/>
 					<div className="d-flex">
 						<T.Select
@@ -517,7 +518,7 @@ class SendTokens extends T.Any {
 							text="REVIEW"
 						/>
 					</div>
-				</T.Form></div></T.If>
+				</T.Form></div>
 		</div>;
 	}
 	onSubmit() {

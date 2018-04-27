@@ -135,17 +135,19 @@ class PageSettings extends T.Page {
 						inputGroupCls="border4sides" placeholder="Repeat new password" autocomplete="off"
 					/>
 					{this.form && this.form.renderServerError()}
+					<T.If v={s.passwordChanged && !s.serverError}>
+						<p>
+							Password changed.
+						</p>
+					</T.If>
+					<div className="d-flex justify-content-center mt-4">
+						<T.Form.SubmitButton
+							clsColor="btn-primary" cls="btn-lg"
+							canSubmit={s.canSubmitPassword && !s.serverError && !s.passwordChanged} fetching={s.fetching}
+							text="Save changes"
+						/>
+					</div>
 				</div>
-				<T.If v={s.passwordChanged && !s.serverError}>
-					<p>
-						Password changed.
-					</p>
-				</T.If>
-				<T.Form.SubmitButton
-					clsColor="btn-primary" cls="btn-lg"
-					canSubmit={s.canSubmitPassword && !s.serverError && !s.passwordChanged} fetching={s.fetching}
-					text="Save changes"
-				/>
 			</T.Form>
 		</div>
 	}
@@ -216,9 +218,9 @@ class Disable2FA extends T.Any {
 			</p>
 			<p>
 				<T.If v={s.wasEnable}><span>
-					You can change the 2FA method by
+					You can change the 2FA method {"by "}
 					<T.If v={ok}><span className="text-muted">
-						{" ✔"}&nbsp;first disabling the current one
+						✔&nbsp;first disabling the current one
 					</span></T.If>
 					<T.If v={!ok}><span>
 						first disabling the current one

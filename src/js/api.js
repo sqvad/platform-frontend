@@ -300,7 +300,8 @@ class Api {
 	requestCodeToVerifyEmail(email) {
 		return (email?Promise.resolve():this.getAuthData()).then(()=>{
 			return this._fetchPOST(`/register/email/verify/code`, {
-				email: email || this.model.auth.email
+				email: email || this.model.auth.email,
+				verificationEndpoint: this.hrefForEmail("/verify-email/%s"),
 			});
 		});
 	}

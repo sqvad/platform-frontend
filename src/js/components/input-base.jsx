@@ -37,7 +37,8 @@ class Input extends Any {
 			onChange={this.onChange.bind(this)}
 			onFocus={this.onFocus.bind(this)}
 			onBlur={this.onBlur.bind(this)}
-			ref={(el=>this.node=el)} />;
+			ref={(el=>this.node=el)}
+			style={p.inputStyle} />;
 		var hintWrapped = p.hintWrapped ? hint : <span className="input-hint">{hint}</span>;
 		return <label className={inputGroupCls}>
 			{input}
@@ -152,23 +153,24 @@ Input.propTypes = {
 	onBlur: Any.PropTypes.func,
 	regexp: Any.PropTypes.instanceOf(RegExp),
 	regexpRemove: Any.PropTypes.oneOfType([
-	Any.PropTypes.oneOfType([
-		Any.PropTypes.instanceOf(RegExp),
-		Any.PropTypes.shape({
-			r: Any.PropTypes.instanceOf(RegExp),
-			v: Any.PropTypes.string,
-		})
-	]),
-	Any.PropTypes.arrayOf(
 		Any.PropTypes.oneOfType([
 			Any.PropTypes.instanceOf(RegExp),
 			Any.PropTypes.shape({
 				r: Any.PropTypes.instanceOf(RegExp),
 				v: Any.PropTypes.string,
 			})
-		])
-	),
-]),
+		]),
+		Any.PropTypes.arrayOf(
+			Any.PropTypes.oneOfType([
+				Any.PropTypes.instanceOf(RegExp),
+				Any.PropTypes.shape({
+					r: Any.PropTypes.instanceOf(RegExp),
+					v: Any.PropTypes.string,
+				})
+			])
+		),
+	]),
+	inputStyle: Any.PropTypes.object,
 };
 
 export default Input;
