@@ -18,14 +18,14 @@ class PageSettings extends T.Page {
 		if (!_s.tab) {
 			// _s.tab = "general";
 			// _s.tab = "changePassword";
-			_s.tab = "2faDisable";
+			// _s.tab = "2faDisable";
 			// _s.tab = "2faRecover";
 		}
 		return this._render(_p,_s,c,_m);
 	}
 	_render(p,s,c,m) {
 		var tab = s.tab || "general";
-		var tab = s.tab || "2faRecover";
+		// var tab = s.tab || "2faRecover";
 		return <T.Page.PageWrapDevice m={m} pagePostfix="wallet">
 			<T.Page.PageWrapProfile key="header" m={m} header="left" {...s}>
 				<T.Page.PageWrapProfileLeft>
@@ -61,7 +61,7 @@ class PageSettings extends T.Page {
 							>Recover 2FA</div>
 						</div>
 					</T.Page.PageWrapProfileWidth>
-					<div style={{background:"#f3f5fa",flex:1}}>
+					<div style={{background:"#f3f5fa",flex:1,paddingBottom:"15px"}}>
 						<T.Page.PageWrapProfileWidth skipLogo>
 							<div style={{paddingTop:"30px"}}>
 								{tab=="general"? this.render_general(p,s,c,m) :null}
@@ -71,7 +71,6 @@ class PageSettings extends T.Page {
 							</div>
 						</T.Page.PageWrapProfileWidth>
 					</div>
-					<br /><br />
 				</div>
 			</T.Page.PageWrapProfile>
 		</T.Page.PageWrapDevice>;
