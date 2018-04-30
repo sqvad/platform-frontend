@@ -23,7 +23,8 @@
 		"etherscanPrefix": {
 			"ETHEREUM_TEST": "https://ropsten.etherscan.io/",
 			"default": "https://etherscan.io/"
-		}
+		},
+		"checkNewBlockEachSeconds": -15
 	},
 	"classicCurrencies": {
 	    "USD": {"text":"USD"},

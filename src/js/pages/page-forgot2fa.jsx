@@ -65,7 +65,7 @@ class PageForgot2FA extends T.Page {
 			return ret;
 		});
 		return <div>
-			<h1 className="h1-center mt-5">CONFIRM YOUR REQUEST</h1>
+			<h1 className="h1-center mt-5">{p.h1||"CONFIRM YOUR REQUEST"}</h1>
 			<p className="text-center">
 				Take a high quality photo of yourself holding your ID document and a handwritten note:
 				<br /><br />

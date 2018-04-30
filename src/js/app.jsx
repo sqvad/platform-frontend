@@ -78,6 +78,14 @@ class App extends React.Component {
 			this.needChange = false;
 			this.forceUpdate();
 		}
+		var m = this.props.m;
+		if (m) {
+			var at = m.currentBlockNumberAt;
+			var duration = (m.settings.misc.checkNewBlockEachSeconds||0)*1000;
+			if (at && duration>0 && (Date.now() - at > duration)) {
+				this.api.getCurrentBlockNumber();
+			}
+		}
 		requestAnimationFrame(()=>this.onRAF());
 	}
 	render() {

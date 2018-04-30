@@ -459,11 +459,11 @@ class SendTokens extends T.Any {
 		var inUsd = null;
 		var hint = null;
 		if (wallet) {
-			var inUsd = T.Currency.asText(p,false,true,s.currency,s.amount);
 			if (s.amount) {
+				// inUsd = T.Currency.asText(p,false,true,s.currency,s.amount);
 				commission = (new BigNumber(s.amount||0)).mul( new BigNumber(commissionRate).div(100) );
 				amountWithComission = (new BigNumber(s.amount||0)).plus(commission);
-				var inUsd = T.Currency.asText(p,false,true,s.currency,amountWithComission);
+				inUsd = T.Currency.asText(p,false,true,s.currency,amountWithComission);
 				amountWithComission = T.Currency.asText(
 					p,
 					false,false,wallet.symbol,
@@ -477,6 +477,7 @@ class SendTokens extends T.Any {
 					<span style={{color:"#333"}}>{inUsd}</span>
 					)
 				</span>;
+			} else {
 			}
 		}
 		var max = T.Currency.maxNoWei(m,wallet);
@@ -751,6 +752,7 @@ class TransactionsTable extends T.Any {
 	}
 	load() {
 		this.setState({loading:true});
+		this.props.m.api.getCurrentBlockNumber();
 		var wallet = this.props.m.user.wallets.filter(v=>v.symbol==this.props.walletId)[0];
 		this.props.m.api.getTransactions(wallet.tokenContractAddress)
 		.then(transactions=>{
@@ -772,7 +774,7 @@ class TransactionsTable extends T.Any {
 		</div>;
 	}
 	render(p,s,c,m) {
-		if (s.loading) {
+		if (s.loading || !m.currentBlockNumber) {
 			return this.render_loading(p,s,c,m);
 		}
 		var wallet = this.props.m.user.wallets.filter(v=>v.symbol==this.props.walletId)[0];
@@ -792,6 +794,13 @@ class TransactionsTable extends T.Any {
 				return <div key={i}>
 					<h3><T.Date onlyDate v={new Date(transactions[0].executeDate || transactions[0].createDate)} mutes={{y:1}} /></h3>
 					{transactions.map((v,i)=>{
+						var confirmations = "n/a";
+						if (v.ethereumBlockNumber && m.currentBlockNumber) {
+							confirmations = (new BigNumber(v.ethereumBlockNumber)).minus(m.currentBlockNumber).toFormat();
+							confirmations = (new BigNumber(m.currentBlockNumber)).minus(
+								new BigNumber(v.ethereumBlockNumber)
+							).toFormat();
+						}
 						var opened = (s.openedTransactions||{})[""+v.id];
 						var descIsSmall = (v.comment || "").length < 100;
 						var tx, isSystemId;// = tx in v ? v.tx || v.address
@@ -863,12 +872,12 @@ class TransactionsTable extends T.Any {
 											</T.If>
 										</div>
 										{
-											descIsSmall?null:
-											v.confirmations&&<span>
+											descIsSmall?null
+											:<span>
 												<br />
 												<i>Confirmations</i>
 												<br />
-												{v.confirmations}
+												{confirmations}
 											</span>
 										}
 										<T.If v={v.address}><span>
@@ -879,10 +888,10 @@ class TransactionsTable extends T.Any {
 											{"  "}
 										</span></T.If>
 									</div>
-									{descIsSmall?v.confirmations&&<div className="transaction-details-field">
+									{descIsSmall?confirmations&&<div className="transaction-details-field">
 										<i>Confirmations</i>
 										<br />
-										{v.confirmations}
+										{confirmations}
 									</div>:null}
 									<div className={"transaction-details-field"} style={{flex:1,marginRight:"0"}}>
 										<i>Description</i>

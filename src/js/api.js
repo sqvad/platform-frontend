@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js';
+
 class Api {
 	constructor(model) {
 		this.model = model;
@@ -222,6 +224,10 @@ class Api {
             this.model.env = ret;
 			this.model.emit('change');
 		}
+		if (cmd.indexOf('system/ethereum/block/number')>-1) {
+            this.model.currentBlockNumber = new BigNumber(ret.blockNumber);
+			this.model.emit('change');
+		}
 		return ret;
 	}
 	_fetch_afterCheck(method, path, params, check, ifFirstCheckIsFalsy, beforeFetch) {
@@ -317,6 +323,10 @@ class Api {
 				verificationEndpoint: this.hrefForEmail("/verify-email/%s"),
 			});
 		});
+	}
+	getCurrentBlockNumber(email) {
+		this.model.currentBlockNumberAt = Date.now();
+		return this._fetchGET('/system/ethereum/block/number');
 	}
 	isEmailAvailable(email) {
 		return this._fetchPOST('/system/check/email/availability', {email}).then(x=>{

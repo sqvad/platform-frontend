@@ -59,7 +59,7 @@ class PageSettings extends T.Page {
 							<div
 								className={"btn "+(tab=="2faRecover"? "btn-secondary active":" btn-outline-secondary")}
 								onClick={()=>{this.setState({tab:"2faRecover"})}} style={{marginTop:m.device.isMobile?"-1px":""}}
-							>Change 2FA</div>
+							>Reset 2FA</div>
 						</div>
 					</T.Page.PageWrapProfileWidth>
 					<div style={{background:"#f3f5fa",flex:1,paddingBottom:"15px"}}>
