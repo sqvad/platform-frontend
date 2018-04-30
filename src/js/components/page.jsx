@@ -1,6 +1,7 @@
 import React from 'react';
 import Any from '../any.jsx';
 import Headers from './headers.jsx';
+import Form from './form.jsx';
 
 class Page extends Any {
 	render(p,s,c,m) {
@@ -74,6 +75,102 @@ class PageWrapProfileWidth extends Any {
 		</div>;
 	}
 }
+
+class NotificationVerifyEmail extends Any {
+	constructor(props) {
+		super(props);
+		if (props.m.path.contains["verify-email"]) {
+			var codeViaURL = props.m.path.order[2];// /verify-email/r6OKtPg9kYYgm-h-qyOsO7sQ1GGOqUqWBpPvZkRBj6Z
+		}
+		if (codeViaURL) {
+			this.setState({codeSending:true,codeSent:false,codeError:null});
+			props.m.api.verifyEmail(codeViaURL)
+			.then(x=>{
+				this.setState({codeSending:false,codeSent:true});
+				this.props.m.api.gotoHref("/");
+				this.props.m.api.getAuthData()
+				.then(()=>{
+					window.location.reload();
+				});
+			})
+			.catch(x=>{
+				this.setState({codeSending:false,codeSent:false,codeError:x});
+			});
+		}
+		// this.setState({codeError:{message:"Wrong code"}});
+	}
+	render(p,s,c,m) {
+		var checkoutEmail = false;
+		if (m.auth) {
+			var auth = m.auth;
+			if (!auth.email) return null;
+			if (auth.emailVerified) return null;
+			checkoutEmail = true;
+		} else {
+			return null;
+		}
+		if (s.codeSent) return;
+		var sendOtherCode = null;
+		if (!s.codeSending || !s.againSending || !(m.auth||{emailVerificationSent:true}).emailVerificationSent) {
+			sendOtherCode = <button
+				className="btn btn-sm btn-outline-primary ml-2"
+				style={{
+					paddingTop: "0px",
+					paddingBottom: "0px",
+					background: "rgba(255,255,255,.1)",
+					color: "white",
+					borderColor: "white",
+				}}
+				onClick={this.sendAgain.bind(this)}
+			>send other code</button>;
+		}
+		if (s.codeSent) {
+			sendOtherCode = <button
+				className="btn btn-sm btn-outline-primary ml-2"
+				style={{
+					paddingTop: "0px",
+					paddingBottom: "0px",
+					background: "rgba(255,255,255,.1)",
+					color: "white",
+					borderColor: "white",
+				}}
+				onClick={()=>window.location.href.reload()}
+			>reload page</button>;
+		}
+		var text = null;
+		if (checkoutEmail || s.codeSent || s.againSent) {
+			text = <span>Sent! Please, check out your email.</span>;
+		}
+		if (s.codeSending || s.againSending) {
+			text = <span>Sending...</span>;
+		}
+		if (s.codeError || s.againEr) {
+			text = <div style={{marginTop:"-0.5em",marginBottom:"-1em"}}>
+				<Form.ServerError serverError={s.againEr || s.codeError} />
+			</div>
+		}
+		if (!text) return null;
+		return <div className="notification">
+			<div style={{marginBottom:"0.5em"}}>
+				<b>Verify email</b> {sendOtherCode}
+			</div>
+			{text}
+		</div>;
+	}
+	sendAgain() {
+		var p = this.props;
+		this.setState({againSending:true,againSent:false,againEr:null,codeError:null});
+		p.m.api.requestCodeToVerifyEmail()
+		.then(()=>{
+			this.setState({againSending:false,againSent:true});
+		})
+		.catch(er=>{
+			this.setState({againSending:false,againSent:false,againEr:er});
+		});
+	}
+}
+
+Page.NotificationVerifyEmail = NotificationVerifyEmail;
 
 Page.PageWrapWidth = PageWrapWidth;
 Page.PageWrapHeader = PageWrapHeader;

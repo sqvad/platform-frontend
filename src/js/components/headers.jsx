@@ -52,9 +52,9 @@ class HeaderButtons extends Any {
 				<Logout {...p} />
 			</div>;
 		} else if (authData.signedInEmail) {
+			// !userData && authData.email && !m.device.isMobile?<span className="d-block mr-3 pt-2 pb-2">{authData.email}</span>:null
 			return <div className="d-flex align-items-center" style={valign}>
 				{userData?<span className="d-block mr-3 pt-2 pb-2 text-uppercase">{userData.firstName} {userData.lastName}</span>:null}
-				{!userData && authData.email && !m.device.isMobile?<span className="d-block mr-3 pt-2 pb-2">{authData.email}</span>:null}
 				<Logout {...p} />
 			</div>;
 		} else {

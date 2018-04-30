@@ -156,16 +156,18 @@ class Api {
 				return v;
 			});
 		}
-		if (cmd=='POST/wallet/transactions/list') {
+		if (cmd.indexOf('GET/wallet/list')>-1) {
             ret.forEach(v=>{
-                if (v.name==v.symbol) {
+                if (v.name=="") {
                     v.name = [
                         this.model.settings.misc.myETHwallet_prefix,
-                        v.name,
+                        v.symbol,
                         this.model.settings.misc.myETHwallet_postfix,
-                    ].map(v=>!!v).join("");
+                    ].filter(v=>!!v).join("");
                 }
             });
+		}
+		if (cmd=='POST/wallet/transactions/list') {
         }
 		return ret;
 	}
@@ -209,7 +211,15 @@ class Api {
 		}
 		if (cmd.indexOf('/wallet/list')>-1) {
             this.model.user = this.model.user || {};
+            // ret.forEach(v=>{
+			// 	v.balance = "1000000000000000";
+			// 	v.commissionRate = 10;
+			// });
             this.model.user.wallets = ret;
+			this.model.emit('change');
+		}
+		if (cmd.indexOf('system/environment/type')>-1) {
+            this.model.env = ret;
 			this.model.emit('change');
 		}
 		return ret;
@@ -260,6 +270,9 @@ class Api {
 			useHash?"#":"",
 			href
 		].filter(v=>!!v).join("");
+	}
+	getEnv() {
+		return this._fetchGET("/system/environment/type");
 	}
     logout() {
         try {
@@ -442,6 +455,12 @@ class Api {
 			formData.append('requestData', v);
 		});
 		return this._fetchPOST('/system/totp/reset/send',formData);
+	}
+	totpResetRequest(passwordOrOldTopt) {
+		return this._fetchPOST('/user/totp/reset/request',{confirmationCode:passwordOrOldTopt});
+	}
+	totpResetConfirm(code) {
+		return this._fetchPOST('/user/totp/reset/confirm',{code});
 	}
 	withdraw(comment,confirmationCode,sum,toAddress,tokenContractAddress) {
 		return this._fetchPOST('/wallet/transactions/withdraw',{

@@ -27,7 +27,6 @@
 	background-size: 424px 182px;
 	background-image: url(../img/header-medium-mobile-1-1x.jpg);
 	background-position-y: 53px;
-	background-color: #36304a;
 }
 .retina-2.mobile .header-medium {
 	background-image: url(../img/header-medium-mobile-1-2x.jpg);
@@ -690,4 +689,19 @@
 }
 .upload-a-photo-list-no-previews + .upload-a-photo, .upload-a-photo-list-previews + .upload-a-photo {
 	margin-top: -150px;
+}
+
+.notification {
+	position: fixed;
+	right: 10px;
+	bottom: 10px;
+	background: #38334b;
+	color: #b7b1cd;
+	padding: 10px 15px;
+}
+.notification b {
+	color: white;
+}
+.notification .server-errors {
+	color: #ffb0b0;
 }

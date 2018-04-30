@@ -33,6 +33,7 @@ class App extends React.Component {
 		if (!this.props.m.settings.misc.showPagesList) {
 			this.api.getAuthData();
 		}
+		this.api.getEnv();
 		this.api.getUserData(false);
 		this.api.getDefaultClassicCurrency();
 		this.onRAF();

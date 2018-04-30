@@ -1,6 +1,6 @@
 import React from 'react';
 import T from '../tags.jsx';
-
+import BigNumber from 'bignumber.js';
 
 class PageWallets extends T.Page {
 	constructor(props) {
@@ -198,6 +198,7 @@ class Receiver extends T.Any {
 	}
 	render(p,s,c,m) {
 		var wallet = p.m.user.wallets.filter(v=>v.symbol==p.walletId)[0];
+		if (s.depositAdr!=s.qrDataUrlVia) return <h2>Loading...</h2>;
 		return <div>
 			<h2>RECEIVE</h2>
 			<h3>RECEIVING ADDRESS</h3>
@@ -208,9 +209,11 @@ class Receiver extends T.Any {
 				}}
 				className={"d-flex align-items-center"+(m.device.isMobile?" flex-column":" justify-content-stretch")}
 			>
-				<T.A external m={m} href={T.TX.href(p.m, true, s.depositAdr||"n/a")}>
-					<img src={s.qrDataUrl} width="228" height="228" alt={s.qrDataUrl?"QR code is loading...":"QR code for "+ s.depositAdr} />
-				</T.A>
+				<T.If v={s.depositAdr==s.qrDataUrlVia}>
+					<T.A external m={m} href={T.TX.href(p.m, true, s.depositAdr||"n/a")}>
+						<img src={s.qrDataUrl} width="228" height="228" alt={s.qrDataUrl?"QR code is loading...":"QR code for "+ s.depositAdr} />
+					</T.A>
+				</T.If>
 				<div
 					className={(m.device.isMobile?" d-flex flex-column align-items-center":"")}
 					style={{
@@ -312,8 +315,11 @@ class Receiver extends T.Any {
 		var p = this.props;
 		var s = this.state||{};
 		if (typeof qrcodelib != typeof undefined) {
-			qrcodelib.toDataURL(T.TX.href(p.m, true, s.depositAdr||"n/a"), (err, url)=>{
-				this.setState({qrDataUrl:url},()=>{this.forceUpdate()});
+			var depositAdr = s.depositAdr;
+			this.setState({qrDataUrlVia:"noup",qrDataUrl:""},()=>{
+				qrcodelib.toDataURL(T.TX.href(p.m, true, depositAdr||"n/a"), (err, url)=>{
+					this.setState({qrDataUrl:url,qrDataUrlVia:depositAdr||"noup"},()=>{this.forceUpdate()});
+				});
 			});
 		}
 	}
@@ -443,20 +449,41 @@ class SendTokens extends T.Any {
 	}
 	render_form(p,s,c,m) {
 		var wallet = m.user.wallets.filter(v=>v.symbol==s.currency)[0];
+		var useComission = !!wallet.commissionRate;
+		var commissionRate = useComission ? wallet.commissionRate : 0;
+		var commission = new BigNumber(0);
+		var amountWithComission = new BigNumber(0);
+		var commissionMax = 0;
 		// wallet = JSON.parse(JSON.stringify(wallet));
 		// wallet.balance = 12345 * Math.pow(10,wallet.format*1) +'';
 		var inUsd = null;
+		var hint = null;
 		if (wallet) {
 			var inUsd = T.Currency.asText(p,false,true,s.currency,s.amount);
-			var inWei = "";
 			if (s.amount) {
-				inWei = T.Currency.coin2wei(s.amount||0, wallet.format) + "wei";
-				inWei = T.Currency._2number(T.Currency.coin2wei(s.amount||0, wallet.format), true) + "wei";
+				commission = (new BigNumber(s.amount||0)).mul( new BigNumber(commissionRate).div(100) );
+				amountWithComission = (new BigNumber(s.amount||0)).plus(commission);
+				var inUsd = T.Currency.asText(p,false,true,s.currency,amountWithComission);
+				amountWithComission = T.Currency.asText(
+					p,
+					false,false,wallet.symbol,
+					amountWithComission
+				);
+				hint = <span className="input-hint">
+					+{commissionRate}% INS withdrawal fee
+					<br />
+					= <span style={{color:"#333"}}>{amountWithComission}</span>
+					{" ("}
+					<span style={{color:"#333"}}>{inUsd}</span>
+					)
+				</span>;
 			}
-			// inUsd = [inUsd, inWei].filter(v=>!!v).join(" ");
-			inUsd = [inUsd].filter(v=>!!v).join(" ");
 		}
 		var max = T.Currency.maxNoWei(m,wallet);
+		if (useComission) {
+			commissionMax = max.mul( new BigNumber(commissionRate).div(100) );
+			max = max.minus(commissionMax);
+		}
 		var maxIsZero = max.isZero();
 		return <div>
 			<h2>SEND</h2>
@@ -473,14 +500,19 @@ class SendTokens extends T.Any {
 							required onChange={this.onCurrency.bind(this)} value={s.currency}
 							options={
 								m.user.wallets.map(v=>{
-									return {value:v.symbol,title:v.symbol +" - "+ v.name};
+									var name = v.name;
+									return {
+										value:v.symbol,
+										title:v.symbol +" - "+ name
+									};
 								})
 							}
 						/>
 						<T.Input.Float
 							bn min={0} aboveMin={true} max={max} belowMax={false} required
 							onChange={this.onAmount.bind(this)} value={wallet ? s.amount : ""}
-							hint={maxIsZero ? "Low funds" : s.amountValid ? inUsd : null}
+							hint={maxIsZero ? "Low funds" : s.amountValid ? hint : null}
+							hintWrapped={!maxIsZero && s.amountValid && !!hint}
 							placeholder="Amount" autocomplete="off" inputGroupCls="border4sides"
 						/>
 					</div>
@@ -557,6 +589,11 @@ class SendTokens extends T.Any {
 		this.setState({note})
 	}
 	render_review(p,s,c,m) {
+		var wallet = m.user.wallets.filter(v=>v.symbol==s.currency)[0];
+		var useComission = !!wallet.commissionRate;
+		var commissionRate = useComission ? wallet.commissionRate : 0;
+		var commission = (new BigNumber(s.amount||0)).mul( new BigNumber(commissionRate).div(100) );
+		var amountWithComission = (new BigNumber(s.amount||0)).plus(commission);
 		return <div>
 			<div style={{maxWidth:"548px"}}>
 				<h2>REVIEW YOUR TRANSACTION</h2>
@@ -565,9 +602,12 @@ class SendTokens extends T.Any {
 						You are about to send the following transaction:
 						<br />
 						<b><T.Currency {...p} id={s.currency} isWei={false} value={s.amount} /></b> to <b>{s.to}</b>
+						<br />
+						<b><T.Currency {...p} id={s.currency} isWei={false} value={commission} /></b>
+						{" "+commissionRate}% INS withdrawal fee
 					</div>
 					<div style={{borderTop: "1px solid #e5e6e7", paddingTop:"15px", marginTop:"15px"}}>
-						<b><T.Currency {...p} id={s.currency} isWei={false} value={s.amount} /></b> in total.
+						<b><T.Currency {...p} id={s.currency} isWei={false} value={amountWithComission} /></b> in total.
 						<div className="mt-4">
 							<button type="button"
 								className={[
@@ -771,8 +811,9 @@ class TransactionsTable extends T.Any {
 						}
 						var isPositive = T.Currency.isPositive(v, true);
 						var colorCls = isPositive===false ? "red" : isPositive ? "green" : "" ;
-						return <div key={"-"+i} className={"transaction-container" + (opened?" opened":" closed")}
-						>
+						return <div key={"-"+i}
+							data-id={v.id}
+							className={"transaction-container" + (opened?" opened":" closed")}>
 							<div className={"transaction-header d-flex"+(m.device.isMobile?" justify-content-between":"")}
 								onClick={()=>{
 									var t = JSON.parse(JSON.stringify(s.openedTransactions||{}));
@@ -803,8 +844,8 @@ class TransactionsTable extends T.Any {
 									</div>
 								</T.If>
 							</div>
-							{opened?
-								<div className={"transaction-details d-flex"+(m.device.isMobile?" flex-column":"")}>
+							{opened
+							?<div className={"transaction-details d-flex"+(m.device.isMobile?" flex-column":"")}>
 									<T.If v={m.device.isMobile}>
 										<div className="transaction-details-field">
 											<i><T.Date onlyTime v={new Date(v.date || v.executeDate || v.createDate)} /></i>
@@ -835,6 +876,7 @@ class TransactionsTable extends T.Any {
 											<i>Address</i>
 											<br />
 											<T.TX isAdr tx={v.address} fullAdrOnDesktop={descIsSmall} fullAdr={!m.device.isMobile} {...p} />
+											{"  "}
 										</span></T.If>
 									</div>
 									{descIsSmall?v.confirmations&&<div className="transaction-details-field">

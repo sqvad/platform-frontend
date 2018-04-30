@@ -223,6 +223,7 @@ class PageSignUp_page1 extends T.Page {
 					</div>
 				</T.Form>
 			</T.Page.PageWrapWidth>
+			<T.Page.NotificationVerifyEmail {...p} />
 		</T.Page.PageWrapDevice>;
 	}
 	checkValid() {
@@ -365,6 +366,7 @@ class PageSignUp_page2 extends T.Page {
 					</div>
 				</T.Form>
 			</T.Page.PageWrapWidth>
+			<T.Page.NotificationVerifyEmail {...p} />
 		</T.Page.PageWrapDevice>;
 	}
 	onSubmit() {

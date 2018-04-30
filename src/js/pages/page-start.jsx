@@ -24,28 +24,22 @@ class PageStart extends T.Page {
 			m.api.gotoHref(T.A.href({href:"/start"},m));
 		}
 		if (auth.signedIn) {
-			debugger;
 			m.api.gotoHref(T.A.href({href:"/"},m));
 			return <div></div>;
 		}
 		if (auth.canSignIn) return <PageSignIn {...p} {...s} />;
-        if (!auth.emailVerified) return <PageVerifyEmail {...p} {...s} />;
-		if (!auth.totpSecretKeyConfirmed) return <PageSet2FA {...p} {...s} />;
-		/*
-		if (auth && auth.emailVerified && m.path.contains["verify-email"]) {
-			m.api.gotoHref(T.A.href({href:"/start"},m));
-		}
-        if (!auth || !auth.emailVerified) {
-			if (auth && (auth.emailVerificationSent || auth.emailLastCodeSentAt)) {
+        // if (!auth.emailVerified) return <PageVerifyEmail {...p} {...s} />;
+        if (!auth.emailVerified) {
+			return <PageVerifyEmail {...p} {...s} />;
+			if (auth.is2FAOn) {
+				return <PageSet2FA {...p} {...s} />;
+			} else if (auth.canSignIn) {
+				return <PageSignIn {...p} {...s} />;
+			} else {
 				return <PageVerifyEmail {...p} {...s} />;
 			}
-            return <PageSignUp {...p} {...s} />;
-        }
-        if (auth && m.auth.emailVerified && !m.auth.totpSecretKeyConfirmed) {
-            return <PageSet2FA {...p} {...s} />;
-        }
-        return <PageSignIn {...p} {...s} />;
-		*/
+		}
+		if (!auth.totpSecretKeyConfirmed) return <PageSet2FA {...p} {...s} />;
     }
 }
 

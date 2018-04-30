@@ -22,7 +22,8 @@ TX.href = function(m,isAdr,tx) {
 	// https://ropsten.etherscan.io/address/0xBA46454801BBFB741FFc6Addf58dc6C2cC061FD7
 	// var prefix =
 	// var prefix = m.settings.misc["@server@isTestnet"] || 1 ? m.settings.misc.testnetEtherscanPrefix : m.settings.misc.mainnetEtherscanPrefix;
-	var prefix = "https://etherscan.io/";
+	var src = m.settings.misc.etherscanPrefix;
+	var prefix = src[m.env] || src["default"];
 	if (isAdr) {
 		return prefix+"address/"+tx;
 	} else {

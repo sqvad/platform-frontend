@@ -1,6 +1,7 @@
 import React from 'react';
 import T from '../tags.jsx';
 import PageWallets from './page-wallets.jsx';
+import PageForgot2FA from './page-forgot2fa.jsx';
 
 class PageSettings extends T.Page {
 	constructor(props) {
@@ -58,7 +59,7 @@ class PageSettings extends T.Page {
 							<div
 								className={"btn "+(tab=="2faRecover"? "btn-secondary active":" btn-outline-secondary")}
 								onClick={()=>{this.setState({tab:"2faRecover"})}} style={{marginTop:m.device.isMobile?"-1px":""}}
-							>Recover 2FA</div>
+							>Change 2FA</div>
 						</div>
 					</T.Page.PageWrapProfileWidth>
 					<div style={{background:"#f3f5fa",flex:1,paddingBottom:"15px"}}>
@@ -332,9 +333,11 @@ class Disable2FA extends T.Any {
 class Recover2FA extends T.Any {
 	constructor(props) {
 		super(props);
-		this.setState({wasEnable:props.m.auth.is2FAOn});
+		// this.setState({wasEnable:props.m.auth.is2FAOn});
+		// props.m.api.loadLib_qrcode();
 	}
 	render(p,s,c,m) {
+		return <PageForgot2FA {...p} onlyContent={true} />;
 		var country = (m && m.user && m.user.country || "us").toLowerCase();
 		return <div style={{maxWidth:"550px"}}>
 			<h2>2-FACTOR AUTHENTICATION</h2>
@@ -346,19 +349,31 @@ class Recover2FA extends T.Any {
 			<p>
 				Authentication apps we can recommend are:
 			</p>
-			<div className="d-flex align-items-space-between justify-content-between apps-block">
+			<div
+				className={[
+				"d-flex justify-content-between apps-block",
+				m.device.isMobile ? "flex-column align-items-center" : " align-items-space-between"
+			].filter(v=>!!v).join(" ")}>
 				<div className="app-block">
-					<div style={{width:"95%"}}>
+					<div style={{
+						width: m.device.isMobile ? "" : "95%"
+					}}>
 						<img src="/img/set2fa-ga.png" width="49" height="55" style={{borderBottom:"6px solid transparent"}}/>
 					</div>
-					<b style={{display:"block",textAlign:"left"}}>Google Authenticator</b>
-					<span style={{display:"block",textAlign:"left"}}>
+					<b style={{
+						display: "block",
+						textAlign: m.device.isMobile ? "" : "left"
+					}}>Google Authenticator</b>
+					<span style={{
+						display:"block",
+						textAlign: m.device.isMobile ? "" : "left"
+					}}>
 						<T.A href={"https://itunes.apple.com/"+country+"/app/google-authenticator/id388497605"} external className="mr-1">App Store</T.A>
 						<T.A href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" external className="ml-1">Google Play</T.A>
 					</span>
 				</div>
 				<div className="app-block">
-					<T.A href="https://authy.com/" external><img src="/img/set2fa-authy.png" width="49" height="55" style={{borderBottom:"6px solid transparent"}}/></T.A>
+					<img src="/img/set2fa-authy.png" width="49" height="55" style={{borderBottom:"6px solid transparent"}}/>
 					<br />
 					<b>Authy</b>
 					<br />
@@ -368,7 +383,7 @@ class Recover2FA extends T.Any {
 					</span>
 				</div>
 				<div className="app-block">
-					<T.A href="https://duo.com/" external><img src="/img/set2fa-duo.png" width="49" height="55" style={{borderBottom:"6px solid transparent"}}/></T.A>
+					<img src="/img/set2fa-duo.png" width="49" height="55" style={{borderBottom:"6px solid transparent"}}/>
 					<br />
 					<b>Duo Mobile</b>
 					<br />
@@ -378,44 +393,114 @@ class Recover2FA extends T.Any {
 					</span>
 				</div>
 			</div>
-			<div style={{marginTop:"36px"}}>
-				<T.Form onSubmit={()=>{}}>
-					<button type="submit"
-						className={[
-							"btn btn-lg btn-primary",
-						].join(" ")}
-						onClick={this.generateKey.bind(this)}
-					>
-						Generate key
-					</button>
-				</T.Form>
-			</div>
-			<div style={{maxWidth:"606px"}}>
-				<div style={{border:"1px solid #e5e6e7", background:"white", padding:"29px"}}>
-					Add a new account at authentication app and scan the QR-code or enter the key below manually.
-					<br /><br />
-					Save the code below:<br />
-					<b>ZSQS6TWCQRTXPRVL</b>
-					<br /><br />
-					Enter this key:<br />
-					<b>NZZUI4ZIPI5SS2CAERWVESRDOVQXK32U</b>
-					<br /><br />
-					<span style={{position:"relative",zIndex:2}}>
-						QR-code:<br />
-					</span>
-					<img src="./img/qr-test.png" width="164" height="164" style={{marginLeft:"-16px",marginTop:"-5px"}}/>
+			<T.If v={!s.newKey}>
+				<div style={{marginTop:"36px"}}>
+					<T.Form onSubmit={()=>{}}>
+						<button type="submit"
+							className={[
+								"btn btn-lg btn-primary",
+								s.showPutOldCodePopup || s.loading ? "disabled" : "",
+							].filter(v=>!!v).join(" ")}
+							onClick={()=>this.setState({showPutOldCodePopup:true})}
+							disabled={s.showPutOldCodePopup || s.loading}
+						>
+							Generate key
+						</button>
+					</T.Form>
 				</div>
-			</div>
+			</T.If>
+			<T.If v={s.showPutOldCodePopup}>
+				<div>
+					<T.Popup.Confirm
+						{...p}
+						makePromise={confirmInfo=>{
+							var s = this.state;
+							this.setState({loading:true});
+							return p.m.api.totpResetRequest(confirmInfo.value)
+							.then(x=>{
+								var newKey = x.newSecretKey;
+								return p.m.api.loadLib_qrcode()
+								.then(()=>{
+									var host = p.m.settings.api.totpDomain;
+									if (host=='window.location.hostname') {
+										host = window.location.hostname;
+									}
+									var gaLink = 'otpauth://totp/'+host+':'+p.m.auth.email+'?secret='+newKey+'&issuer='+host+'&algorithm=SHA1&digits=6&period=30';
+									qrcodelib.toDataURL(gaLink, (err, url)=>{
+										this.setState({loading:false,showPutOldCodePopup:false,qrDataUrl:url,newKey,gaLink});
+									});
+									return x;
+								});
+							});
+						}}
+						catchPromise={er=>{
+							this.setState({loading:false,showPutOldCodePopup:false});
+						}}
+						onClose={()=>this.setState({loading:false,showPutOldCodePopup:false})}
+					/>
+				</div>
+			</T.If>
+			<T.If v={!s.changed && s.newKey}>
+				<div style={{maxWidth:"606px"}} className="mt-4">
+					<div style={{border:"1px solid #e5e6e7", background:"white", padding:"29px"}}>
+						Add a new account at authentication app and scan the QR-code or enter the key below manually.
+						<br /><br />
+						Enter this key:{" "}
+						<b><T.A m={m} href={s.gaLink} external>{s.newKey}</T.A></b>
+						<br /><br />
+						<span style={{position:"relative",zIndex:2}}>
+							QR-code:<br />
+						</span>
+						<T.A m={m} href={s.gaLink} external>
+							<T.If v={p.m.device.isMobile}>
+								<img src={s.qrDataUrl} width="212" height="212" alt={s.qrDataUrl?"QR code is loading...":"QR code for "+ s.gaLink} />
+							</T.If>
+							<T.If v={!p.m.device.isMobile}>
+								<img src={s.qrDataUrl} width="228" height="228" alt={s.qrDataUrl?"QR code is loading...":"QR code for "+ s.gaLink} />
+							</T.If>
+						</T.A>
+					</div>
+				</div>
+			</T.If>
+			<T.If v={s.newKey && !s.changed}>
+				<div style={{marginTop:"36px"}}>
+					<T.Form onSubmit={()=>{}}>
+						<button type="submit"
+							className={[
+								"btn btn-lg btn-primary",
+								s.showPutOldCodePopup || s.loading ? "disabled" : "",
+							].filter(v=>!!v).join(" ")}
+							onClick={()=>this.setState({showConfirmPopup:true})}
+							disabled={s.showConfirmPopup || s.loading}
+						>
+							Confirm new key
+						</button>
+					</T.Form>
+				</div>
+			</T.If>
+			<T.If v={s.showConfirmPopup}>
+				<div>
+					<T.Popup.Confirm
+						{...p} use2fa={true}
+						makePromise={confirmInfo=>{
+							var s = this.state;
+							this.setState({loading:true});
+							return p.m.api.totpResetConfirm(confirmInfo.value)
+							.then(x=>{
+								this.setState({loading:false,showConfirmPopup:false,changed:true});
+							});
+						}}
+						catchPromise={er=>{
+							this.setState({loading:false,showConfirmPopup:false});
+						}}
+						onClose={()=>this.setState({loading:false,showConfirmPopup:false})}
+					/>
+				</div>
+			</T.If>
+			<T.If v={s.changed}>
+				<p>Changed!</p>
+			</T.If>
 		</div>;
-	}
-	generateKey() {
-		this.setState({fetching:true});
-		var m = this.props.m;
-		m.api.generateTotpSecretKey()
-		.then(x=>{
-			debugger;
-			this;x;
-		});
 	}
 }
 

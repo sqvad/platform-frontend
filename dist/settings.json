@@ -20,10 +20,9 @@
 		"startPage": "/wallets",
 		"myETHwallet_prefix": "My ",
 		"myETHwallet_postfix": " wallet",
-
 		"etherscanPrefix": {
-			"main": "https://ropsten.etherscan.io/",
-			"testnet": "https://etherscan.io/"
+			"ETHEREUM_TEST": "https://ropsten.etherscan.io/",
+			"default": "https://etherscan.io/"
 		}
 	},
 	"classicCurrencies": {

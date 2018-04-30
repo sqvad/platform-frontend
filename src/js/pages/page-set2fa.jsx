@@ -50,6 +50,7 @@ class PageSet2FA extends T.Page {
 					<T.A {...p} href="https://authy.com/what-is-2fa/" external>Tutorial for Authy</T.A>
 				</p>
 			</T.Page.PageWrapWidth>
+			<T.Page.NotificationVerifyEmail {...p} />
 		</T.Page.PageWrapDevice>;
 	}
 	render_helpOpened(p,s,c,m) {

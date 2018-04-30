@@ -31,6 +31,7 @@ class PageVerifyEmail extends T.Page {
 		return <T.Page.PageWrapDevice m={m} pagePostfix="set2fa">
 			<T.Page.PageWrapHeader key="header" m={m} header="short" {...s}></T.Page.PageWrapHeader>
 			<T.Page.PageWrapWidth key="width" m={m} {...p}>
+				<div style={{visibility:"hidden"}}>
 				<h1 className="h1-center d-flex flex-column align-items-center">
 					VERIFY EMAIL
 				</h1>
@@ -77,6 +78,8 @@ class PageVerifyEmail extends T.Page {
 					</T.Form>
 				</div>
 				</div>
+				</div>
+				<T.Page.NotificationVerifyEmail {...p} />
 			</T.Page.PageWrapWidth>
 		</T.Page.PageWrapDevice>;
 	}
