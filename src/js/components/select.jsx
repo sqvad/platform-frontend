@@ -128,12 +128,28 @@ class Select extends Any {
 		}
 		style.marginLeft = "-1px";
 		style.marginTop = "-1px";
+		var maxLengthText = "";
+		p.options.forEach(v=>{
+			var text = (v.text || v.title || "") +"";
+			if (maxLengthText.length<text.length) {
+				maxLengthText = text;
+			}
+		})
 		return <label
 			className={[
 				"btn select-label",
 				p.isActive ? "btn-secondary active" : "btn-outline-secondary",
 			].join(" ")} style={style}
 		>
+			<div className="select-box" style={{
+				visibility:"hidden",
+				height:"1px",
+				overflow:"hidden",
+				margin: "0px 0px -1px 0px"
+			}}>
+				<span className="select-text">{maxLengthText}</span>
+				<div className="select-text-icon"></div>
+			</div>
 			<div className="select-box">
 				<span className="select-text">{this.getText()}</span>
 				<div className="select-text-icon"></div>
@@ -155,6 +171,8 @@ class Select extends Any {
 		delete _p.placeholderOnFocus;
 		delete _p.inputGroupCls;
 		delete _p.hint;
+		delete _p.useOrangeWrap;
+		delete _p.optionsOnlyWhileFocused;
 		this.value = p.value || options[0].text || options[0].title;
 		return <select
 			{..._p}
