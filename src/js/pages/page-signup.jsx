@@ -32,6 +32,75 @@ class ChooseRole extends T.Any {
 							var activeChild = v.children.filter(v=>v.id==p.role)[0];
 							var isActive = isActiveSelf || activeChild;
 							return <T.Select
+								isActive={isActive}
+								useOrangeWrap={true}
+								key={"role"+i} value={p.role} onChange={this.onChooseViaSelect.bind(this)}
+								options={v.children.map(v=>{return {value:v.id,text:v.title}})}
+								optionsOnlyWhileFocused={true}
+								placeholder={v.title}
+								placeholderOnFocus="Please choose..."
+								onBlur={this.onChooseViaSelect.bind(this)}
+								style_selectLabel = {{
+									// minWidth: "250px"
+								}}
+							></T.Select>;
+
+
+
+
+							return <label
+								key={"role"+i}
+								className={[
+									"btn select-overflow-label",
+									isActive ? "btn-secondary active" : "btn-outline-secondary",
+								].join(" ")}
+								htmlFor={"select"+i}
+								style={{
+									marginLeft: "-1px",
+									marginTop: "-1px",
+								}}
+							>
+								<div className="select-overflow">
+									<T.Select
+										key={"role"+i} value={p.role} onChange={this.onChooseViaSelect.bind(this)}
+										className="select-overflowed"
+										options={v.children.map(v=>{return {value:v.id,text:v.title}})}
+										optionsOnlyWhileFocused={true}
+										placeholder={v.title}
+										placeholderOnFocus="Please choose..."
+										onBlur={this.onChooseViaSelect.bind(this)}
+										style={{
+											marginLeft: "-1px",
+											marginTop: "-1px",
+										}}
+									></T.Select>
+									<div className="select-icon"></div>
+								</div>
+							</label>;
+
+
+
+							return <label
+								key={"role"+i} data-v={p.role} onClick={this.onChooseViaButton.bind(this)}
+								className={"btn label-label "+(v.title==p.role? "btn-secondary active":" btn-outline-secondary")}
+								htmlFor={"select"+i}
+								style={{
+									marginLeft: "-1px",
+									marginTop: "-1px",
+								}}
+							>
+								<div className="select-overflow">
+									<select id={"select"+i} className="select-overflowed">
+										<option>{v.title}</option>
+										<option>{v.title}</option>
+										<option>{v.title}</option>
+									</select>
+									<div className="select-icon"></div>
+								</div>
+							</label>;
+
+
+							return <T.Select
 								key={"role"+i} value={p.role} onChange={this.onChooseViaSelect.bind(this)}
 								className={[
 									"btn ",
