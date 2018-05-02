@@ -5,10 +5,14 @@ class PageSignIn extends T.Page {
 	constructor(props) {
 		super(props);
 		this.props.m.api.getAuthData()
-		.then(()=>{
-			var m = this.props.m;
-			if (m.auth && m.auth.signedIn) {
-				m.api.gotoHref(T.A.href({href:"/"},m))
+		.then(x=>{
+			if (x) {
+				var m = this.props.m;
+				if (x.signedIn) {
+					m.api.gotoHref(T.A.href({href:"/"},m));
+				} else if (x.is2FAOn && !x.totpSecretKeyConfirmed) {
+					m.api.gotoHref(T.A.href({href:"/set2fa"},m));
+				}
 			}
 		});
 		this.props.m.api.getUserData();
@@ -138,8 +142,13 @@ class PageSignIn extends T.Page {
 			.then(x=>{
 				this.props.m.api.getUserData();
 				return this.props.m.api.getAuthData(true)
-				.then(()=>{
+				.then(x=>{
 					var m = this.props.m;
+					if (x) {
+						if (x.is2FAOn && !x.totpSecretKeyConfirmed) {
+							m.api.gotoHref(T.A.href({href:"/set2fa"},m));
+						}
+					}
 					if (m.path.contains["signin"] && m.auth.signedIn) {
 						m.api.gotoHref(T.A.href({href:"/"},m));
 					} else {

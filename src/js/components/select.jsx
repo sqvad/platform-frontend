@@ -173,6 +173,7 @@ class Select extends Any {
 		delete _p.hint;
 		delete _p.useOrangeWrap;
 		delete _p.optionsOnlyWhileFocused;
+		delete _p.style_selectLabel;
 		this.value = p.value || options[0].text || options[0].title;
 		return <select
 			{..._p}

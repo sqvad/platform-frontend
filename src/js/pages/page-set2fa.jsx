@@ -224,7 +224,12 @@ class PageSet2FA extends T.Page {
 		</div>;
 	}
 	showPopup_finish2fa() {
-		var popup = <T.Popup.Finish2fa {...this.props} onClose={()=>this.setState({popup:null})} />;
+		var popup = <T.Popup.Finish2fa {...this.props} onClose={()=>{
+			this.setState({popup:null});
+			this.props.m.api.getAuthData().then(x=>{
+				this.props.m.api.gotoHref(T.A.href({href:"/"},this.props.m));
+			})
+		}} />;
 		this.setState({popup});
 	}
 }

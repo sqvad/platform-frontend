@@ -87,11 +87,16 @@ class NotificationVerifyEmail extends Any {
 			props.m.api.verifyEmail(codeViaURL)
 			.then(x=>{
 				this.setState({codeSending:false,codeSent:true});
-				this.props.m.api.gotoHref("/");
-				this.props.m.api.getAuthData()
-				.then(()=>{
-					window.location.reload();
-				});
+				var auth = this.props.m;
+				if (auth && auth.email) {
+					this.props.m.api.gotoHref("/");
+					this.props.m.api.getAuthData()
+					.then(()=>{
+						window.location.reload();
+					});
+				} else {
+					this.props.m.api.gotoHref("/signin");
+				}
 			})
 			.catch(x=>{
 				this.setState({codeSending:false,codeSent:false,codeError:x});
@@ -101,13 +106,15 @@ class NotificationVerifyEmail extends Any {
 	}
 	render(p,s,c,m) {
 		var checkoutEmail = false;
-		if (m.auth) {
-			var auth = m.auth;
-			if (!auth.email) return null;
-			if (auth.emailVerified) return null;
-			checkoutEmail = true;
-		} else {
-			return null;
+		if (!s.codeError) {
+			if (m.auth) {
+				var auth = m.auth;
+				if (!auth.email) return null;
+				if (auth.emailVerified) return null;
+				checkoutEmail = true;
+			} else {
+				return null;
+			}
 		}
 		if (s.codeSent) return;
 		var sendOtherCode = null;
