@@ -130,7 +130,7 @@ label.input-group {
 	display: block;
 }
 .input-group.for-textarea {
-	margin-top: 28px;
+	/* margin-top: 28px; */
 }
 
 select.btn::after {

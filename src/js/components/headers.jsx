@@ -115,7 +115,7 @@ class HeaderLeft extends Any {
 		return m.device.isMobile ? this.render_mobile(p,s,c,m) : this.render_default(p,s,c,m);
 	}
 	render_default(p,s,c,m) {
-		return <div className="bg-violet w-100">
+		return <div className={"bg-violet" + (m.device.isMobile?"w-100":"")}>
 			<A className="left-menu-logo" m={m} href="">
 				<span className="left-menu-logo-img"></span>
 			</A>
@@ -139,14 +139,19 @@ class HeaderLeft extends Any {
 				<div className="logo logo-nopad-96x32" />
 			</A>
 			<div className="burger" onClick={()=>this.setState({opened:!s.opened})} />
-			{s.opened?this.render_mobile_opened(p,s,c,m):null}
+			{this.render_mobile_opened(p,s,c,m)}
 		</div>;
 	}
 	render_mobile_opened(p,s,c,m) {
 		var spread = {};
 		if (m.device.isMobile) {
 			spread.className = "d-flex justify-content-between w-100";
-			spread.style = {borderTop:"1px solid #302c43"};
+			spread.style = {
+				borderTop:"1px solid #302c43",
+				height: s.opened ? "70px" : "0px",
+				overflow: "hidden",
+				transition: "0.3s height linear",
+			};
 		}
 		return <div {...spread}>
 			<A className={"left-menu-item"+(p.tab=="wallets"?" active":"")} m={m} href="/wallets"

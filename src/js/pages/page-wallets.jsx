@@ -91,7 +91,7 @@ class PageWallets extends T.Page {
 		if (m.device.isMobile) {
 			img += "-mobile-"+ m.device.retina +"x.jpg";
 			style.background = "#302840 url(./img/wallet-header-"+img+") center top no-repeat";
-			style.backgroundSize = "200px 434px";
+			style.backgroundSize = "320px 434px";
 			style.paddingBottom = "37px";
 		} else {
 			img += ".png";
@@ -191,7 +191,10 @@ class Receiver extends T.Any {
 		this.fetchDepositData();
 		props.m.api.loadLib_clipboardjs()
 		.then(()=>{
-			new ClipboardJS(this.copy);
+			if (this.copy) {
+				new ClipboardJS(this.copy);
+				this.copyWrapped = true;
+			}
 		});
 		props.m.api.loadLib_qrcode()
 		.then(this.refreshQR.bind(this));
@@ -242,16 +245,15 @@ class Receiver extends T.Any {
 					<div>
 						<button
 							type="button" ref={el=>this.copy=el} data-clipboard-target="#receiverId"
-							className="btn-link pl-0 mr-0"
-							style={{color:"inherit",borderLeft:"0"}}
+							className="btn-link pl-0 mr-0 wallet-receive-name-btn"
+							style={{borderLeft:"0"}}
 						>
 							Copy
 							<span className="icon icon-24 icon-copy" />
 						</button>
 						<button
 							onClick={()=>{this.setState({renamePopup:true})}}
-							type="button" className="btn-link pl-0 mr-0"
-							style={{color:"inherit"}}
+							type="button" className="btn-link pl-0 mr-0 wallet-receive-name-btn"
 						>
 							Rename&nbsp;
 							<span className="icon icon-24 icon-rename" />
@@ -318,7 +320,14 @@ class Receiver extends T.Any {
 			var depositAdr = s.depositAdr;
 			this.setState({qrDataUrlVia:"noup",qrDataUrl:""},()=>{
 				qrcodelib.toDataURL(T.TX.href(p.m, true, depositAdr||"n/a"), (err, url)=>{
-					this.setState({qrDataUrl:url,qrDataUrlVia:depositAdr||"noup"},()=>{this.forceUpdate()});
+					this.setState({qrDataUrl:url,qrDataUrlVia:depositAdr||"noup"},()=>{
+						this.forceUpdate();
+						setTimeout(()=>{
+							if (this.copy) {
+								new ClipboardJS(this.copy);
+							}
+						},20);
+					});
 				});
 			});
 		}
@@ -390,14 +399,14 @@ class Settings extends T.Any {
 		var wallet = m.user.wallets.filter(v=>v.symbol==p.walletId)[0];
 		return <div>
 			<h2>SETTINGS</h2>
-			<h3>CHANGE WALLET NAME</h3>
+			<h3 className="mt-4 mb-3">CHANGE WALLET NAME</h3>
 			<T.Form handler={this}>
 				<T.Input
-					required placeholder="Wallet name" inputGroupCls="border4sides"
+					required placeholder="Wallet name" inputGroupCls="border4sides placeholder-to-up"
 					value={s.name||""}
 					onChange={(name,nameValid)=>{this.setState({name,nameValid:!!nameValid})}}
 				/>
-				<div className="mt-4">
+				<div style={{marginTop: s.name ? "-14px": "4px", transition: "0.2s margin-top linear"}}>
 					<T.Form.SubmitButton
 						canSubmit={s.name && s.name!=wallet.name} fetching={s.fetching}
 						clsColor="btn-primary" cls="btn-lg"

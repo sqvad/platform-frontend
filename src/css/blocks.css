@@ -92,6 +92,11 @@
 	display: block;
 	max-width: 50%;
 }
+.desktop .profile-left-menu > .bg-violet {
+	position: fixed;
+	top: 0; bottom: 0; height: 100%;
+	width: inherit;
+}
 .logo-nopad-96x32 {
 	width: 96px;
 	height: 32px;
@@ -198,6 +203,14 @@
 	background-image: url(../img/sprite-3x.png);
 	background-size: 300px 500px;
 }
+.retina-2 .icon-30 {
+	background-image: url(../img/sprite-2x.png);
+	background-size: 300px 500px;
+}
+.retina-3 .icon-30 {
+	background-image: url(../img/sprite-3x.png);
+	background-size: 300px 500px;
+}
 .icon-currency-horizontal {
 	display: inline-block;
 	vertical-align: middle;
@@ -301,6 +314,14 @@
 	font-size: 11px;
 	text-transform: uppercase;
 	cursor: pointer;
+	background: rgba(168,168,255,0);
+	transition: background-color 0.1s linear;
+}
+.left-menu-item:hover {
+	text-decoration: none;
+}
+.desktop .left-menu-item:hover {
+	background: rgba(168,168,255,0.12);
 }
 .left-menu-item-label {
 	display: block;
@@ -311,7 +332,7 @@
 	transition: opacity 0.1s linear;
 }
 .left-menu-item:hover .icon-white {
-	opacity: 1;
+	opacity: 0.8;
 }
 .left-menu-logo {
 	display: flex;
@@ -333,6 +354,9 @@
 	background: transparent url(../img/logo/logo-profile.png) center center no-repeat;
 	border-bottom: 1px solid #e7e7e7;
 	margin-bottom: 53px;
+}
+.mobile .profile-logo {
+	display: none;
 }
 .profile-center h1 {
 	font-weight: 800;
@@ -742,4 +766,12 @@
 }
 .btn.active .select-text-icon {
 	background-image: url(../img/dropdown-white.png);
+}
+.wallet-receive-name-btn {
+	color: inherit;
+	transition: 0.1s color linear;
+}
+.wallet-receive-name-btn:hover {
+	text-decoration: none;
+	color: #fc4c04;
 }

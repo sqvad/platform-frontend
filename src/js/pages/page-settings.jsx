@@ -34,7 +34,7 @@ class PageSettings extends T.Page {
 				</T.Page.PageWrapProfileLeft>
 				<div className="w-100 d-flex flex-column">
 					<T.Page.PageWrapProfileWidth>
-						<h1>Settings</h1>
+						<h1 className="mb-3">Settings</h1>
 						<div
 							className={
 								[
@@ -78,7 +78,7 @@ class PageSettings extends T.Page {
 	}
 	render_general(p,s,c,m) {
 		return <div>
-			<h2>DEFAULT CURRENCY</h2>
+			<h2 className="mt-0">DEFAULT CURRENCY</h2>
 			<p>You can choose which currency to show by default for your crypto holdings.</p>
 			<T.Form onSubmit={()=>this.onCurrency_save()}>
 				<div style={{maxWidth:"236px"}}>
@@ -118,7 +118,7 @@ class PageSettings extends T.Page {
 	}
 	render_changePassword(p,s,c,m) {
 		return <div>
-			<h2>CHANGE YOUR PASSWORD</h2>
+			<h2 className="mt-0">CHANGE YOUR PASSWORD</h2>
 			<p>You will be logged out of all other devices after changing your password.</p>
 			<T.Form onSubmit={this.onPassword_save.bind(this)} handler={this}>
 				<div style={{maxWidth:"482px"}}>
@@ -141,7 +141,10 @@ class PageSettings extends T.Page {
 							Password changed.
 						</p>
 					</T.If>
-					<div className="d-flex justify-content-center mt-4">
+					<div className={[
+						"d-flex mt-4",
+						m.device.isMobile ? "justify-content-center" : ""
+					].filter(v=>!!v).join(" ")}>
 						<T.Form.SubmitButton
 							clsColor="btn-primary" cls="btn-lg"
 							canSubmit={s.canSubmitPassword && !s.serverError && !s.passwordChanged} fetching={s.fetching}
