@@ -53,7 +53,9 @@ class PageWrapProfile extends Any {
 		if (m.device.isMobile) {
 			cls = "d-flex flex-column";
 		}
-		return <div className={cls} style={{minHeight:"100%"}}>
+		var style = p.style || {};
+		style.minHeight = "100%";
+		return <div className={cls} style={style}>
 			{c}
 		</div>;
 	}
@@ -67,7 +69,7 @@ class PageWrapProfileLeft extends Any {
 }
 class PageWrapProfileWidth extends Any {
 	render(p,s,c,m) {
-		return <div className="w-100">
+		return <div className="w-100" style={p.style||{}}>
 			{!p.skipLogo?<div className="profile-logo"></div>:null}
 			<div className="profile-center" key="profile-center">
 				{c}

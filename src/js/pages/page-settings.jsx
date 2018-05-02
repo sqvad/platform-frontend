@@ -27,13 +27,22 @@ class PageSettings extends T.Page {
 	_render(p,s,c,m) {
 		var tab = s.tab || "general";
 		// var tab = s.tab || "2faRecover";
+		var divPageStyle = {};
+		var divHeaderStyle = {};
+		var divContentStyle = {flex:1,paddingBottom:"15px"};
+		if (m.device.isMobile) {
+			divPageStyle.background = "#f3f5fa";
+			divHeaderStyle.background = "#ffffff";
+		} else {
+			divContentStyle.background = "#f3f5fa";
+		}
 		return <T.Page.PageWrapDevice m={m} pagePostfix="wallet">
-			<T.Page.PageWrapProfile key="header" m={m} header="left" {...s}>
+			<T.Page.PageWrapProfile key="header" m={m} header="left" {...s} style={divPageStyle}>
 				<T.Page.PageWrapProfileLeft>
 					<T.Headers.Left m={m} {...p} {...s} tab="settings" />
 				</T.Page.PageWrapProfileLeft>
 				<div className="w-100 d-flex flex-column">
-					<T.Page.PageWrapProfileWidth>
+					<T.Page.PageWrapProfileWidth style={divHeaderStyle}>
 						<h1 className="mb-3">Settings</h1>
 						<div
 							className={
@@ -62,7 +71,7 @@ class PageSettings extends T.Page {
 							>Reset 2FA</div>
 						</div>
 					</T.Page.PageWrapProfileWidth>
-					<div style={{background:"#f3f5fa",flex:1,paddingBottom:"15px"}}>
+					<div style={divContentStyle}>
 						<T.Page.PageWrapProfileWidth skipLogo>
 							<div style={{paddingTop:"30px"}}>
 								{tab=="general"? this.render_general(p,s,c,m) :null}

@@ -498,7 +498,7 @@ class SendTokens extends T.Any {
 		return <div>
 			<h2>SEND</h2>
 			<p>This form allows you to spend funds from your wallet. Always double check your destination address!</p>
-				<div style={{maxWidth:"482px"}}><T.Form handler={this}>
+				<div style={{maxWidth:"482px",marginBottom:"15px"}}><T.Form handler={this}>
 					<T.Input.TxAdr
 						name="to" placeholder="Send to" inputGroupCls="border4sides"
 						onChange={this.onTo.bind(this)} value={s.to||""} required m={m}
