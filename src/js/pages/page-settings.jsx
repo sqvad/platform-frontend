@@ -214,7 +214,7 @@ class Disable2FA extends T.Any {
 		var strSwitch = s.wasEnable ? "disable" : "enable";
 		var strSwitched = s.wasEnable ? "disabled" : "enabled";
 		return <div>
-			<h2 className="mb-3">2-FACTOR AUTHENTICATION</h2>
+			<h2 className="mb-3 mt-0">DISABLE 2-FACTOR AUTHENTICATION</h2>
 			<p>
 				You currently have 2FA&nbsp;
 				<T.If v={s.enableAgainSent}><b>

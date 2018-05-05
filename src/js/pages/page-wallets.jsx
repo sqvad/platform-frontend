@@ -401,11 +401,13 @@ class Settings extends T.Any {
 			<h2>SETTINGS</h2>
 			<h3 className="mt-4 mb-3">CHANGE WALLET NAME</h3>
 			<T.Form handler={this}>
-				<T.Input
-					required placeholder="Wallet name" inputGroupCls="border4sides placeholder-to-up"
-					value={s.name||""}
-					onChange={(name,nameValid)=>{this.setState({name,nameValid:!!nameValid})}}
-				/>
+				<div style={{maxWidth:"482px"}}>
+					<T.Input
+						required placeholder="Wallet name" inputGroupCls="border4sides placeholder-to-up"
+						value={s.name||""}
+						onChange={(name,nameValid)=>{this.setState({name,nameValid:!!nameValid})}}
+					/>
+				</div>
 				<div style={{marginTop: s.name ? "-14px": "4px", transition: "0.2s margin-top linear"}}>
 					<T.Form.SubmitButton
 						canSubmit={s.name && s.name!=wallet.name} fetching={s.fetching}

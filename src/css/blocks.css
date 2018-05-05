@@ -17,7 +17,7 @@
 .header-medium {
 	padding: 15px;
 	min-height: 210px;
-	background: #38334b url(../img/header-1.png) center top no-repeat;
+	background: #36304a url(../img/header-1.png) center top no-repeat;
 }
 .header-medium > .row, .header-short > .row {
 	padding-left: 15px;
@@ -219,6 +219,12 @@
 	width: 150px;
 	height: 40px;
 }
+.retina-2 .icon-currency-horizontal {
+	background-image: url(../img/coins-horizontal-2x.png);
+}
+.retina-3 .icon-currency-horizontal {
+	background-image: url(../img/coins-horizontal-3x.png);
+}
 .icon-currency-horizontal.icon-currency-ETH {
 	background-position-x: -0px;
 }
@@ -388,6 +394,9 @@
 }
 .wallets-list .wallet {
 	float: left;
+}
+.wallets-list .wallet:hover {
+	background: #454161;
 }
 .mobile .wallets-list .wallet {
 	width: 100%;
@@ -738,7 +747,7 @@
 .select-label select {
 	position: absolute;
 	left: 0; right: 0; height: 100%;
-	top: 0; bottom: 0; width: 100%;
+	top: 1px; bottom: -1px; width: 100%;
 	opacity: 0.01;
 	font: inherit;
 	line-height: 2;
