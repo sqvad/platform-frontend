@@ -481,7 +481,7 @@ class SendTokens extends T.Any {
 					amountWithComission
 				);
 				hint = <span className="input-hint">
-					+{commissionRate}% INS withdrawal fee
+					+{commissionRate}% withdrawal fee
 					<br />
 					= <span style={{color:"#333"}}>{amountWithComission}</span>
 					{" ("}
@@ -616,7 +616,7 @@ class SendTokens extends T.Any {
 						<b><T.Currency {...p} id={s.currency} isWei={false} value={s.amount} /></b> to <b>{s.to}</b>
 						<br />
 						<b><T.Currency {...p} id={s.currency} isWei={false} value={commission} /></b>
-						{" "+commissionRate}% INS withdrawal fee
+						{" "+commissionRate}% withdrawal fee
 					</div>
 					<div style={{borderTop: "1px solid #e5e6e7", paddingTop:"15px", marginTop:"15px"}}>
 						<b><T.Currency {...p} id={s.currency} isWei={false} value={amountWithComission} /></b> in total.

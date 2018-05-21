@@ -9,12 +9,17 @@ class PageVerifyEmail extends T.Page {
 		}
 		if (codeViaURL) {
 			this.setState({code:codeViaURL});
-			props.m.api.verifyEmail(codeViaURL)
-			.then(x=>{
-				this.props.m.api.gotoHref("/");
-			})
-			.catch(x=>{
-				this.setState({error:x});
+			debugger;
+			T.Form.delay(1)
+			.then(()=>{
+				debugger;
+				props.m.api.verifyEmail(codeViaURL)
+				.then(x=>{
+					this.props.m.api.gotoHref("/");
+				})
+				.catch(x=>{
+					this.setState({error:x});
+				});
 			});
 		} else {
 			this.setState({code:""});
@@ -94,11 +99,21 @@ class PageVerifyEmail extends T.Page {
 		});
 	}
 	onSubmit() {
-		return T.Form.wrapFetch(this, false, this.props.m.api.verifyEmail(this.state.code))
+		debugger;
+		return T.Form.delay(1)
+		.then(()=>{
+			debugger;
+			T.Form.wrapFetch(this, false, this.props.m.api.verifyEmail(this.state.code))
+		})
 		.catch(x=>{
 			this.setState({error:x});
-			this.props.m.getAuthData();
 			this.props.m.getUserData();
+			this.props.m.getAuthData()
+			.then(()=>{
+				if (props.m.auth && props.m.auth.emailVerified) {
+					this.props.m.api.gotoHref("/");
+				}
+			});
 		});
 	}
 }

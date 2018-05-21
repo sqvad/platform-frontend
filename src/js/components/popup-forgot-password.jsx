@@ -15,6 +15,16 @@ class PopupForgotPassword extends Any {
 		this.setState({email,emailValid});
 	}
 	render(p,s,c,m) {
+		if (s.sended && !s.fetching) {
+			return <div className="notification">
+				<div style={{marginBottom:"0.5em"}}>
+					<b>Success</b>
+				</div>
+				<div>
+					Please follow the instructions sent to your email inbox.
+				</div>
+			</div>;
+		}
 		var content = <div>
 			<h1 className="h1-center mt-0">PASSWORD RESET</h1>
 			<p style={{textAlign:"center"}}>

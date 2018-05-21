@@ -1,6 +1,7 @@
 import React from 'react';
 import Any from '../any.jsx';
 import Headers from './headers.jsx';
+import Popup from './popup.jsx';
 import Form from './form.jsx';
 
 class Page extends Any {
@@ -83,30 +84,36 @@ class NotificationVerifyEmail extends Any {
 		super(props);
 		if (props.m.path.contains["verify-email"]) {
 			var codeViaURL = props.m.path.order[2];// /verify-email/r6OKtPg9kYYgm-h-qyOsO7sQ1GGOqUqWBpPvZkRBj6Z
-		}
-		if (codeViaURL) {
-			this.setState({codeSending:true,codeSent:false,codeError:null});
-			props.m.api.verifyEmail(codeViaURL)
-			.then(x=>{
-				this.setState({codeSending:false,codeSent:true});
-				var auth = this.props.m;
-				if (auth && auth.email) {
-					this.props.m.api.gotoHref("/");
+			this.setState({codeViaURL,codeSending:true,codeError:null});
+			Form.delay(2)
+			.then(()=>{
+				props.m.api.verifyEmail(codeViaURL)
+				.then(x=>{
 					this.props.m.api.getAuthData()
-					.then(()=>{
-						window.location.reload();
+					.then(x=>{
+						this.setState({codeSending:false,codeSent:true});
 					});
-				} else {
-					this.props.m.api.gotoHref("/signin");
-				}
-			})
-			.catch(x=>{
-				this.setState({codeSending:false,codeSent:false,codeError:x});
+				})
+				.catch(x=>{
+					this.setState({codeSending:false,codeSent:false,codeError:x});
+				});
 			});
 		}
 		// this.setState({codeError:{message:"Wrong code"}});
 	}
 	render(p,s,c,m) {
+		if (s.codeViaURL && !s.verifyEmailForceClosed) {
+			return <Popup.VerifyEmail
+				{...p} {...s}
+				noClose={s.codeSending}
+				onClose={(s2,popup)=>{
+					this.setState({verifyEmailForceClosed:true});
+				}}
+			></Popup.VerifyEmail>;
+		} else {
+			return null;
+		}
+		/*
 		var checkoutEmail = false;
 		if (!s.codeError) {
 			if (m.auth) {
@@ -118,7 +125,31 @@ class NotificationVerifyEmail extends Any {
 				return null;
 			}
 		}
-		if (s.codeSent) return;
+		// if (s.codeSent) return null;
+		var sendOtherCode = null;
+		if (checkoutEmail || s.codeSent || s.againSent) {
+			text = <span>Sent! Please, check out your email.</span>;
+		}
+		if (s.codeSending || s.againSending) {
+		}
+		*/
+		return <div>
+
+		</div>;
+	}
+	render_old(p,s,c,m) {
+		var checkoutEmail = false;
+		if (!s.codeError) {
+			if (m.auth) {
+				var auth = m.auth;
+				if (!auth.email) return null;
+				if (auth.emailVerified) return null;
+				checkoutEmail = true;
+			} else {
+				return null;
+			}
+		}
+		if (s.codeSent) return null;
 		var sendOtherCode = null;
 		if (!s.codeSending || !s.againSending || !(m.auth||{emailVerificationSent:true}).emailVerificationSent) {
 			sendOtherCode = <button
@@ -151,7 +182,24 @@ class NotificationVerifyEmail extends Any {
 			text = <span>Sent! Please, check out your email.</span>;
 		}
 		if (s.codeSending || s.againSending) {
-			text = <span>Sending...</span>;
+			text = <span>
+				Sending
+				<span style={{
+					display: "inline-block",
+					width: "24px",
+					height: "16px",
+					position: "relative",
+					marginLeft: "4px",
+					color: "white",
+				}}>
+					<img src="img/loader-white.svg" width="24" height="24"
+					style={{
+						position: "relative",
+						top: "0px",
+						color: "white",
+					}} />
+				</span>
+			</span>;
 		}
 		if (s.codeError || s.againEr) {
 			text = <div style={{marginTop:"-0.5em",marginBottom:"-1em"}}>

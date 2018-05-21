@@ -84,3 +84,6 @@
 	border-color: #bec5d1;
 	color: #a1a8b3;
 }
+.btn-relative {
+	position: relative;
+}

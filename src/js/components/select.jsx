@@ -175,13 +175,26 @@ class Select extends Any {
 		delete _p.optionsOnlyWhileFocused;
 		delete _p.style_selectLabel;
 		this.value = p.value || options[0].text || options[0].title;
+		var firstOptionIsDisabled = false;
+		if (s.focused) {
+			if (p.placeholderOnFocus) {
+				firstOptionIsDisabled = true;
+			} else if (p.placeholder && !p.useFormControl) {
+				firstOptionIsDisabled = true;
+			} else if (p.useFormControl) {
+				firstOptionIsDisabled = true;
+			}
+		}
 		return <select
 			{..._p}
 			className={cls}
 			value={p.value} onChange={this.onChangeViaSelect.bind(this)} onFocus={this.onFocus.bind(this)} onBlur={this.onBlur.bind(this)}
 		>
 			{options.map((v,i)=>{
-				return <option key={"option"+i} value={v.value||v.id}>{v.text||v.title}</option>
+				return <option
+					key={"option"+i} value={v.value||v.id}
+					disabled={i==0 && firstOptionIsDisabled}
+				>{v.text||v.title}</option>
 			})}
 		</select>;
 	}

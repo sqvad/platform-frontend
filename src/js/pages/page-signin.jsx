@@ -10,8 +10,10 @@ class PageSignIn extends T.Page {
 				var m = this.props.m;
 				if (x.signedIn) {
 					m.api.gotoHref(T.A.href({href:"/"},m));
-				} else if (x.is2FAOn && !x.totpSecretKeyConfirmed) {
-					m.api.gotoHref(T.A.href({href:"/set2fa"},m));
+				} else if (x.emailVerificationSent && !x.emailVerified) {
+					// m.api.gotoHref(T.A.href({href:"/verify-email"},m));
+				} else if (x.signedInEmail && x.is2FAOn && !x.totpSecretKeyConfirmed) {
+					// m.api.gotoHref(T.A.href({href:"/set2fa"},m));
 				}
 			}
 		});
@@ -22,6 +24,7 @@ class PageSignIn extends T.Page {
 		});
 	}
 	render(p,s,c,m) {
+		var auth = m.auth;
 		return <T.Page.PageWrapDevice m={m} pagePostfix="signup">
 			<T.Page.PageWrapHeader key="header" m={m} header="medium" {...s}>
 				<hgroup>
@@ -40,16 +43,37 @@ class PageSignIn extends T.Page {
 					{this.render2fa(p,s,c,m)}
 				</T.If>
 				{s.popupForgotPassword ? this.renderForgotPassword(p,s,c,m) : null}
+				{
+					!p.m.path.contains["verify-email"] &&
+					!s.popup_thanksForRegister_closed && auth && auth.emailVerificationSent && !auth.emailVerified
+					? this.renderThanksForRegister(p,s,c,m) : null
+				}
+				<T.Page.NotificationVerifyEmail {...p} />
 			</T.Page.PageWrapWidth>
 		</T.Page.PageWrapDevice>;
 	}
+	renderThanksForRegister(p,s,c,m) {
+		return <div>
+			<T.Popup.ThanksForRegister {...p}
+				onClose={(res,popup)=>{
+					this.setState({popup_thanksForRegister_closed:popup.state.closeViaCancel});
+				}}
+				makePromise={()=>{
+					return T.Form.delay(0.001)
+					.then(()=>p.m.api.requestCodeToVerifyEmail());
+				}}
+			/>
+		</div>;
+	}
 	render2fa(p,s,c,m) {
 		var noPopup = !s.popup2fa && m.auth && m.auth.signedInEmail;
+		var noPopup = true;
 		var popup = <T.Popup.Put2fa {...p} onClose={()=>this.on2faOk()}
 			noPopup={noPopup}
 			makePromise={code=>{
 				return p.m.api.login2fa(code);
 			}}
+			str_put2faTo="log in"
 		/>;
 		if (noPopup) {
 			return <div className="d-flex flex-row justify-content-center mt-5">
@@ -145,6 +169,7 @@ class PageSignIn extends T.Page {
 				.then(x=>{
 					var m = this.props.m;
 					if (x) {
+						debugger;
 						if (x.is2FAOn && !x.totpSecretKeyConfirmed) {
 							m.api.gotoHref(T.A.href({href:"/set2fa"},m));
 						}

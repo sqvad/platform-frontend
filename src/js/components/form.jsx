@@ -84,13 +84,15 @@ class SubmitButton extends Any {
 	render(p,s,c,m) {
 		var canSubmit = p.canSubmit;
 		var fetching = p.fetching;
+		var dontChangeText = true;
+		if ('dontChangeText' in p) dontChangeText = p.dontChangeText;
 		var cls = [
-			"btn",
+			"btn btn-relative",
 			fetching ? "btn-link" : p.clsColor,
 			p.cls || "",
 			!canSubmit || fetching ? "disabled" : ""
 		].filter(v=>!!v).join(" ");
-		var text = fetching && !p.dontChangeText ? (p.textLoading || "Loading...") : (c || p.text);
+		var text = fetching && !dontChangeText ? (p.textLoading || "Loading") : (c || p.text);
 		var spread = {};
 		if (p.onClick) spread.onClick = p.onClick;
 		if (p.style) spread.style = p.style;
@@ -100,13 +102,42 @@ class SubmitButton extends Any {
 			disabled={!canSubmit || fetching}
 			className={cls}
 		>
-			{text}
+			{p.dontShowLoader ? this.renderText(text, false) : this.renderText(text, fetching)}
+			{p.dontShowLoader ? null : this.renderLoader(text, fetching)}
 		</button>;
+	}
+	renderText(text, fetching) {
+		if (!fetching) return text;
+		return <span style={{visibility:"hidden"}}>{text}</span>;
+	}
+	renderLoader(text, fetching) {
+		if (!fetching) return null;
+		return <span style={{
+			display: "block",
+			width: "24px",
+			height: "16px",
+			position: "absolute",
+			left: "50%",
+			top: "50%",
+			marginLeft: "-12px",
+			marginTop: "-8px",
+		}}>
+			<img src="img/loader.svg" width="24" height="24"
+			style={{
+				position: "relative",
+				top: "-2px",
+				color: "black"
+			}} />
+		</span>;
 	}
 }
 Form.SubmitButton = SubmitButton;
 Form.ServerError = ServerError;
 Form.prototype.ServerError = ServerError;
+Form.delay = function(sec) {
+	if (!sec) sec = 1;
+	return new Promise(resolve=>setTimeout(resolve,sec*1000));
+};
 Form.wrapFetch = function(tag, catchEr, promise) {
 	var putTo = tag.form || tag;
 	var startAt = Date.now();

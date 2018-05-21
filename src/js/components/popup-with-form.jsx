@@ -17,7 +17,7 @@ class PopupWithForm extends Any {
 		if (p.noPopup) {
 			return <div>{c}</div>;
 		} else {
-			return <Popup onClose={this.onClose || p.onClose}>{c}</Popup>;
+			return <Popup onClose={this.onClose || p.onClose} noClose={p.noClose || s.noClose}>{c}</Popup>;
 		}
 	}
 	makePromise(p,s) {

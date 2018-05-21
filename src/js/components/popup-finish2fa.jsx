@@ -51,7 +51,7 @@ class PopupFinish2fa extends Any {
 					>
 						FINISH 2FA SETUP
 					</button>
-					<A m={m} className="text-muted external" href="forgot2fa"><small>I’m not able to log in with 2FA</small></A>
+					<A m={m} className="text-muted external" href="forgot2fa"><small>I don’t have access to my 2FA</small></A>
 				</div>
 			</Form>
 		</Popup>;

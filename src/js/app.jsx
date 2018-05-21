@@ -93,26 +93,33 @@ class App extends React.Component {
 		m.api = this.api;
 		var spread = {m};
 		var Page;
-		if (!Page) { // for any users - via url
-			// if (m.path.contains["verify-email"] || m.path.contains["start"]) Page = PageStart;
-			if (m.path.contains["forgot2fa"]) Page = PageForgot2FA;
-			if (m.path.contains["reset-password"]) Page = PageResetPassword;
-			if (m.path.contains["verify-email"]) Page = PageVerifyEmail;
-			if (m.path.contains["early-access"]) Page = PageEA;
-		}
-		if (!Page && m.settings.misc.showPagesList) { // for demo
-			if (m.path.contains["signup"]) Page = PageSignUp;
-			if (m.path.contains["set2fa"]) {
-				Page = PageSet2FA;
+		if (1) { // via url for signin
+			if (!Page) { // for any users - via url
+				// if (m.path.contains["verify-email"] || m.path.contains["start"]) Page = PageStart;
+				if (m.path.contains["forgot2fa"]) Page = PageForgot2FA;
+				if (m.path.contains["reset-password"]) Page = PageResetPassword;
+				if (m.path.contains["verify-email"]) { // PageVerifyEmail will redirects to "/":
+					// Page = PageVerifyEmail;
+					// - if email is already verified
+					// - after verification
+					Page = PageSignIn;
+				}
+				if (m.path.contains["early-access"]) Page = PageEA;
 			}
-			if (m.path.contains["signin"]) Page = PageSignIn;
-		}
-		if (!Page) { // signin for anonymous
-			// if (!m.auth || !m.auth.signedIn) {
+			if (!Page && m.settings.misc.showPagesList) { // for demo
 				if (m.path.contains["signup"]) Page = PageSignUp;
-				if (m.path.contains["set2fa"]) Page = PageSet2FA;
+				if (m.path.contains["set2fa"]) {
+					Page = PageSet2FA;
+				}
 				if (m.path.contains["signin"]) Page = PageSignIn;
-			// }
+			}
+			if (!Page) { // signin for anonymous
+				// if (!m.auth || !m.auth.signedIn) {
+					if (m.path.contains["signup"]) Page = PageSignUp;
+					if (m.path.contains["set2fa"]) Page = PageSet2FA;
+					if (m.path.contains["signin"]) Page = PageSignIn;
+				// }
+			}
 		}
 		if (!Page) { // for authorized users...
 			if (m.auth && m.auth.signedIn || m.settings.misc.showPagesList) {
@@ -128,11 +135,10 @@ class App extends React.Component {
 				// ...or via settings.json
 				if (!toWallet || !toSettings) {
 					if (!m.settings.misc.showPagesList) {
-						if (m.settings.misc.startPage.indexOf("wallets")>-1) {
-							toWallet = true;
-						}
 						if (m.settings.misc.startPage.indexOf("settings")>-1) {
 							toSettings = true;
+						} else {
+							toWallet = true;
 						}
 					}
 				}
@@ -150,11 +156,19 @@ class App extends React.Component {
 				}
 			}
 		}
-		if (!Page || m.logoutInProgress) { // for anonymous (start or signin)
+		if (!Page || m.logoutInProgress) { // anonymous have no url
 			if (m.settings.misc.showPagesList) {
 				Page = PageEA;
 			} else {
-				Page = PageStart;
+				// Page = PageStart;
+				var auth = m && m.auth;
+				if (!auth || !auth.email) {
+					Page = PageSignUp;
+				} else if (auth.signedInEmail && !auth.totpSecretKeyConfirmed) {
+					Page = PageSet2FA;
+				} else if (!auth.signedIn) {
+					Page = PageSignIn;
+				}
 			}
 		}
 		return <Page {...spread}></Page>;

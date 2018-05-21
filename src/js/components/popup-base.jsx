@@ -3,9 +3,10 @@ import Any from '../any.jsx';
 
 class Popup extends Any {
 	render(p,s,c,m) {
+		var noClose = p.noClose || s.noClose;
 		return <div key="popup" className="popup-container popup-hidden" onClick={this.onClick.bind(this)} ref={el=>this.nodeContainer=el}>
             <div className="popup" ref={el=>this.nodePopup=el}
-            >{c}<div className="popup-close" onClick={this.onClickClose.bind(this)}><span className="icon close clickable"></span></div></div>
+            >{c}<div className="popup-close" onClick={this.onClickClose.bind(this)} style={{display:(noClose?"none":"")}}><span className="icon close clickable"></span></div></div>
         </div>;
 	}
 	componentDidMount() {
@@ -30,17 +31,26 @@ class Popup extends Any {
 		this.onClickOuter(e);
 	}
 	onClickOuter(e) {
-		this.close();
+		if (this.props.noClose || this.state && this.state.noClose) return;
+		this.setState({closeViaCancel:true}, ()=>{
+			this.close();
+		});
+
 	}
 	onClickClose(e) {
-		this.close();
+		this.setState({closeViaCancel:true}, ()=>{
+			this.close();
+		});
 	}
 	onKeyUp(e) {
-		if (e.keyCode===27) this.close();
+		this.setState({closeViaCancel:true}, ()=>{
+			if (e.keyCode===27) this.close();
+		});
+
 	}
 	close() {
 		if (this.props.onClose) {
-			this.props.onClose();
+			this.props.onClose(this);
 		}
 	}
 }

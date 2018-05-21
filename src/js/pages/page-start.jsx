@@ -5,8 +5,6 @@ import PageSignUp from './page-signup.jsx';
 import PageVerifyEmail from './page-verify-email.jsx';
 import PageSet2FA from './page-set2fa.jsx';
 import PageSignIn from './page-signin.jsx';
-import PageWallets from './page-wallets.jsx';
-import PageSettings from './page-settings.jsx';
 
 class PageStart extends T.Page {
 	constructor(props) {
@@ -27,6 +25,10 @@ class PageStart extends T.Page {
 			m.api.gotoHref(T.A.href({href:"/"},m));
 			return <div></div>;
 		}
+		if (!auth.emailVerified) return <PageVerifyEmail {...p} {...s} />;
+		if (!auth.signedInEmail) return <PageSignIn {...p} {...s} />;
+		if (!auth.totpSecretKeyConfirmed) return <PageSet2FA {...p} {...s} />;
+		/*
 		if (auth.canSignIn) return <PageSignIn {...p} {...s} />;
         // if (!auth.emailVerified) return <PageVerifyEmail {...p} {...s} />;
         if (!auth.emailVerified) {
@@ -40,6 +42,7 @@ class PageStart extends T.Page {
 			}
 		}
 		if (!auth.totpSecretKeyConfirmed) return <PageSet2FA {...p} {...s} />;
+		*/
     }
 }
 

@@ -26,7 +26,7 @@ class PageSettings extends T.Page {
 	}
 	_render(p,s,c,m) {
 		var tab = s.tab || "general";
-		// var tab = s.tab || "2faRecover";
+		// var tab = s.tab || "2faDisable";
 		var divPageStyle = {};
 		var divHeaderStyle = {};
 		var divContentStyle = {flex:1,paddingBottom:"15px"};
@@ -64,10 +64,12 @@ class PageSettings extends T.Page {
 							<div
 								className={"btn "+(tab=="2faDisable"? "btn-secondary active":" btn-outline-secondary")}
 								onClick={()=>{this.setState({tab:"2faDisable"})}} style={{marginTop:m.device.isMobile?"-1px":""}}
-							>{m.auth&&!m.auth.is2FAOn?"Enable 2FA":"Disable 2FA"}</div>
+							>2FA</div>
 							<div
 								className={"btn "+(tab=="2faRecover"? "btn-secondary active":" btn-outline-secondary")}
-								onClick={()=>{this.setState({tab:"2faRecover"})}} style={{marginTop:m.device.isMobile?"-1px":""}}
+								onClick={()=>{this.setState({tab:"2faRecover"})}} style={{marginTop:m.device.isMobile?"-1px":""
+									,display:"none"
+								}}
 							>Reset 2FA</div>
 						</div>
 					</T.Page.PageWrapProfileWidth>
@@ -99,7 +101,7 @@ class PageSettings extends T.Page {
 							{id:"EUR", text:"EUR"},
 							{id:"CNY", text:"CNY"},
 							{id:"JPY", text:"JPY"},
-							{id:"KOW", text:"KOW"},
+							{id:"KRW", text:"KRW"},
 							{id:"AUD", text:"AUD"},
 						]}
 					/>
@@ -214,7 +216,7 @@ class Disable2FA extends T.Any {
 		var strSwitch = s.wasEnable ? "disable" : "enable";
 		var strSwitched = s.wasEnable ? "disabled" : "enabled";
 		return <div>
-			<h2 className="mb-3 mt-0">DISABLE 2-FACTOR AUTHENTICATION</h2>
+			<h2 className="mb-3 mt-0">2-FACTOR AUTHENTICATION</h2>
 			<p>
 				You currently have 2FA&nbsp;
 				<T.If v={s.enableAgainSent}><b>
@@ -240,10 +242,10 @@ class Disable2FA extends T.Any {
 					</span></T.If>
 					{" and afterwards "}
 					<T.If v={s.enableAgainSent}><span><span className="text-muted">
-						✔&nbsp;setting up the new method
+						✔&nbsp;enabling the new method
 					</span>.</span></T.If>
 					<T.If v={!s.enableAgainSent}><span>
-						setting up the new method.
+						enabling the new method.
 					</span></T.If>
 				</span></T.If>
 			</p>
@@ -281,7 +283,7 @@ class Disable2FA extends T.Any {
 					>Enable</button>
 				</T.If>
 			</T.If>
-			<T.If v={s.popup}>
+			<T.If v={s.popup && p.m.auth.is2FAOn}>
 				<T.Popup.Confirm
 					{...p} use2fa={true}
 					makePromise={(confirmInfo,popup)=>{
@@ -307,9 +309,21 @@ class Disable2FA extends T.Any {
 						this.setState({popup:false,fetching:ps.fetching,sent:ps.sent,serverError:ps.serverError});
 						return ret;
 					}}
+					str_put2faTo="disable 2FA"
 				/>
 			</T.If>
-			<T.If v={s.popupEnableAgain}>
+			<T.If v={s.popup && !p.m.auth.is2FAOn || s.popupEnableAgain}><div>
+				<Recover2FA {...p} onEnabled={()=>{
+					this.setState({
+						popupEnableAgain:false,
+						popup:false,
+						sent:true,
+						serverError:null,
+						// enableAgainSent:true,
+					});
+				}} />
+			</div></T.If>
+			<T.If v={0 && s.popupEnableAgain}>
 				<T.Popup.Put2fa
 					{...p}
 					makePromise={(code,popup)=>{
@@ -349,7 +363,7 @@ class Recover2FA extends T.Any {
 		// props.m.api.loadLib_qrcode();
 	}
 	render(p,s,c,m) {
-		return <PageForgot2FA {...p} onlyContent={true} />;
+		// return <PageForgot2FA {...p} onlyContent={true} />;
 		var country = (m && m.user && m.user.country || "us").toLowerCase();
 		return <div style={{maxWidth:"550px"}}>
 			<h2>2-FACTOR AUTHENTICATION</h2>
@@ -498,19 +512,28 @@ class Recover2FA extends T.Any {
 							var s = this.state;
 							this.setState({loading:true});
 							return p.m.api.totpResetConfirm(confirmInfo.value)
-							.then(x=>{
+							.then(()=>{
+								return p.m.api.toggle2FASetting(true, confirmInfo.value);
+							})
+							.then(()=>{
 								this.setState({loading:false,showConfirmPopup:false,changed:true});
+								this.props.onEnabled();
 							});
 						}}
 						catchPromise={er=>{
+							// debugger;
 							this.setState({loading:false,showConfirmPopup:false});
+							this.setState({loading:false});
 						}}
-						onClose={()=>this.setState({loading:false,showConfirmPopup:false})}
+						onClose={()=>{
+							this.setState({loading:false,showConfirmPopup:false})
+						}}
+						str_put2faTo="enable 2FA"
 					/>
 				</div>
 			</T.If>
 			<T.If v={s.changed}>
-				<p>Changed!</p>
+				<p style={{display:"none"}}>Changed!</p>
 			</T.If>
 		</div>;
 	}

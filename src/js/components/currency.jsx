@@ -25,10 +25,19 @@ class Currency extends Any {
 		return isClassical ? this.render_classical_text(p,s,c,m) : this.render_coin_text(p,s,c,m);
 	}
 	render_classical(p,s,c,m) {
-		return <span className="in-usd">{this.render_classical_text(p,s,c,m)}</span>;
+		var id = this._2id(p);
+		var usdId = p.usdId || m.defaultClassicCurrency;
+		var format = this._2format(p,m,id);
+		if (m.currenciesRate && usdId && (format||format===0||format==='0')) {
+			var rate = (m.currenciesRate[id]||{})[usdId];
+			if (rate) {
+				return <span className="in-usd">{this.render_classical_text(p,s,c,m)}</span>;
+			}
+		}
+		return <span className="in-usd" title="Rate is not avalaible">{((m.settings.classicCurrencies[usdId]||{}).text||usdId)} n/a</span>;
 	}
 	render_classical_text(p,s,c,m) {
-		var str = "...";
+		var str = "n/a";
 		var id = this._2id(p);
 		var usdId = p.usdId || m.defaultClassicCurrency;
 		var format = this._2format(p,m,id);

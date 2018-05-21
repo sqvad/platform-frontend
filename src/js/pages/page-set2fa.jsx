@@ -44,10 +44,10 @@ class PageSet2FA extends T.Page {
 					Had problems with setup? Please check our tutorials:
 					<br />
 					<br />
-					<T.A {...p} href="https://en.wikipedia.org/wiki/Google_Authenticator" external>Tutorial for Google Authenticator</T.A>
+					<T.A {...p} href="https://support.google.com/accounts/answer/1066447?co=GENIE.Platform%3DAndroid&hl=en" external>Tutorial for Google Authenticator</T.A>
 					<br />
 					<br />
-					<T.A {...p} href="https://authy.com/what-is-2fa/" external>Tutorial for Authy</T.A>
+					<T.A {...p} href="https://support.authy.com/hc/en-us/" external>Tutorial for Authy</T.A>
 				</p>
 			</T.Page.PageWrapWidth>
 			<T.Page.NotificationVerifyEmail {...p} />
