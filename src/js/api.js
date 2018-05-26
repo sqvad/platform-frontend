@@ -224,7 +224,7 @@ class Api {
             this.model.env = ret;
 			this.model.emit('change');
 		}
-		if (cmd.indexOf('system/ethereum/block/number')>-1) {
+		if (cmd.indexOf('system/cts/block/number')>-1) {
             this.model.currentBlockNumber = new BigNumber(ret.blockNumber);
 			this.model.emit('change');
 		}
@@ -326,7 +326,7 @@ class Api {
 	}
 	getCurrentBlockNumber(email) {
 		this.model.currentBlockNumberAt = Date.now();
-		return this._fetchGET('/system/ethereum/block/number');
+		return this._fetchGET('/system/cts/block/number');
 	}
 	isEmailAvailable(email) {
 		return this._fetchPOST('/system/check/email/availability', {email}).then(x=>{

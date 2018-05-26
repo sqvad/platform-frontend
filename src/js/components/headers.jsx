@@ -166,6 +166,7 @@ class HeaderLeft extends Any {
 			</A>
 			<A className="left-menu-item" m={m}
 				style={{paddingRight:m.device.isMobile?"15px":""}}
+				onClick={()=>m.api.logout()}
 			>
 				<span className="icon icon-30 icon-lg icon-logout icon-white"></span>
 				<span className="left-menu-item-label">log out</span>

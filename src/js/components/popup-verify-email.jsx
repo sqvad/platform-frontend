@@ -64,7 +64,7 @@ class PopupVerifyEmail extends PopupWithForm {
 					<p>Sent! Please, check out your email.</p>
 				</If>
 				<If v={s.againEr || p.codeError}><div className="mt-4">
-					<Form.ServerError serverError={s.againEr || p.codeError} />
+					<Form.ServerError m={m} serverError={s.againEr || p.codeError} />
 					<div>
 						<Form.SubmitButton
 							canSubmit={true} fetching={p.codeSending || s.againSending}

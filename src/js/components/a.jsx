@@ -26,6 +26,7 @@ class A extends Any {
 
 A.href = function(p,m) {
 	var href = p.href;
+	if (!m) debugger;
 	if (!p.external && m.settings.misc.pathViaHash) {
 		if (href=="/") {
 			href = "#"

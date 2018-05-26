@@ -66,7 +66,7 @@ class InputPassword extends Input {
 	render(p,s,c,m) {
 		var type = "password";
 		var hint = p.hint || this.getHint(s.value || p.value);
-		return <Input {...p} {...p} {...s} m={m} type={type} />;
+		return <Input {...p} onChange={this.onChange.bind(this)} {...s} m={m} type={type} hint={hint} />;
 	}
 	onValid(valid, validOld, input) {
 		input._onValid.call(this, valid, validOld, input);
@@ -76,6 +76,14 @@ class InputPassword extends Input {
 	}
 	checkValid(str) {
 		return this.haveGroups(str).haveAll;
+	}
+	onChange(v, valid, validOld, input) {
+		this.setState({value:v},()=>{
+			this.forceUpdate();
+		});
+		if (this.props.onChange) {
+			this.props.onChange(v, valid, validOld, input);
+		}
 	}
 }
 

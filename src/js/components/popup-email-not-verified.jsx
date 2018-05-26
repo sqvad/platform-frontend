@@ -7,7 +7,7 @@ import Form from './form.jsx';
 import Input from './input.jsx';
 import A from './a.jsx';
 
-class PopupThanksForRegister extends PopupWithForm {
+class PopupEmailNotVerified extends PopupWithForm {
 	constructor(props) {
 		super(props);
 		this.setState({code2fa:""});
@@ -48,8 +48,13 @@ class PopupThanksForRegister extends PopupWithForm {
 				</div>
 				<If v={s.serverError}><div className="mt-4 mb-4">
 					<Form.ServerError m={m} serverError={s.serverError} />
+					<div style={{marginTop:"-16px"}}>
+						<Form.ServerError m={m} serverError={{message:"Please, try again later"}} />
+					</div>
 				</div></If>
-				<Form handler={this}>
+				<Form handler={this} onInit={()=>{
+					this.form.onSubmit();
+				}}>
 					<Form.SubmitButton
 						canSubmit={true} fetching={s.fetching}
 						clsColor="btn-primary" cls={"mb-3 "+(m.device.isMobile?"btn-sm":"btn-lg")}
@@ -75,4 +80,4 @@ class PopupThanksForRegister extends PopupWithForm {
 	}
 }
 
-export default PopupThanksForRegister;
+export default PopupEmailNotVerified;

@@ -9,6 +9,9 @@ class Form extends Any {
 		if (props.handler) {
 			props.handler.form = this;
 		}
+		if (props.onInit) {
+			props.onInit(this);
+		}
 	}
 	render(p,s,c,m) {
 		var serverError = null;
@@ -77,7 +80,13 @@ class Form extends Any {
 		if ('serverError' in this.props) {
 			serverError = this.props.serverError;
 		}
-		return <ServerError serverError={serverError} />;
+		var m = this.props.m;
+		if (!m) {
+			if (this.props.handler && this.props.handler.props) {
+				m = this.props.handler.props.m;
+			}
+		}
+		return <ServerError m={m} serverError={serverError} />;
 	}
 }
 class SubmitButton extends Any {

@@ -94,7 +94,7 @@ label.input-group {
 	font-weight: bold;
 }
 .input-group.placeholder-to-up.input-group-with-select .placeholder {
-	left: 4px;
+	/* left: 4px; */
 }
 .border4sides.input-group.placeholder-to-up  .placeholder {
 	top: 2px;
@@ -221,3 +221,37 @@ select.btn::after {
 	background: green;
 }
 */
+
+.select-label-form select {
+	width: 100% !important;
+	opacity: 0.01;
+}
+.select-label-form .select-box {
+	position: absolute;
+	left: 0;
+	top: 10px;
+}
+.select-label-form .select-wrap {
+	position: relative;
+	width: 100%;
+	border-bottom: 2px solid #bec5d1;
+}
+.select-label-form .select-wrap .select-box {
+	width: 100%;
+}
+.select-label-form .select-wrap .select-text-icon {
+	position: absolute;
+	top: 4px;
+	right: 10px;
+	left: auto;
+}
+.border4sides.select-label-form .select-wrap {
+	border: 1px solid #e5e6e7;
+	background: white;
+}
+.border4sides.select-label-form .select-wrap .select-box {
+	left: 10px;
+}
+.border4sides.select-label-form .select-wrap .select-text-icon {
+	right: 25px;
+}

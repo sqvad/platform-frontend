@@ -6,6 +6,7 @@ import PopupConfirm from './popup-confirm.jsx';
 import PopupPutPassword from './popup-put-password.jsx';
 import PopupForgotPassword from './popup-forgot-password.jsx';
 import PopupThanksForRegister from './popup-thanks-for-register.jsx';
+import PopupEmailNotVerified from './popup-email-not-verified.jsx';
 import PopupVerifyEmail from './popup-verify-email.jsx';
 
 Popup.Finish2fa = PopupFinish2fa;
@@ -14,6 +15,7 @@ Popup.PutPassword = PopupPutPassword;
 Popup.Confirm = PopupConfirm;
 Popup.ForgotPassword = PopupForgotPassword;
 Popup.ThanksForRegister = PopupThanksForRegister;
+Popup.EmailNotVerified = PopupEmailNotVerified;
 Popup.VerifyEmail = PopupVerifyEmail;
 
 export default Popup;

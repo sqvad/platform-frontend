@@ -41,7 +41,7 @@ class PopupForgotPassword extends Any {
 					Sent! Please, check out your email.
 				</p></If>
 				<If v={s.serverError}>
-					<Form.ServerError message="Invalid email" errors={[0]}></Form.ServerError>
+					<Form.ServerError m={m} message="Invalid email" errors={[0]}></Form.ServerError>
 				</If>
 				<div className="d-flex flex-column align-items-center justify-content-center mt-4">
 					<Form.SubmitButton

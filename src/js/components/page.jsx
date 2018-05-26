@@ -203,7 +203,7 @@ class NotificationVerifyEmail extends Any {
 		}
 		if (s.codeError || s.againEr) {
 			text = <div style={{marginTop:"-0.5em",marginBottom:"-1em"}}>
-				<Form.ServerError serverError={s.againEr || s.codeError} />
+				<Form.ServerError m={m} serverError={s.againEr || s.codeError} />
 			</div>
 		}
 		if (!text) return null;

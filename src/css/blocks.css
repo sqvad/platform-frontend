@@ -650,6 +650,12 @@
 	padding: 5px 10px;
 	white-space: pre;
 }
+.server-error-message {
+	background: #ffecec;
+	border: 1px solid #ffc7c7;
+	color: #d02525;
+	padding: 5px 10px;
+}
 
 .smooth-opening-content {
 	transition: max-height 1s ease-out;

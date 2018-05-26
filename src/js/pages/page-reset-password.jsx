@@ -38,6 +38,7 @@ class PageResetPassword extends T.Page {
 							</T.If>
 							<T.Input.Password
 								name="new password" onChange={this.onPassword.bind(this)}
+								placeholder="new password"
 								value={s.password} required
 							/>
 							<T.Input.PasswordConfirm

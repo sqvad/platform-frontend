@@ -22,6 +22,9 @@ class PageSignIn extends T.Page {
 			email: this.props.m && this.props.m.auth && this.props.m.auth.email || "",
 			password:"", //popupForgotPassword: true,
 		});
+		this.setState({
+			emailValid: T.Input.Email.validate(this.state.email)
+		});
 	}
 	render(p,s,c,m) {
 		var auth = m.auth;
@@ -135,7 +138,57 @@ class PageSignIn extends T.Page {
 						</span>
 					</div>
 					{this.form && <div className="mt-4">{this.form.renderServerError()}</div>}
+					<T.If v={s.againSent}>
+						<div className="mt-4">We've sent you a verification link.</div>
+					</T.If>
 					<div className="d-flex justify-content-center mt-4 mb-4">
+						<T.If v={0
+							|| (s.serverError||{}).message=="User email is not verified"
+							|| (s.serverError||{}).message=="Verification code resend not allowed"
+							|| (s.serverError||{}).message=="ERR_USER_EMAIL_IS_NOT_VERIFIED"
+							|| (s.serverError||{}).message=="ERR_VERIFICATION_CODE_INVALID"
+						}>
+							<T.Form.SubmitButton
+								canSubmit={true} fetching={s.againFetching}
+								type="button" dontChangeText onClick={()=>{
+									this.setState({againFetching:true,againSent:false});
+									p.m.api.requestCodeToVerifyEmail(s.email)
+									.then(()=>{
+										this.setState({serverError:null});
+										this.setState({againFetching:false,againSent:true});
+									})
+									.catch(x=>{
+										this.setState({serverError:x});
+										this.setState({againFetching:false});
+									})
+								}}
+								clsColor="btn-outline-primary" cls={(m.device.isMobile ? "btn-sm" : "btn-lg")+" mr-3"}
+							>
+								Resend verification link
+							</T.Form.SubmitButton>
+						</T.If>
+						<T.If v={0
+							|| (s.serverError||{}).message=="User email is not verified"
+							|| (s.serverError||{}).message=="Verification code resend not allowed"
+							|| (s.serverError||{}).message=="ERR_USER_EMAIL_IS_NOT_VERIFIED"
+							|| (s.serverError||{}).message=="ERR_VERIFICATION_CODE_INVALID"
+						}>
+							<T.If v={!s.popup_thanksForRegister_closed}>
+								<T.Popup.EmailNotVerified {...p} email={s.email || p.m.auth && p.m.auth.email}
+									onClose={(res,popup)=>{
+										this.setState({popup_thanksForRegister_closed:popup.state.closeViaCancel});
+									}}
+									makePromise={()=>{
+										return T.Form.delay(5)
+										.then(()=>p.m.api.requestCodeToVerifyEmail(s.email))
+										.then(()=>{
+											this.setState({serverError:null});
+											this.setState({againFetching:false,againSent:true});
+										})
+									}}
+								/>
+							</T.If>
+						</T.If>
 						<T.Form.SubmitButton
 							clsColor="btn-primary" cls="btn-lg"
 							canSubmit={s.canSubmit} fetching={s.fetching}
@@ -150,7 +203,7 @@ class PageSignIn extends T.Page {
 		var s = this.state || {};
 		this.setState({
 			canSubmit: s.emailValid && s.passwordValid
-		});
+		}, ()=>{this.forceUpdate();});
 	}
 	onEmail(v, valid) {
 		this.setState({email:v,emailValid:valid}, ()=>{this.checkValid()});

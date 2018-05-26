@@ -27,7 +27,7 @@ class PopupPutPassword extends PopupWithForm {
 						name="Account password" onChange={(password,passwordValid)=>this.setState({password,passwordValid,serverError:null})}
 						value={s.password} required
 					/>
-					<Form.ServerError serverError={s.serverError} />
+					<Form.ServerError m={m} serverError={s.serverError} />
 					<div className="d-flex flex-column align-items-center justify-content-center mt-4">
 						<Form.SubmitButton
 							canSubmit={s.passwordValid} fetching={s.fetching}

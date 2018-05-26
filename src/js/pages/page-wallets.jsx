@@ -678,7 +678,7 @@ class SendTokens extends T.Any {
 		return <div>
 			<h2>Sending...</h2>
 			<T.If v={s.transactionSendEr}><div>
-				<T.Form.ServerError {...s.transactionSendEr} />
+				<T.Form.ServerError m={m} {...s.transactionSendEr} />
 			</div></T.If>
 			<div>
 				<br />
@@ -734,7 +734,7 @@ class SendTokens extends T.Any {
 			</div></T.If>
 			<T.If v={s.transactionSendEr}><div>
 				<h2>ERROR</h2>
-				<T.Form.ServerError {...s.transactionSendEr} />
+				<T.Form.ServerError m={m} {...s.transactionSendEr} />
 				<div className="mt-4">
 					<button type="button"
 						className={[
@@ -781,7 +781,7 @@ class TransactionsTable extends T.Any {
 	render_empty(p,s,c,m) {
 		return <div>
 			<h2>No transactions found</h2>
-			<T.Form.ServerError serverError={s.serverError} />
+			<T.Form.ServerError m={m} serverError={s.serverError} />
 		</div>;
 	}
 	render(p,s,c,m) {
@@ -806,18 +806,18 @@ class TransactionsTable extends T.Any {
 					<h3><T.Date onlyDate v={new Date(transactions[0].executeDate || transactions[0].createDate)} mutes={{y:1}} /></h3>
 					{transactions.map((v,i)=>{
 						var confirmations = "n/a";
-						if (v.ethereumBlockNumber && m.currentBlockNumber) {
-							confirmations = (new BigNumber(v.ethereumBlockNumber)).minus(m.currentBlockNumber).toFormat();
+						if (v.blockNumber && m.currentBlockNumber) {
+							confirmations = (new BigNumber(v.blockNumber)).minus(m.currentBlockNumber).toFormat();
 							confirmations = (new BigNumber(m.currentBlockNumber)).minus(
-								new BigNumber(v.ethereumBlockNumber)
+								new BigNumber(v.blockNumber)
 							).toFormat();
 						}
 						var opened = (s.openedTransactions||{})[""+v.id];
 						var descIsSmall = (v.comment || "").length < 100;
 						var tx, isSystemId;// = tx in v ? v.tx || v.address
-						if ('ethereumTransactionHash' in v) {
+						if ('transactionHash' in v) {
 							isSystemId = false;
-							tx = v.ethereumTransactionHash;
+							tx = v.transactionHash;
 							if (!tx) {
 								isSystemId = true;
 								tx = ''+v.id;

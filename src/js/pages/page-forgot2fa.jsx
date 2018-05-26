@@ -101,7 +101,7 @@ class PageForgot2FA extends T.Page {
 			</div></T.If>
 			<T.If v={s.serverEr}><div className="mt-4">
 				<p style={{textAlign:"center"}}>Some error...</p>
-				<T.Form.ServerError {...s.serverEr} />
+				<T.Form.ServerError m={m} {...s.serverEr} />
 			</div></T.If>
 			<div className="d-flex flex-column align-items-center mt-4 mb-4">
 				<button type="button"

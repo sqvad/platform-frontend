@@ -19,13 +19,18 @@ class PageSet2FA extends T.Page {
 			<T.Page.PageWrapWidth key="width" m={m} {...p}>
 				<h1 className="h1-center d-flex flex-column align-items-center">
 					<T.If v={!m.device.isMobile}>
-						<img src="/img/set2fa-header.png" width="311" height="122" className="d-block mb-4"/>
+						<img src="/img/set2fa-header-311.png" width="311" height="122" className="d-block mb-4"/>
 					</T.If>
 					<T.If v={m.device.isMobile}>
-						<img src="/img/set2fa-header.png" width="240" height="94" className="d-block mb-4"/>
+						<img src={[
+							"/img/set2fa-header-",
+							m.device.retina==1 ? "240" : "",
+							m.device.retina==2 ? "480" : "",
+							m.device.retina!=1 && m.device.retina!=2 ? "720" : "",
+							,".png"
+						].filter(v=>!!v).join("")} width="240" height="94" className="d-block mb-4"/>
 					</T.If>
-					PLEASE SETUP <nobr>2-FACTOR</nobr> AUTHENTICATION
-					<br />
+					<span>PLEASE SETUP <nobr>2-FACTOR</nobr> AUTHENTICATION</span>
 				</h1>
 				<p className="h1-addition">
 					2-factor authentication (2FA) <nobr>is a reliable</nobr> and simple way to keep <nobr>the account safe.</nobr>
